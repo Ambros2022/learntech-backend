@@ -1,0 +1,26 @@
+module.exports = (sequelize, Sequelize) => {
+    const college_recognition = sequelize.define("college_recognition", {
+        recognition_id: {
+        type: Sequelize.INTEGER
+      },
+  
+      college_and_university_id: {
+        type: Sequelize.INTEGER
+      },
+      
+    }
+      ,
+      {
+  
+        timestamps: true,
+        underscored: true,
+        createdAt: "created_at",
+        updatedAt: "updated_at"
+      }
+  
+  
+    );
+  
+    return  college_recognition;
+  };
+  
