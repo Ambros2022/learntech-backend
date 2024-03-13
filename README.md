@@ -1,5 +1,5 @@
 +
-
+eegit 
 
 preproddatabase = bstudynode
 live database name = bangalore_study_react
