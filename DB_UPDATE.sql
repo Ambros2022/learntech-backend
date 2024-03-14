@@ -51,70 +51,264 @@ CREATE TABLE cities (
 ALTER TABLE cities
 ADD COLUMN city_type ENUM('main', 'default') DEFAULT 'default';
 
-CREATE TABLE colleges (
-    id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    country_id INT,
-    state_id INT,
-    city_id INT,
+CREATE TABLE levels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
-    slug VARCHAR(150) NOT NULL,
-    type ENUM('college','university','board') DEFAULT 'college',
-    status ENUM('Draft', 'Published') DEFAULT 'Published',
-    home_view_status ENUM('top_college', 'default') DEFAULT 'default',
-    college_type ENUM('Public','Deemed','Private','Government','Autonomous') DEFAULT NULL,
-    genders_accepted ENUM('Male','Female','Co-Ed') DEFAULT NULL,
-    campus_size_type ENUM('Acres', 'Cent') DEFAULT NULL,
-    listing_order BIGINT DEFAULT 99999,
-    established VARCHAR(150) DEFAULT NULL,
-    meta_title VARCHAR(150) DEFAULT NULL,
-    meta_description VARCHAR(200) DEFAULT NULL,
-    meta_keyword VARCHAR(300) DEFAULT NULL,
-    campus_size VARCHAR(150) DEFAULT NULL,
-    address VARCHAR(150) DEFAULT NULL,
-    map VARCHAR(200) DEFAULT NULL,
-    icon VARCHAR(150) DEFAULT NULL,
-    logo VARCHAR(150) DEFAULT NULL,
-    video_url VARCHAR(150) DEFAULT NULL,
-    avg_rating FLOAT DEFAULT NULL,
-    about LONGTEXT DEFAULT NULL,
-    scholarship LONGTEXT DEFAULT NULL,
-    exam_data LONGTEXT DEFAULT NULL,
-    why_choose LONGTEXT DEFAULT NULL,
-    career_opportunities LONGTEXT DEFAULT NULL,
-    placements LONGTEXT DEFAULT NULL,
-    undergraduate LONGTEXT DEFAULT NULL,
-    postgraduate LONGTEXT DEFAULT NULL,
-    doctorate LONGTEXT DEFAULT NULL,
-    diploma LONGTEXT DEFAULT NULL,
-    admissions LONGTEXT DEFAULT NULL,
-    FOREIGN KEY (country_id) REFERENCES countries(id) ON DELETE SET NULL,
-    FOREIGN KEY (state_id) REFERENCES states(id) ON DELETE SET NULL,
-    FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE SET NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
-
-
-
-
-CREATE TABLE college_streams (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    stream_id INT,
-    college_id INT,
+CREATE TABLE recognition_and_approvals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    recognition_approval_name VARCHAR(150) NOT NULL,
+    recognition_approval_slug VARCHAR(150) DEFAULT NULL,
+    recognition_approval_full_name VARCHAR(150) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (stream_id) REFERENCES streams(id),
-    FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE amenities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    amenities_name VARCHAR(150) NOT NULL,
+    amenities_slug VARCHAR(150) DEFAULT NULL,
+    amenities_logo VARCHAR(150) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE banners (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(200) DEFAULT NULL,
+  link VARCHAR(200) DEFAULT NULL,
+  image VARCHAR(150) DEFAULT NULL,
+  description VARCHAR(300) DEFAULT NULL,
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  promo_banner ENUM('Draft', 'All_Exams_page', 'All_News_page', 'All_Scholarship_page', 'Nri_page', 'Study_Abroad_page', 'All_college_page', 'All_university_page', 'All_school_page', 'Services_Page') DEFAULT 'Draft',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE pages (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  url VARCHAR(150) DEFAULT NULL,
+  top_description LONGTEXT DEFAULT NULL,
+  bottom_description LONGTEXT DEFAULT NULL,
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keyword VARCHAR(200) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE school_boards (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE schools (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  country_id INT,
+  state_id INT,
+  city_id INT,
+  school_board_id INT,
+  name VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  home_view_status ENUM('top_school', 'default') DEFAULT 'default',
+  school_type ENUM('Public', 'Deemed', 'Private', 'Government', 'Autonomous') DEFAULT 'Private',
+  listing_order BIGINT DEFAULT 99999,
+  established VARCHAR(150) DEFAULT NULL,
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keyword VARCHAR(300) DEFAULT NULL,
+  address VARCHAR(150) DEFAULT NULL,
+  map VARCHAR(200) DEFAULT NULL,
+  icon VARCHAR(150) DEFAULT NULL,
+  banner_image VARCHAR(150) DEFAULT NULL,
+  video_url VARCHAR(150) DEFAULT NULL,
+  avg_rating FLOAT DEFAULT NULL,
+  info LONGTEXT DEFAULT NULL,
+  admissions_process LONGTEXT DEFAULT NULL,
+  extracurriculars LONGTEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (country_id) REFERENCES countries(id),
+  FOREIGN KEY (state_id) REFERENCES states(id),
+  FOREIGN KEY (city_id) REFERENCES cities(id),
+  FOREIGN KEY (school_board_id) REFERENCES school_boards(id)
+);
+CREATE TABLE school_levels (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  level_id INT,
+  school_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (level_id) REFERENCES levels(id),
+  FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+CREATE TABLE school_amenities (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  amenitie_id INT,
+  school_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (amenitie_id) REFERENCES amenities(id),
+  FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+CREATE TABLE school_galleries (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  school_id INT,
+  image VARCHAR(200) NOT NULL,
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+CREATE TABLE school_faqs (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  school_id INT,
+  questions LONGTEXT DEFAULT NULL,
+  answers LONGTEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS `amenities` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `amenities_name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `amenities_slug` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `amenities_logo` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `amenities_amenities_slug_unique` (`amenities_slug`)
-) ENGINE = InnoDB AUTO_INCREMENT = 12 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE streams (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  h1_title VARCHAR(150) NOT NULL,
+  logo VARCHAR(150) DEFAULT NULL,
+  description LONGTEXT DEFAULT NULL,
+  top_college LONGTEXT DEFAULT NULL,
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keyword VARCHAR(200) DEFAULT NULL,
+  listing_order BIGINT DEFAULT 99999,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+CREATE TABLE stream_faqs (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  stream_id INT,
+  questions LONGTEXT DEFAULT NULL,
+  answers LONGTEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (stream_id) REFERENCES streams(id) ON DELETE CASCADE
+);
+CREATE TABLE sub_streams (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  stream_id INT,
+  sub_stream_name VARCHAR(150) NOT NULL,
+  sub_stream_slug VARCHAR(150) NOT NULL,
+  sub_stream_description VARCHAR(200) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (stream_id) REFERENCES streams(id)
+);
+CREATE TABLE general_courses (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  stream_id INT,
+  sub_streams_id INT,
+  course_type ENUM('UG', 'PG', 'Diploma', 'Doctorate', 'Default') DEFAULT 'Default',
+  name VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  short_name VARCHAR(300) DEFAULT NULL,
+  duration VARCHAR(300) DEFAULT NULL,
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keywords VARCHAR(200) DEFAULT NULL,
+  description LONGTEXT DEFAULT NULL,
+  syllabus LONGTEXT DEFAULT NULL,
+  admissions LONGTEXT DEFAULT NULL,
+  career_opportunities LONGTEXT DEFAULT NULL,
+  top_college LONGTEXT DEFAULT NULL,
+  logo VARCHAR(150) DEFAULT NULL,
+  is_trending TINYINT(1) NOT NULL DEFAULT 0,
+  is_top_rank TINYINT(1) NOT NULL DEFAULT 0,
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (stream_id) REFERENCES streams(id),
+  FOREIGN KEY (sub_streams_id) REFERENCES sub_streams(id)
+);
+CREATE TABLE general_course_faqs (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  general_course_id INT,
+  questions LONGTEXT DEFAULT NULL,
+  answers LONGTEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (general_course_id) REFERENCES general_courses(id)  ON DELETE CASCADE
+);
+
+CREATE TABLE colleges (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  country_id INT,
+  state_id INT,
+  city_id INT,
+  name VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  type ENUM('college', 'university', 'board') DEFAULT 'college',
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  home_view_status ENUM('top_college', 'default') DEFAULT 'default',
+  college_type ENUM('Public', 'Deemed', 'Private', 'Government', 'Autonomous') DEFAULT NULL,
+  listing_order BIGINT DEFAULT 99999,
+  established VARCHAR(150) DEFAULT NULL,
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keyword VARCHAR(300) DEFAULT NULL,
+  address VARCHAR(150) DEFAULT NULL,
+  map VARCHAR(200) DEFAULT NULL,
+  icon VARCHAR(150) DEFAULT NULL,
+  logo VARCHAR(150) DEFAULT NULL,
+  banner_image VARCHAR(150) DEFAULT NULL,
+  video_url VARCHAR(150) DEFAULT NULL,
+  avg_rating FLOAT DEFAULT NULL,
+  info LONGTEXT DEFAULT NULL,
+  admissions LONGTEXT DEFAULT NULL,
+  placements LONGTEXT DEFAULT NULL,
+  rankings LONGTEXT DEFAULT NULL,
+  scholarship LONGTEXT DEFAULT NULL,
+  hostel LONGTEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (country_id) REFERENCES countries(id),
+  FOREIGN KEY (state_id) REFERENCES states(id),
+  FOREIGN KEY (city_id) REFERENCES cities(id)
+);
+CREATE TABLE college_streams (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  stream_id INT,
+  college_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (stream_id) REFERENCES streams(id),
+  FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE
+);
+CREATE TABLE courses (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  college_id INT,
+  general_course_id INT,
+  course_type ENUM('UG', 'PG', 'Diploma', 'Doctorate', 'Default') DEFAULT 'Default',
+  slug VARCHAR(150) NOT NULL,
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keywords VARCHAR(200) DEFAULT NULL,
+  course_details LONGTEXT DEFAULT NULL,
+  eligibility LONGTEXT DEFAULT NULL,
+  fee_structure LONGTEXT DEFAULT NULL,
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (college_id) REFERENCES colleges(id),
+  FOREIGN KEY (general_course_id) REFERENCES general_courses(id)
+);
+
+
+
+
+
+
+
+
