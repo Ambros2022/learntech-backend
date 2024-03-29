@@ -1,15 +1,20 @@
 const { authJwt, globalvalidation } = require("../middleware");
+const countriesController = require("../controllers/countries.controller.js");
+const statecontroller = require("../controllers/state.controller");
+const citycontroller = require("../controllers/city.controller");
+const amenitiescontroller = require("../controllers/amenities.controller");
+const schoolboardcontroller = require("../controllers/schoolboard.controller");
+const schoolcontroller = require("../controllers/school.controller");
+
 const admincontroller = require("../controllers/admin.controller");
 const accreditationscontroller = require("../controllers/accreditations.controller");
 const systemconficontroller = require("../controllers/systemconfig.controller");
-const amenitiescontroller = require("../controllers/amenities.controller");
 const streamcontroller = require("../controllers/stream.controller");
 const substreamcontroller = require("../controllers/substream.controller");
 const pagecontroller = require("../controllers/page.controller");
 const winston = require("../config/winston");
 const managementcontroller = require("../controllers/management.controller");
 const enquirycontroller = require("../controllers/enquiry.controller");
-const citycontroller = require("../controllers/city.controller");
 const areacontroller = require("../controllers/area.controller");
 const bannercontroller = require("../controllers/banner.controller");
 const generalcoursecontroller = require("../controllers/generalcourse.controller.js");
@@ -22,8 +27,6 @@ const servicecontroller = require("../controllers/service.controller");
 const authorcontroller = require("../controllers/author.controller");
 const categoriescontroller = require("../controllers/categories.controller");
 const blogcontroller = require("../controllers/blog.controller");
-const schoolcontroller = require("../controllers/school.controller");
-const schoolboardcontroller = require("../controllers/schoolboard.controller");
 const polytechniccontroller = require("../controllers/polytechnic.controller");
 const reviewcontroller = require("../controllers/review.controller");
 const upcoming_coursescontroller = require("../controllers/upcoming_courses.controller");
@@ -48,17 +51,19 @@ const websiteimagepopupcontroller = require("../controllers/websitepopupimage.co
 const redirecturlcontroller = require("../controllers/redirecturl.controller");
 const promopagecontroller = require("../controllers/promopage.controller");
 const newsandeventscontroller = require("../controllers/newsandevents.controller");
-const examcontroller= require("../controllers/exam.controller");
-const usercontroller= require("../controllers/user.controller");
-const databackupcontroller= require("../controllers/databackup.controller");
-const scholarshipcontroller= require("../controllers/scholarship.controller");
+const examcontroller = require("../controllers/exam.controller");
+const usercontroller = require("../controllers/user.controller");
+const databackupcontroller = require("../controllers/databackup.controller");
+const scholarshipcontroller = require("../controllers/scholarship.controller");
 
-const abroadcountriescontroller= require("../controllers/abroadcountries.controller");
-const abroaduniversitiescontroller= require("../controllers/abroaduniversities.controller");
-const youtubevideoscontroller= require("../controllers/youtubevideos.controller");
+const abroadcountriescontroller = require("../controllers/abroadcountries.controller");
+const abroaduniversitiescontroller = require("../controllers/abroaduniversities.controller");
+const youtubevideoscontroller = require("../controllers/youtubevideos.controller");
 
 
-const countriesController = require("../controllers/countries.controller.js");
+
+
+
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -77,19 +82,19 @@ module.exports = function (app) {
     winston.log(
       "info",
       "Method:" +
-        req.method +
-        " Path:" +
-        req.path +
-        " Request Body:" +
-        req.ip +
-        " Request IP:" +
-        requestBody +
-        " statusCode:" +
-        res.statusCode +
-        " headers:" +
-        req.headers +
-        "Time" +
-        new Date()
+      req.method +
+      " Path:" +
+      req.path +
+      " Request Body:" +
+      req.ip +
+      " Request IP:" +
+      requestBody +
+      " statusCode:" +
+      res.statusCode +
+      " headers:" +
+      req.headers +
+      "Time" +
+      new Date()
     );
     winston.log("info", "--------------------------------------------------");
 
@@ -120,7 +125,7 @@ module.exports = function (app) {
     countriesController.findOne
   );
 
- 
+
 
   app.put(
     "/api/admin/countries/update",
@@ -135,6 +140,147 @@ module.exports = function (app) {
     countriesController.delete
   );
 
+  /**  state Routes End*/
+  app.get(
+    "/api/admin/state/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    statecontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/state/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    statecontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/state/add",
+    globalvalidation.stateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    statecontroller.create
+  );
+
+  app.post(
+    "/api/admin/state/update",
+    globalvalidation.updatestateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    statecontroller.update
+  );
+
+  app.post(
+    "/api/admin/state/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    statecontroller.delete
+  );
+
+  /**  state Routes End*/
+
+  /**  city Routes End*/
+  app.get(
+    "/api/admin/city/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    citycontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/city/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    citycontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/city/add",
+    globalvalidation.citySchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    citycontroller.create
+  );
+
+  app.post(
+    "/api/admin/city/update",
+    globalvalidation.cityUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    citycontroller.update
+  );
+
+  app.post(
+    "/api/admin/city/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    citycontroller.delete
+  );
+
+  /**  city Routes End*/
+
+  /**  Amenities Routes Start*/
+  app.get(
+    "/api/admin/amenities/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    amenitiescontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/amenities/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    amenitiescontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/amenities/add",
+    globalvalidation.AmenitiesSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    amenitiescontroller.create
+  );
+
+  app.post(
+    "/api/admin/amenities/update",
+    globalvalidation.AmenitiesSchemaUpdate,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    amenitiescontroller.update
+  );
+
+  app.post(
+    "/api/admin/amenities/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    amenitiescontroller.delete
+  );
+  /** amenities Routes End*/
+
+
+  //**** schoolboard  Routes start  *****/
+
+  app.get(
+    "/api/admin/schoolboard/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardcontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/schoolboard/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardcontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/schoolboard/add",
+    globalvalidation.schoolboardSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardcontroller.create
+  );
+
+  app.post(
+    "/api/admin/schoolboard/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardcontroller.delete
+  );
+
+  app.post(
+    "/api/admin/schoolboard/update",
+    globalvalidation.schoolboardUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardcontroller.update
+  );
+
+
+
 
   app.get(
     "/api/admin/dashboardcounts",
@@ -143,8 +289,8 @@ module.exports = function (app) {
   );
 
 
-   /* abroaduniversitiescontroller Routes start*/
-   app.get(
+  /* abroaduniversitiescontroller Routes start*/
+  app.get(
     "/api/admin/abroaduniversities/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     abroaduniversitiescontroller.findAll
@@ -177,10 +323,10 @@ module.exports = function (app) {
   );
 
   /* abroaduniversitiescontroller Routes End*/
-  
 
-   /* abroardcountries Routes start*/
-   app.get(
+
+  /* abroardcountries Routes start*/
+  app.get(
     "/api/admin/abroadcountries/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     abroadcountriescontroller.findAll
@@ -700,7 +846,7 @@ module.exports = function (app) {
   //**** Review Routes start  *****/
 
   app.get(
-    "/api/admin/review/get",reviewcontroller.findAll
+    "/api/admin/review/get", reviewcontroller.findAll
   );
 
   app.get(
@@ -711,7 +857,7 @@ module.exports = function (app) {
 
   app.post(
     "/api/admin/review/add",
-    globalvalidation.reviewSchema,reviewcontroller.create
+    globalvalidation.reviewSchema, reviewcontroller.create
   );
 
   app.post(
@@ -790,40 +936,8 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     schoolcontroller.updategallery
   );
-  
-  //**** schoolboard  Routes start  *****/
 
-  app.get(
-    "/api/admin/schoolboard/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolboardcontroller.findAll
-  );
 
-  app.get(
-    "/api/admin/schoolboard/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolboardcontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/schoolboard/add",
-    globalvalidation.schoolboardSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolboardcontroller.create
-  );
-
-  app.post(
-    "/api/admin/schoolboard/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolboardcontroller.delete
-  );
-
-  app.post(
-    "/api/admin/schoolboard/update",
-    globalvalidation.schoolboardUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolboardcontroller.update
-  );
 
   //**** polytechnic Routes start  *****/
 
@@ -997,7 +1111,7 @@ module.exports = function (app) {
   );
   app.get(
     "/api/admin/generalcourse/get/:id",
-    [ globalvalidation.Validate],
+    [globalvalidation.Validate],
     generalcoursecontroller.findOne
   );
 
@@ -1042,39 +1156,7 @@ module.exports = function (app) {
   );
   /** accreditations Routes End*/
 
-  /**  Amenities Routes Start*/
-  app.get(
-    "/api/admin/amenities/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    amenitiescontroller.findAll
-  );
 
-  app.get(
-    "/api/admin/amenities/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    amenitiescontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/amenities/add",
-    globalvalidation.AmenitiesSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    amenitiescontroller.create
-  );
-
-  app.post(
-    "/api/admin/amenities/update",
-    globalvalidation.AmenitiesSchemaUpdate,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    amenitiescontroller.update
-  );
-
-  app.post(
-    "/api/admin/amenities/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    amenitiescontroller.delete
-  );
-  /** amenities Routes End*/
 
   /**  Stream Routes Start*/
   app.get(
@@ -1082,7 +1164,7 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     streamcontroller.findAll
   );
-//authJwt.verifyToken, authJwt.isAdmin, 
+  //authJwt.verifyToken, authJwt.isAdmin, 
   app.get(
     "/api/admin/stream/get/:id",
     [globalvalidation.Validate],
@@ -1094,7 +1176,7 @@ module.exports = function (app) {
     [globalvalidation.Validate],
     streamcontroller.findOneWebView
   );
-  
+
   app.post(
     "/api/admin/stream/add",
     globalvalidation.StreamSchema,
@@ -1194,40 +1276,7 @@ module.exports = function (app) {
 
   /**  page Routes End*/
 
-  /**  city Routes End*/
-  app.get(
-    "/api/admin/city/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    citycontroller.findAll
-  );
 
-  app.get(
-    "/api/admin/city/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    citycontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/city/add",
-    globalvalidation.citySchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    citycontroller.create
-  );
-
-  app.post(
-    "/api/admin/city/update",
-    globalvalidation.cityUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    citycontroller.update
-  );
-
-  app.post(
-    "/api/admin/city/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    citycontroller.delete
-  );
-
-  /**  city Routes End*/
 
   /**  area Routes start*/
 
@@ -1913,6 +1962,7 @@ module.exports = function (app) {
   );
 
   /**Scholarship route end   */
+
 
 
 

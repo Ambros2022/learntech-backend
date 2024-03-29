@@ -79,30 +79,47 @@ exports.create = async (req, res) => {
         ? null
         : req.body.listing_order;
     const schoolDetails = await school.create({
-      school_name: req.body.school_name,
-      school_slug: req.body.school_slug,
-      video_url: req.body.video_url ? req.body.video_url : null,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      meta_description: req.body.meta_description
-        ? req.body.meta_description
-        : null,
-      area_id: req.body.area_id,
-      // school_board_id: req.body.school_board_id,
+      country_id: req.body.country_id,
+      state_id: req.body.state_id,
+      // video_url: req.body.video_url ? req.body.video_url : null,
+      // meta_title: req.body.meta_title ? req.body.meta_title : null,
+      // meta_description: req.body.meta_description
+      //   ? req.body.meta_description
+      //   : null,
+      // area_id: req.body.area_id,
+      // // school_board_id: req.body.school_board_id,
+      // city_id: req.body.city_id,
+      // school_type_id: req.body.school_type_id,
+      // // school_level_id: req.body.school_level_id,
       city_id: req.body.city_id,
-      school_type_id: req.body.school_type_id,
-      // school_level_id: req.body.school_level_id,
-      genders_accepted: req.body.genders_accepted,
-      established: req.body.established ? req.body.established : null,
-      status: req.body.status ? req.body.status : null,
-      address: req.body.address ? req.body.address : null,
-      map: req.body.map ? req.body.map : null,
-      total_seats: total_seats,
-      listing_order: listingvalue,
-      about: req.body.about ? req.body.about : null,
-      extra_curricular: req.body.extra_curricular
-        ? req.body.extra_curricular
-        : null,
-      school_logo: logonames,
+      school_board_id: req.body.school_board_id,
+      name: req.body.name,
+      slug: req.body.slug,
+      status: req.body.status,
+      home_view_status: req.body.home_view_status,
+      school_type: req.body.school_type,
+      listing_order: req.body.listing_order,
+      established: req.body.established,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keyword: req.body.meta_keyword,
+      address: req.body.address,
+      map: req.body.map,
+      icon: req.body.icon,
+      banner_image: req.body.banner_image,
+      video_url: req.body.video_url,
+      avg_rating: req.body.avg_rating,
+      info: req.body.info,
+      admissions_process: req.body.admissions_process,
+      extracurriculars: req.body.extracurriculars,
+      // banner_image: req.body.banner_image,
+      // total_seats: total_seats,
+      // listing_order: listingvalue,
+      // about: req.body.about ? req.body.about : null,
+      // extra_curricular: req.body.extra_curricular
+      //   ? req.body.extra_curricular
+      //   : null,
+      // school_logo: logonames,
     });
 
     if (req.body.board_id && schoolDetails.id) {

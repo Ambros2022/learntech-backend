@@ -5,31 +5,31 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
       },
-      established: {
-        type: Sequelize.STRING,
-      },
-      city_id: {
-        type: Sequelize.INTEGER,
-      },
-      area_id: {
-        type: Sequelize.INTEGER,
-      },
-      rank: {
-        type: Sequelize.INTEGER,
-      },
+      // established: {
+      //   type: Sequelize.STRING,
+      // },
+      // city_id: {
+      //   type: Sequelize.INTEGER,
+      // },
+      // area_id: {
+      //   type: Sequelize.INTEGER,
+      // },
+      // rank: {
+      //   type: Sequelize.INTEGER,
+      // },
       slug: {
         type: Sequelize.STRING,
       },
 
-      address: {
-        type: Sequelize.STRING,
-      },
-      logo: {
-        type: Sequelize.STRING,
-      },
-      status: {
-        type: Sequelize.STRING,
-      },
+      // address: {
+      //   type: Sequelize.STRING,
+      // },
+      // logo: {
+      //   type: Sequelize.STRING,
+      // },
+      // status: {
+      //   type: Sequelize.STRING,
+      // },
     },
     {
       timestamps: true,
