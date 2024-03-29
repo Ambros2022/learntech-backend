@@ -43,6 +43,15 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
+      // include:[
+        
+      //     {
+      //       required: false,
+      //       association: "state",
+      //       attributes: ["id", "name"],
+      //     },
+        
+      // ],
       order: [orderconfig],
     })
     .then((data) => {

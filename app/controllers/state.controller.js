@@ -1,6 +1,6 @@
 const db = require("../models");
 const path = require('path');
-const city = db.city;
+const state = db.state;
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
 const Op = db.Sequelize.Op;
@@ -14,27 +14,27 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    const { count: totalItems, rows: city } = data;
+    const { count: totalItems, rows: state } = data;
     const currentPage = page ? +page : 1;
     const totalPages = Math.ceil(totalItems / limit);
-    return { totalItems, city, totalPages, currentPage };
+    return { totalItems, state, totalPages, currentPage };
 };
 
 exports.create = async (req, res) => {
 
     try {
-        const cityDetails = await city.create({
+        console.log("req.body", req.body);
+        const stateDetails = await state.create({
             name: req.body.name,
-            // city_slug: req.body.city_slug,
-            state_id: req.body.state_id,
-            // city_description: req.body.city_description,
+            country_id: req.body.country_id,
 
         });
 
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
-            data: cityDetails
+            data: stateDetails
+
         });
     }
     catch (error) {
@@ -62,20 +62,23 @@ exports.findAll = async (req, res) => {
     }
     var condition = sendsearch.customseacrh(searchText, searchfrom);
     const { limit, offset } = getPagination(page, size);
-    city.findAndCountAll({
-        where: condition, limit, offset, 
+    state.findAndCountAll({
+        where: condition, limit, offset,
 
         include: [
             {
                 required: false,
-                association: "state",
+                association: "country",
+                attributes: ["id", "name"],
+            },
+            {
+                required: false,
+                association: "city",
                 attributes: ["id", "name"],
             },
            
 
         ],
-        
-        
         order: [orderconfig]
     })
         .then(data => {
@@ -86,7 +89,7 @@ exports.findAll = async (req, res) => {
                 totalItems: response.totalItems,
                 currentPage: response.currentPage,
                 totalPages: response.totalPages,
-                data: response.city
+                data: response.state
             });
         })
         .catch(err => {
@@ -94,7 +97,7 @@ exports.findAll = async (req, res) => {
                 status: 0,
                 message:
 
-                    err.message || "Some error occurred while retrieving city."
+                    err.message || "Some error occurred while retrieving state."
             });
         });
 };
@@ -133,12 +136,12 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
     const id = req.body.id;
     try {
-        city.update
+        state.update
             ({
                 name: req.body.name,
+                country_id: req.body.country_id,
                 // city_slug: req.body.city_slug,
                 // city_description: req.body.city_description,
-                state_id: req.body.state_id,
                 //state_id: req.body.state_id ? req.body.state_id : null,
             },
                 {
@@ -158,9 +161,11 @@ exports.update = (req, res) => {
     }
 
 };
+
+
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    city.findByPk(id)
+    state.findByPk(id)
         .then(data => {
             if (data) {
                 res.status(200).send({
@@ -173,16 +178,15 @@ exports.findOne = (req, res) => {
             } else {
                 res.status(400).send({
                     status: 0,
-                    message: `Cannot find city with id=${id}.`
+                    message: `Cannot find state with id=${id}.`
                 });
             }
         })
         .catch(err => {
             res.status(500).send({
                 status: 0,
-                message: "Error retrieving city with id=" + id
+                message: "Error retrieving state with id=" + id
 
             });
         });
 };
-

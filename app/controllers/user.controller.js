@@ -9,6 +9,7 @@ var bcrypt = require("bcryptjs");
 var sendemails = require("../config/email.config");
 const ResetToken = db.resettokens;
 const sendsearch = require("../utility/Customsearch");
+const nodemailer = require('nodemailer');
 
 const getPagination = (page, size) => {
 
@@ -251,6 +252,71 @@ exports.signout = async (req, res) => {
   }
 };
 
+// exports.forgotPassword = async (req, res) => {
+//   var email = req.body.email;
+//   try {
+//     User.findOne({
+//       where: { email: email },
+//     }).then((user) => {
+//       if (!user) {
+//         return res.status(404).send({ message: "User Not found." });
+//       }
+
+//       function generator() {
+//         const ran1 = () =>
+//           [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].sort((x, z) => {
+//             ren = Math.random();
+//             if (ren == 0.5) return 0;
+//             return ren > 0.5 ? 1 : -1;
+//           });
+//         const ran2 = () =>
+//           ran1().sort((x, z) => {
+//             ren = Math.random();
+//             if (ren == 0.5) return 0;
+//             return ren > 0.5 ? 1 : -1;
+//           });
+
+//         return Array(6)
+//           .fill(null)
+//           .map((x) => ran2()[(Math.random() * 9).toFixed()])
+//           .join("");
+//       }
+
+//       var Otp = generator();
+
+//       ResetToken.create({
+//         email: req.body.email,
+//         expiration: 10,
+//         token: Otp,
+//         user_id: user.id,
+//         used: 0,
+//       });
+
+//       sendemails.forgotpasswordmail(req.body.email, Otp);
+
+//       return res.status(200).send({
+//         status: 1,
+//         message: "Reset otp sent to your email.",
+//         data: {
+//           id: user.id,
+//           email: user.email,
+//           Otp: Otp,
+//         },
+//       });
+//     });
+//   } catch (error) {
+//     return res.status(400).send({
+//       message: "Unable to insert data",
+//       errors: error,
+//       status: 0,
+//     });
+//   }
+// };
+
+
+
+// Assuming you have the sendemails module which contains forgotpasswordmail function
+
 exports.forgotPassword = async (req, res) => {
   var email = req.body.email;
   try {
@@ -291,7 +357,31 @@ exports.forgotPassword = async (req, res) => {
         used: 0,
       });
 
-      sendemails.forgotpasswordmail(req.body.email, Otp);
+      // Nodemailer configuration
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'amankumar0149@gmail.com', // Your Gmail email address
+          pass: '922912', // Your Gmail password
+        },
+      });
+
+      // Email options
+      const mailOptions = {
+        from: 'amankumar0149@gmail.com', // Sender's email address
+        to: req.body.email, // Recipient's email address
+        subject: 'Password Reset OTP', // Email subject
+        text: `Your OTP for password reset is: ${Otp}`, // Email body
+      };
+
+      // Sending email
+      transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
 
       return res.status(200).send({
         status: 1,
@@ -311,6 +401,7 @@ exports.forgotPassword = async (req, res) => {
     });
   }
 };
+
 
 exports.tokenverify = async (req, res) => {
   try {

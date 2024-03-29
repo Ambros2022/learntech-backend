@@ -25,66 +25,90 @@ const getPagingData = (data, page, limit) => {
   return { totalItems, schoolboards, totalPages, currentPage };
 };
 
+// exports.create = async (req, res) => {
+//   try {
+//     let logonames = "";
+
+//     if (req.files && req.files.logo) {
+//       let avatar = req.files.logo;
+
+//       // Check if the uploaded file is allowed
+//       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+//         return res.status(400).send({
+//           message: "Invalid File type ",
+//           errors: {},
+//           status: 0,
+//         });
+//       }
+
+//       if (avatar.size / (1024 * 1024) > allowed_file_size) {
+//         return res.status(400).send({
+//           message: "File too large ",
+//           errors: {},
+//           status: 0,
+//         });
+//       }
+
+//       let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+//       let IsUpload = avatar.mv("./storage/schoolboards_logo/" + logoname)
+//         ? 1
+//         : 0;
+
+//       if (IsUpload) {
+//         logonames = "schoolboards_logo/" + logoname;
+//       }
+//     }
+
+//     const schoolboardsDetails = await schoolboards.create({
+//       name: req.body.name,
+//       city_id: req.body.city_id,
+//       area_id: req.body.area_id,
+//       slug: req.body.slug,
+//       status: req.body.status,
+//       rank: req.body.rank ? req.body.rank : null,
+//       address: req.body.address ? req.body.address : null,
+//       established: req.body.established ? req.body.established : null,
+//       logo: logonames,
+//     });
+
+//     res.status(200).send({
+//       status: 1,
+//       message: "Data Save Successfully",
+//       data: schoolboardsDetails,
+//     });
+//   } catch (error) {
+//     return res.status(400).send({
+//       message: "Unable to insert data",
+//       errors: error,
+//       status: 0,
+//     });
+//   }
+// };
+
 exports.create = async (req, res) => {
+
   try {
-    let logonames = "";
+      const schoolboardsDetails = await schoolboards.create({
+          name: req.body.name,
+          slug: req.body.slug,
+          // status: req.body.status,
+  });
 
-    if (req.files && req.files.logo) {
-      let avatar = req.files.logo;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/schoolboards_logo/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        logonames = "schoolboards_logo/" + logoname;
-      }
-    }
-
-    const schoolboardsDetails = await schoolboards.create({
-      name: req.body.name,
-      city_id: req.body.city_id,
-      area_id: req.body.area_id,
-      slug: req.body.slug,
-      status: req.body.status,
-      rank: req.body.rank ? req.body.rank : null,
-      address: req.body.address ? req.body.address : null,
-      established: req.body.established ? req.body.established : null,
-      logo: logonames,
-    });
-
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-      data: schoolboardsDetails,
-    });
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to insert data",
-      errors: error,
-      status: 0,
-    });
+      res.status(200).send({
+          status: 1,
+          message: 'Data Save Successfully',
+          data: schoolboardsDetails
+      });
   }
-};
+  catch (error) {
+      return res.status(400).send({
+          message: 'Unable to insert data',
+          errors: error,
+          status: 0
+      });
+  }
+}
 
 exports.findAll = async (req, res) => {
   const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
@@ -107,10 +131,10 @@ exports.findAll = async (req, res) => {
       where: condition,
       limit,
       offset,
-      include: [
-        { association: "citys", attributes: ["id", "city_name"] },
-        { association: "areas", attributes: ["id", "area_name"] },
-      ],
+      // include: [
+      //   { association: "citys", attributes: ["id", "city_name"] },
+      //   { association: "areas", attributes: ["id", "area_name"] },
+      // ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -164,12 +188,7 @@ exports.delete = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
   schoolboards
-    .findByPk(id, {
-      include: [
-        { association: "citys", attributes: ["id", "city_name"] },
-        { association: "areas", attributes: ["id", "area_name"] },
-      ],
-    })
+    .findByPk(id)
     .then((data) => {
       if (data) {
         res.status(200).send({

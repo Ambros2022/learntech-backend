@@ -4,9 +4,11 @@ const Amenities = db.amenities;
 const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
 const Op = db.Sequelize.Op;
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
+// const fs = require('fs');
+const fs = require('fs').promises;
 
 // Allowed file size in mb
 const allowed_file_size = 2;
@@ -48,6 +50,14 @@ exports.create = async (req, res) => {
           status: 0,
         });
       }
+
+// if (avatar.size / (1024 * 1024) > allowed_file_size) {
+//   return res.status(400).send({
+//     message: "Invalid File type ",
+//     errors: {},
+//     status: 0,
+//   });
+// }
 
       let logoname = "logo" + Date.now() + path.extname(avatar.name);
 
@@ -122,7 +132,7 @@ exports.findAll = async (req, res) => {
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: err.message || "Some error occurred while retrieving Streams.",
+        message: err.message || "Some error occurred while retrieving amenities.",
       });
     });
 };
@@ -136,19 +146,19 @@ exports.delete = (req, res) => {
       if (num == 1) {
         res.status(200).send({
           status: 1,
-          message: "Stream  deleted successfully",
+          message: "amenities  deleted successfully",
         });
       } else {
         res.status(400).send({
           status: 0,
-          message: `delete Sub Stream with id=${id}. Maybe Stream was not found!`,
+          message: `delete Sub amenities with id=${id}. Maybe amenities was not found!`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Could not delete Stream with id=" + id,
+        message: "Could not delete amenities with id=" + id,
       });
     });
 };
@@ -166,14 +176,14 @@ exports.findOne = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find Stream with id=${id}.`,
+          message: `Cannot find amenities with id=${id}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving stream with id=" + id,
+        message: "Error retrieving amenities with id=" + id,
       });
     });
 };
