@@ -305,6 +305,22 @@ CREATE TABLE courses (
   FOREIGN KEY (general_course_id) REFERENCES general_courses(id)
 );
 
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (1, 'Pre-Primary', NULL, NULL);
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (2, 'Primary', NULL, NULL);
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (3, 'Secondary', NULL, NULL);
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (4, 'Higher Secondary', NULL, NULL);
 
 
 
