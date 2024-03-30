@@ -184,10 +184,8 @@ const stateSchema = [
     .withMessage("state name is required")
     .isLength({ max: 150 })
     .withMessage("state name should be less than 150 character"),
+  ...validateIdRequired_id(countries, "country_id"),
 
-    body("country_id")
-    .exists({ checkFalsy: true })
-    .withMessage("country id  is required")
 ];
 
 const updatestateSchema = [
@@ -196,35 +194,11 @@ const updatestateSchema = [
     .withMessage("state name is required")
     .isLength({ max: 150 })
     .withMessage("state name should be less than 150 character"),
+    
+  ...validateIdRequired_id(state, "id"),
+  ...validateIdRequired_id(countries, "id"),
 
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return state
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((state) => {
-          if (state) {
-            return true;
-          } else {
-            return Promise.reject("state Does not exist");
-          }
-        });
-    }),
 
-      body("country_id")
-        .exists({ checkFalsy: true })
-        .withMessage(`country id is required`)
-        .custom(async (value) => {
-          const states = await state.findByPk(value);
-          if (!states) {
-            throw new Error(`country id does not exist`);
-          }
-        }),
 ];
 
 const citySchema = [
@@ -234,7 +208,7 @@ const citySchema = [
     .isLength({ max: 150 })
     .withMessage("city name should be less than 150 character"),
 
-    body("state_id")
+  body("state_id")
     .exists({ checkFalsy: true })
     .withMessage("state id  is required")
 ];
@@ -265,15 +239,15 @@ const cityUpdateSchema = [
         });
     }),
 
-    body("state_id")
-        .exists({ checkFalsy: true })
-        .withMessage(`state id is required`)
-        .custom(async (value) => {
-          const cities = await city.findByPk(value);
-          if (!cities) {
-            throw new Error(`state id does not exist`);
-          }
-        }),
+  body("state_id")
+    .exists({ checkFalsy: true })
+    .withMessage(`state id is required`)
+    .custom(async (value) => {
+      const cities = await city.findByPk(value);
+      if (!cities) {
+        throw new Error(`state id does not exist`);
+      }
+    }),
 ];
 
 const AmenitiesSchema = [
@@ -287,71 +261,71 @@ const AmenitiesSchema = [
     .exists({ checkFalsy: true })
     .withMessage("Slug is required")
     .isLength({ max: 150 })
-.withMessage("Slug should be less than 150 character")
-.custom((value) => {
-  return Amenities.findOne({
-    where: {
-      amenities_slug: value,
-    },
-  }).then((Amenities) => {
-    if (Amenities) {
-      return Promise.reject("Slug already in use");
-    } else {
-      // Indicates the success of this synchronous custom validator
-      return true;
-    }
-  });
-}),
+    .withMessage("Slug should be less than 150 character")
+    .custom((value) => {
+      return Amenities.findOne({
+        where: {
+          amenities_slug: value,
+        },
+      }).then((Amenities) => {
+        if (Amenities) {
+          return Promise.reject("Slug already in use");
+        } else {
+          // Indicates the success of this synchronous custom validator
+          return true;
+        }
+      });
+    }),
 ];
 const AmenitiesSchemaUpdate = [
-body("amenities_name")
-.exists({ checkFalsy: true })
-.withMessage("Amenities name is required")
-.isLength({ max: 150 })
-.withMessage("Amenities name should be less than 150 character"),
+  body("amenities_name")
+    .exists({ checkFalsy: true })
+    .withMessage("Amenities name is required")
+    .isLength({ max: 150 })
+    .withMessage("Amenities name should be less than 150 character"),
 
-body("id")
-.exists({ checkFalsy: true })
-.withMessage("id is required")
-.custom((value) => {
-  return Amenities.findOne({
-    where: {
-      id: value,
-    },
-  }).then((Amenities) => {
-    if (Amenities) {
-      return true;
-    } else {
-      // Indicates the success of this synchronous custom validator
-      return Promise.reject("Stream Does not exist");
-    }
-  });
-}),
+  body("id")
+    .exists({ checkFalsy: true })
+    .withMessage("id is required")
+    .custom((value) => {
+      return Amenities.findOne({
+        where: {
+          id: value,
+        },
+      }).then((Amenities) => {
+        if (Amenities) {
+          return true;
+        } else {
+          // Indicates the success of this synchronous custom validator
+          return Promise.reject("Stream Does not exist");
+        }
+      });
+    }),
 
-body("amenities_slug")
-.exists({ checkFalsy: true })
-.withMessage("Slug is required")
-.isLength({ max: 150 })
-.withMessage("Slug should be less than 150 character")
-.custom((value, { req }) => {
-  return Amenities.findOne({
-    where: {
-      amenities_slug: {
-        [Op.eq]: value,
-      },
-      id: {
-        [Op.not]: [req.body.id],
-      },
-    },
-  }).then((Amenities) => {
-    if (Amenities) {
-      return Promise.reject("Slug already in use");
-    } else {
-      // Indicates the success of this synchronous custom validator
-      return true;
-    }
-  });
-}),
+  body("amenities_slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character")
+    .custom((value, { req }) => {
+      return Amenities.findOne({
+        where: {
+          amenities_slug: {
+            [Op.eq]: value,
+          },
+          id: {
+            [Op.not]: [req.body.id],
+          },
+        },
+      }).then((Amenities) => {
+        if (Amenities) {
+          return Promise.reject("Slug already in use");
+        } else {
+          // Indicates the success of this synchronous custom validator
+          return true;
+        }
+      });
+    }),
 ];
 
 const schoolboardSchema = [
@@ -896,7 +870,7 @@ const AccreditationsSchemaUpdate = [
     }),
 ];
 
-    
+
 
 const StreamSchema = [
   body("stream_name")
@@ -4347,7 +4321,7 @@ const adminpasswordSchema = [
 ];
 
 
-  
+
 
 const globalvalidation = {
   Validate: Validate,

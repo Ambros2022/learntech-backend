@@ -71,12 +71,6 @@ exports.findAll = async (req, res) => {
                 association: "country",
                 attributes: ["id", "name"],
             },
-            {
-                required: false,
-                association: "city",
-                attributes: ["id", "name"],
-            },
-           
 
         ],
         order: [orderconfig]
@@ -165,28 +159,50 @@ exports.update = (req, res) => {
 
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    state.findByPk(id)
-        .then(data => {
-            if (data) {
-                res.status(200).send({
-                    status: 1,
-                    message: 'successfully retrieved',
-                    data: data
 
-                });
+    state
+        .findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        id: {
+                            [Op.eq]: id,
+                        },
+                    },
+                    // {
+                    //   stream_slug: {
+                    //     [Op.eq]: id,
+                    //   },
+                    // },
+                ],
+            },
+            include: [
+                {
 
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `Cannot find state with id=${id}.`
-                });
-            }
+                    required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
+                }
+
+            ],
+
         })
-        .catch(err => {
+        .then(async (data) => {
+            res.status(200).send({
+                status: 1,
+                message: "successfully retrieved",
+                data: data,
+
+            });
+        })
+        .catch((err) => {
             res.status(500).send({
                 status: 0,
-                message: "Error retrieving state with id=" + id
-
+                message: "Error retrieving stream with id=" + id,
             });
         });
 };
