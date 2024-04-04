@@ -943,11 +943,11 @@ db.CollegeAndUniversity.belongsTo(db.area, {
   as: "area",
 });
 
-db.area.hasMany(db.school, { as: "school" });
-db.school.belongsTo(db.area, {
-  foreignKey: "area_id",
-  as: "area",
-});
+// db.area.hasMany(db.school, { as: "school" });
+// db.school.belongsTo(db.area, {
+//   foreignKey: "area_id",
+//   as: "area",
+// });
 
 
 

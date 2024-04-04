@@ -508,128 +508,26 @@ const schoolSchema = [
     .withMessage("School  name is required")
     .isLength({ max: 150 })
     .withMessage("School  name should be less than 150 character"),
-  // body("genders_accepted")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("genders accepted is required"),
 
-  // body("school_slug")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("slug name is required")
-  //   .isLength({ max: 150 })
-  //   .withMessage("slug name should be less than 150 character")
-  //   .custom((value) => {
-  //     return school
-  //       .findOne({
-  //         where: {
-  //           school_slug: value,
-  //         },
-  //       })
-  //       .then((school) => {
-  //         if (school) {
-  //           return Promise.reject("Slug already in use");
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return true;
-  //         }
-  //       });
-  //   }),
+    checkField('name', 150, school, true),
 
-  // body("school_board_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("School board Id is required")
-  //   .custom((value) => {
-  //     return schoolboards
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((schoolboards) => {
-  //         if (schoolboards) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("School board Id Not exist");
-  //         }
-  //       });
-  //   }),
-  // body("area_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("area Id is required")
-  //   .custom((value) => {
-  //     return area
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((area) => {
-  //         if (area) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("area Id Not exist");
-  //         }
-  //       });
-  //   }),
+    body("school_board_id")
+    .exists({ checkFalsy: true })
+    .withMessage("school board id  is required"),
 
-  // body("city_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("city Id is required")
-  //   .custom((value) => {
-  //     return city
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((city) => {
-  //         if (city) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("city Id Not exist");
-  //         }
-  //       });
-  //   }),
-  // body("school_type_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("School type is required")
-  //   .custom((value) => {
-  //     return schooltype
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((schooltype) => {
-  //         if (schooltype) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("School type  Not exist");
-  //         }
-  //       });
-  //   }),
-  // body("school_level_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("School level is required")
-  //   .custom((value) => {
-  //     return schoollevel
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((schoollevel) => {
-  //         if (schoollevel) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("School level  Not exist");
-  //         }
-  //       });
-  //   }),
+  body("country_id")
+    .exists({ checkFalsy: true })
+    .withMessage("country id  is required"),
+  
+    body("state_id")
+    .exists({ checkFalsy: true })
+    .withMessage("state id  is required"),
+
+    body("city_id")
+    .exists({ checkFalsy: true })
+    .withMessage("city id  is required")
+
+
 ];
 
 const schoolUpdateSchema = [
@@ -659,128 +557,7 @@ const schoolUpdateSchema = [
         });
     }),
 
-  // body("school_slug")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("slug is required")
-  //   .isLength({ max: 150 })
-  //   .withMessage("slug should be less than 150 character")
-  //   .custom((value, { req }) => {
-  //     return school
-  //       .findOne({
-  //         where: {
-  //           school_slug: {
-  //             [Op.eq]: value,
-  //           },
-  //           id: {
-  //             [Op.not]: [req.body.id],
-  //           },
-  //         },
-  //       })
-  //       .then((school) => {
-  //         if (school) {
-  //           return Promise.reject("Slug already in use");
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return true;
-  //         }
-  //       });
-  //   }),
-  // body("school_board_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("School board Id is required")
-  //   .custom((value) => {
-  //     return schoolboards
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((schoolboards) => {
-  //         if (schoolboards) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("School board Id Not exist");
-  //         }
-  //       });
-  //   }),
-  // body("area_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("area Id is required")
-  //   .custom((value) => {
-  //     return area
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((area) => {
-  //         if (area) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("area Id Not exist");
-  //         }
-  //       });
-  //   }),
-
-  // body("city_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("city Id is required")
-  //   .custom((value) => {
-  //     return city
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((city) => {
-  //         if (city) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("city Id Not exist");
-  //         }
-  //       });
-  //   }),
-  // body("school_type_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("School type is required")
-  //   .custom((value) => {
-  //     return schooltype
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((schooltype) => {
-  //         if (schooltype) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("School type  Not exist");
-  //         }
-  //       });
-  //   }),
-  // body("school_level_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("School level is required")
-  //   .custom((value) => {
-  //     return schoollevel
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((schoollevel) => {
-  //         if (schoollevel) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("School level  Not exist");
-  //         }
-  //       });
-  //   }),
+  
 ];
 
 const StreamSchema = [
@@ -4368,9 +4145,9 @@ const globalvalidation = {
   SubStreamSchemaUpdate: SubStreamSchemaUpdate,
 
 
-  
-  
-  
+
+
+
   AccreditationsSchema: AccreditationsSchema,
   AccreditationsSchemaUpdate: AccreditationsSchemaUpdate,
   areaSchema: areaSchema,
@@ -4403,7 +4180,7 @@ const globalvalidation = {
   categoriesUpdateSchema: categoriesUpdateSchema,
   blogSchema: blogSchema,
   blogUpdateSchema: blogUpdateSchema,
-  
+
   polytechnicSchema: polytechnicSchema,
   polytechnicUpdateSchema: polytechnicUpdateSchema,
   reviewSchema: reviewSchema,

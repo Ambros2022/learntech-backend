@@ -283,6 +283,65 @@ module.exports = function (app) {
     schoolboardcontroller.update
   );
 
+   //**** school Routes start  *****/
+
+   app.get(
+    "/api/admin/school/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/school/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/school/add",
+    globalvalidation.schoolSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.create
+  );
+
+
+  app.post(
+    "/api/admin/school/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.delete
+  );
+
+  app.post(
+    "/api/admin/school/update",
+    globalvalidation.schoolUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.update
+  );
+  app.get(
+    "/api/admin/schooltype/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.schooltypefindAll
+  );
+  app.get(
+    "/api/admin/schoollevel/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.schoollevelfindAll
+  );
+
+
+  app.post(
+    "/api/admin/school/updatefaqs",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.updatefaqs
+  );
+
+  app.post(
+    "/api/admin/school/updategallery",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolcontroller.updategallery
+  );
+
+
    /**  Stream Routes Start*/
    app.get(
     "/api/admin/stream/get",
@@ -1034,64 +1093,7 @@ app.post(
     reviewcontroller.changestatus
   );
 
-  //**** school Routes start  *****/
-
-  app.get(
-    "/api/admin/school/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/school/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/school/add",
-    globalvalidation.schoolSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.create
-  );
-
-
-  app.post(
-    "/api/admin/school/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.delete
-  );
-
-  app.post(
-    "/api/admin/school/update",
-    globalvalidation.schoolUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.update
-  );
-  app.get(
-    "/api/admin/schooltype/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.schooltypefindAll
-  );
-  app.get(
-    "/api/admin/schoollevel/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.schoollevelfindAll
-  );
-
-
-  app.post(
-    "/api/admin/school/updatefaqs",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.updatefaqs
-  );
-
-  app.post(
-    "/api/admin/school/updategallery",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.updategallery
-  );
-
+ 
 
 
   //**** polytechnic Routes start  *****/
