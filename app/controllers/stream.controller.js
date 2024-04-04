@@ -38,11 +38,11 @@ exports.create = async (req, res) => {
   //  const obj = JSON.parse(req.body.mac);
   // var messages = Array.prototype.slice.call(req.body.mac);
   //req.body['mac[]'].length
-  console.log(req.body);
+  // console.log(req.body);
   try {
     let logonames = "";
-    let iconnames = "";
-    let promo_banner_names = "";
+    // let iconnames = "";
+    // let promo_banner_names = "";
 
     if (req.files && req.files.promo_banner) {
       let avatar = req.files.promo_banner;
@@ -131,45 +131,28 @@ exports.create = async (req, res) => {
       }
     }
     let listingvalue =
-    (req.body.listing_order == 0 || req.body.listing_order=='') ? null : req.body.listing_order;
+      (req.body.listing_order == 0 || req.body.listing_order == '') ? null : req.body.listing_order;
 
     const streamDetails = await stream.create({
-      stream_name: req.body.stream_name,
-      stream_slug: req.body.stream_slug,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
+      name: req.body.name,
+      slug: req.body.slug,
       h1_title: req.body.h1_title ? req.body.h1_title : null,
-      title_description: req.body.title_description
-        ? req.body.title_description
-        : null,
-      keywords:
-        req.body.keywords && req.body.keywords != "null"
-          ? req.body.keywords
-          : null,
-      ug_box: req.body.ug_box ? req.body.ug_box : null,
-      pg_box: req.body.pg_box ? req.body.pg_box : null,
-      doctorate_box: req.body.doctorate_box ? req.body.doctorate_box : null,
-      diploma_box: req.body.diploma_box ? req.body.diploma_box : null,
-      description_box: req.body.description_box
-        ? req.body.description_box
-        : null,
-      eligibility_criteria: req.body.eligibility_criteria
-        ? req.body.eligibility_criteria
-        : null,
-      placement_career: req.body.placement_career
-        ? req.body.placement_career
-        : null,
-      top_recruiters: req.body.top_recruiters ? req.body.top_recruiters : null,
-      job_analysis: req.body.job_analysis ? req.body.job_analysis : null,
-      stream_description: req.body.stream_description
-        ? req.body.stream_description
-        : null,
-      home_view_status: req.body.home_view_status,
-
-      listing_order: listingvalue,
+      description: req.body.description ? req.body.description : null,
+      top_college: req.body.top_college,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keyword: req.body.meta_keyword,
+      listing_order: req.body.listing_order,
+      top_college: req.body.top_college,
       logo: logonames,
-      icon: iconnames,
-      promo_banner: promo_banner_names,
-      promo_banner_status: req.body.promo_banner_status,
+
+
+
+
+      // listing_order: listingvalue,
+      // icon: iconnames,
+      // promo_banner: promo_banner_names,
+      // promo_banner_status: req.body.promo_banner_status,
     });
 
     if (req.body.faqs && streamDetails.id) {
@@ -196,6 +179,7 @@ exports.create = async (req, res) => {
     });
   }
 };
+
 
 exports.findAll = async (req, res) => {
   // console.log(req.query);
@@ -447,7 +431,7 @@ exports.findOne = (req, res) => {
               },
             ],
           },
-          attributes: ["id", "title","slug","group"],
+          attributes: ["id", "title", "slug", "group"],
           include: [
             {
               required: false,
@@ -457,7 +441,7 @@ exports.findOne = (req, res) => {
                 {
                   required: false,
                   association: "college_groupss",
-                  attributes: ["id", "type", "name", "slug","avg_rating", "logo","status"],
+                  attributes: ["id", "type", "name", "slug", "avg_rating", "logo", "status"],
                   where: {
                     type: "college",
                     status: "Published",
@@ -466,8 +450,8 @@ exports.findOne = (req, res) => {
               ],
             },
           ],
-          limit:30,
-          subQuery:false,
+          limit: 30,
+          subQuery: false,
         });
 
         res.status(200).send({
@@ -545,39 +529,50 @@ exports.findOneWebView = (req, res) => {
     });
 };
 
-exports.update =async (req, res) => {
+exports.update = async (req, res) => {
   const id = req.body.id;
   console.log(req.body);
 
   try {
     let logonames = "";
-    let iconnames = "";
-    let promo_banner_names = "";
+    // let iconnames = "";
+    // let promo_banner_names = "";
     let listingvalue =
-      (req.body.listing_order == 0 || req.body.listing_order=='') ? null : req.body.listing_order;
+      (req.body.listing_order == 0 || req.body.listing_order == '') ? null : req.body.listing_order;
     let STREAD = {
-      stream_name: req.body.stream_name,
-      stream_slug: req.body.stream_slug,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      h1_title: req.body.h1_title,
-      title_description: req.body.title_description
-        ? req.body.title_description
-        : null,
-      keywords:
-        req.body.keywords ,
-      ug_box: req.body.ug_box ,
-      pg_box: req.body.pg_box ,
-      doctorate_box: req.body.doctorate_box ,
-      diploma_box: req.body.diploma_box,
-      description_box: req.body.description_box,
-      eligibility_criteria: req.body.eligibility_criteria,
-      placement_career: req.body.placement_career,
-      top_recruiters: req.body.top_recruiters ? req.body.top_recruiters : null,
-      job_analysis: req.body.job_analysis ? req.body.job_analysis : null,
-      stream_description: req.body.stream_description,
-      home_view_status: req.body.home_view_status,
-      promo_banner_status: req.body.promo_banner_status,
-      listing_order: listingvalue,
+      // stream_name: req.body.stream_name,
+      // stream_slug: req.body.stream_slug,
+      // meta_title: req.body.meta_title ? req.body.meta_title : null,
+      // h1_title: req.body.h1_title,
+      // title_description: req.body.title_description
+      //   ? req.body.title_description
+      //   : null,
+      // keywords:
+      //   req.body.keywords ,
+      // ug_box: req.body.ug_box ,
+      // pg_box: req.body.pg_box ,
+      // doctorate_box: req.body.doctorate_box ,
+      // diploma_box: req.body.diploma_box,
+      // description_box: req.body.description_box,
+      // eligibility_criteria: req.body.eligibility_criteria,
+      // placement_career: req.body.placement_career,
+      // top_recruiters: req.body.top_recruiters ? req.body.top_recruiters : null,
+      // job_analysis: req.body.job_analysis ? req.body.job_analysis : null,
+      // stream_description: req.body.stream_description,
+      // home_view_status: req.body.home_view_status,
+      // promo_banner_status: req.body.promo_banner_status,
+      // listing_order: listingvalue,
+      name: req.body.name,
+      slug: req.body.slug,
+      h1_title: req.body.h1_title ? req.body.h1_title : null,
+      description: req.body.description ? req.body.description : null,
+      top_college: req.body.top_college,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keyword: req.body.meta_keyword,
+      listing_order: req.body.listing_order,
+      top_college: req.body.top_college,
+      logo: logonames,
     };
     if (req.files && req.files.promo_banner) {
       let avatar = req.files.promo_banner;
@@ -670,7 +665,7 @@ exports.update =async (req, res) => {
       }
     }
 
-  await  stream.update(STREAD, {
+    await stream.update(STREAD, {
       where: { id: req.body.id },
     });
 
@@ -679,8 +674,8 @@ exports.update =async (req, res) => {
         where: { stream_id: req.body.id },
       });
       const faqss = JSON.parse(req.body.faqs);
-      _.forEach(faqss,async function (value) {
-        await  streamfaq.create({
+      _.forEach(faqss, async function (value) {
+        await streamfaq.create({
           stream_id: req.body.id,
           questions: value.questions ? value.questions : null,
           answers: value.answers ? value.answers : null,

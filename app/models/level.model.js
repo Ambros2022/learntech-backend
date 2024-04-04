@@ -1,6 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
     const level = sequelize.define("levels", {
-      level_name: {
+      name: {
             type: Sequelize.STRING
         }
     } ,

@@ -40,6 +40,10 @@ db.city = require("../models/city.model.js")(sequelize, Sequelize);
 db.amenities = require("../models/amenities.model.js")(sequelize, Sequelize);
 db.schoolboards = require("../models/school_boards.model.js")(sequelize, Sequelize);
 db.school = require("../models/school.model.js")(sequelize, Sequelize);
+db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
+db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
+db.page = require("../models/page.model.js")(sequelize, Sequelize);
+db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
@@ -52,13 +56,13 @@ db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 
 db.area = require("../models/area.model.js")(sequelize, Sequelize);
 db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
-db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
-db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
+
+
 db.stream_faq = require("../models/stream_faq.model.js")(sequelize, Sequelize);
-db.page = require("../models/page.model.js")(sequelize, Sequelize);
+
 
 db.accreditation = require("../models/accreditation.model.js")(sequelize, Sequelize);
-db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
+
 db.management = require("../models/management.model.js")(sequelize, Sequelize);
 db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 db.affilition = require("../models/affilition.model.js")(sequelize, Sequelize);

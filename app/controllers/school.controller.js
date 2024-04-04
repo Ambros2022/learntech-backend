@@ -16,7 +16,7 @@ const boardschools = db.boardschools;
 const schoolgallery = db.schoolgallery;
 const Op = db.Sequelize.Op;
 // Array of allowed files
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -39,10 +39,10 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let logonames = "";
+    let icons = "";
 
-    if (req.files && req.files.school_logo) {
-      let avatar = req.files.school_logo;
+    if (req.files && req.files.icon) {
+      let avatar = req.files.icon;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -66,31 +66,13 @@ exports.create = async (req, res) => {
       let IsUpload = avatar.mv("./storage/school_logo/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "school_logo/" + logoname;
+        icons = "school_logo/" + logoname;
       }
     }
 
-    let total_seats =
-      req.body.total_seats == "null" || req.body.total_seats == ""
-        ? null
-        : req.body.total_seats;
-    let listingvalue =
-      req.body.listing_order == 0 || req.body.listing_order == ""
-        ? null
-        : req.body.listing_order;
     const schoolDetails = await school.create({
       country_id: req.body.country_id,
       state_id: req.body.state_id,
-      // video_url: req.body.video_url ? req.body.video_url : null,
-      // meta_title: req.body.meta_title ? req.body.meta_title : null,
-      // meta_description: req.body.meta_description
-      //   ? req.body.meta_description
-      //   : null,
-      // area_id: req.body.area_id,
-      // // school_board_id: req.body.school_board_id,
-      // city_id: req.body.city_id,
-      // school_type_id: req.body.school_type_id,
-      // // school_level_id: req.body.school_level_id,
       city_id: req.body.city_id,
       school_board_id: req.body.school_board_id,
       name: req.body.name,
@@ -105,21 +87,14 @@ exports.create = async (req, res) => {
       meta_keyword: req.body.meta_keyword,
       address: req.body.address,
       map: req.body.map,
-      icon: req.body.icon,
+      // icon: req.body.icon,
+      icon: icons,
       banner_image: req.body.banner_image,
       video_url: req.body.video_url,
       avg_rating: req.body.avg_rating,
       info: req.body.info,
       admissions_process: req.body.admissions_process,
       extracurriculars: req.body.extracurriculars,
-      // banner_image: req.body.banner_image,
-      // total_seats: total_seats,
-      // listing_order: listingvalue,
-      // about: req.body.about ? req.body.about : null,
-      // extra_curricular: req.body.extra_curricular
-      //   ? req.body.extra_curricular
-      //   : null,
-      // school_logo: logonames,
     });
 
     if (req.body.board_id && schoolDetails.id) {
@@ -202,9 +177,6 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   const id = req.body.id;
-  // console.log(id);
-  // console.log(req.body);
-
   try {
     let logonames = "";
     let total_seats =
@@ -218,41 +190,65 @@ exports.update = async (req, res) => {
     // console.log(total_seats);
     // console.log("total_seats");
     let STREAD = {
-      school_name: req.body.school_name,
-      school_slug: req.body.school_slug,
+      // school_name: req.body.school_name,
+      // school_slug: req.body.school_slug,
+      // meta_title: req.body.meta_title,
+      // meta_description: req.body.meta_description,
+      // // school_board_id: req.body.school_board_id,
+      // area_id: req.body.area_id,
+      // city_id: req.body.city_id,
+      // school_type_id: req.body.school_type_id,
+      // // school_level_id: req.body.school_level_id,
+      // genders_accepted: req.body.genders_accepted,
+      // established:
+      //   req.body.established && req.body.established != "null"
+      //     ? req.body.established
+      //     : null,
+      // status: req.body.status ? req.body.status : null,
+      // address:
+      //   req.body.address && req.body.address != "null"
+      //     ? req.body.address
+      //     : null,
+      // video_url:
+      //   req.body.video_url && req.body.video_url != "null"
+      //     ? req.body.video_url
+      //     : null,
+      // map: req.body.map && req.body.map != "null" ? req.body.map : null,
+      // total_seats: total_seats,
+      // listing_order: listingvalue,
+      // about: req.body.about && req.body.about != "null" ? req.body.about : null,
+      // extra_curricular:
+      //   req.body.extra_curricular && req.body.extra_curricular != "null"
+      //     ? req.body.extra_curricular
+      //     : null,
+      country_id: req.body.country_id,
+      state_id: req.body.state_id,
+      city_id: req.body.city_id,
+      school_board_id: req.body.school_board_id,
+      name: req.body.name,
+      slug: req.body.slug,
+      status: req.body.status,
+      home_view_status: req.body.home_view_status,
+      school_type: req.body.school_type,
+      listing_order: req.body.listing_order,
+      established: req.body.established,
       meta_title: req.body.meta_title,
       meta_description: req.body.meta_description,
-      // school_board_id: req.body.school_board_id,
-      area_id: req.body.area_id,
-      city_id: req.body.city_id,
-      school_type_id: req.body.school_type_id,
-      // school_level_id: req.body.school_level_id,
-      genders_accepted: req.body.genders_accepted,
-      established:
-        req.body.established && req.body.established != "null"
-          ? req.body.established
-          : null,
-      status: req.body.status ? req.body.status : null,
-      address:
-        req.body.address && req.body.address != "null"
-          ? req.body.address
-          : null,
-      video_url:
-        req.body.video_url && req.body.video_url != "null"
-          ? req.body.video_url
-          : null,
-      map: req.body.map && req.body.map != "null" ? req.body.map : null,
-      total_seats: total_seats,
-      listing_order: listingvalue,
-      about: req.body.about && req.body.about != "null" ? req.body.about : null,
-      extra_curricular:
-        req.body.extra_curricular && req.body.extra_curricular != "null"
-          ? req.body.extra_curricular
-          : null,
+      meta_keyword: req.body.meta_keyword,
+      address: req.body.address,
+      map: req.body.map,
+      // icon: req.body.icon,
+      icon: icons,
+      banner_image: req.body.banner_image,
+      video_url: req.body.video_url,
+      avg_rating: req.body.avg_rating,
+      info: req.body.info,
+      admissions_process: req.body.admissions_process,
+      extracurriculars: req.body.extracurriculars,
     };
 
-    if (req.files && req.files.school_logo) {
-      let avatar = req.files.school_logo;
+    if (req.files && req.files.icon) {
+      let avatar = req.files.icon;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -276,7 +272,7 @@ exports.update = async (req, res) => {
       let IsUpload = avatar.mv("./storage/school_logo/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "school_logo/" + logoname;
+        icons = "school_logo/" + logoname;
       }
       STREAD["school_logo"] = logonames;
     }

@@ -158,31 +158,80 @@ exports.update = (req, res) => {
     }
 
 };
+// exports.findOne = (req, res) => {
+//     const id = req.params.id;
+//     city.findByPk(id)
+//         .then(data => {
+//             if (data) {
+//                 res.status(200).send({
+//                     status: 1,
+//                     message: 'successfully retrieved',
+//                     data: data
+
+//                 });
+
+//             } else {
+//                 res.status(400).send({
+//                     status: 0,
+//                     message: `Cannot find city with id=${id}.`
+//                 });
+//             }
+//         })
+//         .catch(err => {
+//             res.status(500).send({
+//                 status: 0,
+//                 message: "Error retrieving city with id=" + id
+
+//             });
+//         });
+// };
+
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    city.findByPk(id)
-        .then(data => {
-            if (data) {
-                res.status(200).send({
-                    status: 1,
-                    message: 'successfully retrieved',
-                    data: data
 
-                });
+    city
+        .findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        id: {
+                            [Op.eq]: id,
+                        },
+                    },
+                    // {
+                    //   stream_slug: {
+                    //     [Op.eq]: id,
+                    //   },
+                    // },
+                ],
+            },
+            include: [
+                {
 
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `Cannot find city with id=${id}.`
-                });
-            }
+                    required: false,
+                    association: "state",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
+                }
+
+            ],
+
         })
-        .catch(err => {
+        .then(async (data) => {
+            res.status(200).send({
+                status: 1,
+                message: "successfully retrieved",
+                data: data,
+
+            });
+        })
+        .catch((err) => {
             res.status(500).send({
                 status: 0,
-                message: "Error retrieving city with id=" + id
-
+                message: "Error retrieving stream with id=" + id,
             });
         });
 };
-
