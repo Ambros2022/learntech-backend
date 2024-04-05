@@ -44,6 +44,7 @@ db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
 db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
 db.page = require("../models/page.model.js")(sequelize, Sequelize);
 db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
+db.accesstokens = require("../models/accesstokens.model.js")(sequelize, Sequelize);
 
 
 

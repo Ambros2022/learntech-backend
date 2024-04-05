@@ -11,6 +11,7 @@ module.exports = function(app) {
   });
 
   app.post("/api/auth/signinadmin", controller.signinadmin);
+  app.post("/auth/me", controller.checkAccessTokenAdmin);
 
   app.post(
     "/api/auth/signup",
