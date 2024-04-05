@@ -104,7 +104,8 @@ function checkField(fieldName, maxLength, model, requireUnique = false) {
 
   return validationChain;
 }
-function checkField_update(fieldName, maxLength, model, requireUnique = false, id) {
+function checkField_update(fieldName, maxLength, model, requireUnique = false) {
+
   let validationChain = [];
 
   // Check if field exists and its length
@@ -120,8 +121,10 @@ function checkField_update(fieldName, maxLength, model, requireUnique = false, i
   if (requireUnique) {
     validationChain.push(
       body(fieldName)
-        .custom((value) => {
-          console.log(value);
+        .custom((value, { req }) => {
+          // console.log(value);
+          let id = req.body.id
+          // console.log(req.body.id);
           return model
             .findOne({
               where: {
@@ -169,12 +172,91 @@ const Test = [
     .withMessage("User name should be string"),
 ];
 
+const RedirecturlSchema = [
+  body("old_url")
+    .exists({ checkFalsy: true })
+    .withMessage(" old_url is required")
+    .custom((value) => {
+      let firstChar = value.charAt(0);
+      if (firstChar === "/") {
+        return true;
+        // First character is a slash
+      } else {
+        return Promise.reject(
+          "Enter valid URL must be contail first char / like: /dfewerfrew"
+        );
+      }
+    }),
+  checkField('old_url', 200, redirecturl, true),
+
+  body("new_url")
+    .exists({ checkFalsy: true })
+    .withMessage("new_url name is required")
+    .custom((value) => {
+      let firstChar = value.charAt(0);
+      if (firstChar === "/") {
+
+        return true;
+        // First character is a slash
+      } else {
+        return Promise.reject(
+          "Enter valid URL must be contail first char / like: /defgrefijf"
+        );
+      }
+    }),
+  checkField('new_url', 200, redirecturl, true),
+
+  body("status_code")
+    .exists({ checkFalsy: true })
+    .withMessage(" status_code is required"),
+];
+
+const RedirecturlSchemaUpdate = [
+  ...validateIdRequired_id(redirecturl, "id"),
+  body("old_url")
+    .exists({ checkFalsy: true })
+    .withMessage(" old_url is required")
+    .custom((value) => {
+      let firstChar = value.charAt(0);
+      if (firstChar === "/") {
+        return true;
+        // First character is a slash
+      } else {
+        return Promise.reject(
+          "Enter valid URL must be contail first char / like: /dfewerfrew"
+        );
+      }
+    }),
+
+  body("new_url")
+    .exists({ checkFalsy: true })
+    .withMessage("new_url name is required")
+    .custom((value) => {
+      let firstChar = value.charAt(0);
+      if (firstChar === "/") {
+        return true;
+        // First character is a slash
+      } else {
+        return Promise.reject(
+          "Enter valid URL must be contail first char / like: /defgrefijf"
+        );
+      }
+    }),
+  checkField_update('old_url', 200, redirecturl, true),
+
+
+
+  body("status_code")
+    .exists({ checkFalsy: true })
+    .withMessage(" status_code is required"),
+
+];
 const countrySchema = [
   checkField('name', 150, countries, true),
 ];
 const countriesUpdateSchema = [
   ...validateIdRequired_id(countries, "id"),
-  checkField_update('name', 150, countries, true, "id"),
+  checkField_update('name', 150, countries, true),
 
 ];
 
@@ -194,7 +276,7 @@ const updatestateSchema = [
     .withMessage("state name is required")
     .isLength({ max: 150 })
     .withMessage("state name should be less than 150 character"),
-    
+
   ...validateIdRequired_id(state, "id"),
   ...validateIdRequired_id(countries, "id"),
 
@@ -3891,97 +3973,7 @@ const JobvacanciesSchemaUpdate = [
         });
     }),
 ];
-const RedirecturlSchema = [
-  body("old_url")
-    .exists({ checkFalsy: true })
-    .withMessage(" old_url is required")
-    .custom((value) => {
-      let firstChar = value.charAt(0);
-      if (firstChar === "/") {
-        return true;
-        // First character is a slash
-      } else {
-        return Promise.reject(
-          "Enter valid URL must be contail first char / like: /dfewerfrew"
-        );
-      }
-    }),
 
-  body("new_url")
-    .exists({ checkFalsy: true })
-    .withMessage("new_url name is required")
-    .custom((value) => {
-      let firstChar = value.charAt(0);
-      if (firstChar === "/") {
-        return true;
-        // First character is a slash
-      } else {
-        return Promise.reject(
-          "Enter valid URL must be contail first char / like: /defgrefijf"
-        );
-      }
-    }),
-
-  body("status_code")
-    .exists({ checkFalsy: true })
-    .withMessage(" status_code is required"),
-];
-
-const RedirecturlSchemaUpdate = [
-  body("old_url")
-    .exists({ checkFalsy: true })
-    .withMessage(" old_url is required")
-    .custom((value) => {
-      let firstChar = value.charAt(0);
-      if (firstChar === "/") {
-        return true;
-        // First character is a slash
-      } else {
-        return Promise.reject(
-          "Enter valid URL must be contail first char / like: /dfewerfrew"
-        );
-      }
-    }),
-
-  body("new_url")
-    .exists({ checkFalsy: true })
-    .withMessage("new_url name is required")
-    .custom((value) => {
-      let firstChar = value.charAt(0);
-      if (firstChar === "/") {
-        return true;
-        // First character is a slash
-      } else {
-        return Promise.reject(
-          "Enter valid URL must be contail first char / like: /defgrefijf"
-        );
-      }
-    }),
-
-  body("status_code")
-    .exists({ checkFalsy: true })
-    .withMessage(" status_code is required"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return redirecturl
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((redirecturl) => {
-          if (redirecturl) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("redirecturl Does not exist");
-          }
-        });
-    }),
-];
 const PromopageSchema = [
   body("title").exists({ checkFalsy: true }).withMessage(" title is required"),
 

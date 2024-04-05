@@ -105,8 +105,42 @@ module.exports = function (app) {
     next();
   });
 
+  /**  redirecturl Routes Start  **/
+  
+  app.get(
+    "/api/admin/redirect-url/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.findAll
+  );
 
-  /**  Countries Routes start*/
+  app.get(
+    "/api/admin/redirect-url/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/redirect-url/add",
+    globalvalidation.RedirecturlSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.create
+  );
+
+  app.post(
+    "/api/admin/redirect-url/update",
+    globalvalidation.RedirecturlSchemaUpdate,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.update
+  );
+
+  app.post(
+    "/api/admin/redirect-url/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.delete
+  );
+
+
+  /**  Countries Routes start **/
 
   app.get(
     "/api/admin/countries/get",
@@ -495,38 +529,6 @@ module.exports = function (app) {
     promopagecontroller.delete
   );
 
-  /**  redirecturl Routes Start*/
-  app.get(
-    "/api/admin/redirect-url/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/redirect-url/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/redirect-url/add",
-    globalvalidation.RedirecturlSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.create
-  );
-
-  app.post(
-    "/api/admin/redirect-url/update",
-    globalvalidation.RedirecturlSchemaUpdate,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.update
-  );
-
-  app.post(
-    "/api/admin/redirect-url/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.delete
-  );
 
   /**  job Routes Start*/
   app.get(

@@ -3,7 +3,7 @@ const winston = require("../config/winston");
 const homecontroller = require("../controllers/website/home.controller");
 const blogcontroller = require("../controllers/blog.controller");
 
-const redirecturlcontroller= require("../controllers/redirecturl.controller");
+const redirecturlcontroller = require("../controllers/redirecturl.controller");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -39,125 +39,135 @@ module.exports = function (app) {
   });
 
 
-  /* start Home page apis*/ 
+  // redirection
+
+  app.get(
+    "/api/website/redirecturl/get", redirecturlcontroller.findAll
+  );
+
+  app.get(
+    "/api/website/redirecturl/config", redirecturlcontroller.getFile
+  );
+
+  /* start Home page apis*/
 
   app.post(
-    "/api/website/home/header",homecontroller.pagetdata
+    "/api/website/home/header", homecontroller.pagetdata
   );
 
   app.post(
-    "/api/website/home/topcrousel",homecontroller.topcollege
+    "/api/website/home/topcrousel", homecontroller.topcollege
   );
 
   app.post(
-    "/api/website/home/blogsandnews",homecontroller.blogsandnews
+    "/api/website/home/blogsandnews", homecontroller.blogsandnews
   );
 
   app.get(
-    "/api/website/home/hompagevideos",homecontroller.findhomepagevideos
+    "/api/website/home/hompagevideos", homecontroller.findhomepagevideos
   );
   app.get(
-    "/api/website/home/streams",homecontroller.findAllstreams
+    "/api/website/home/streams", homecontroller.findAllstreams
   );
   app.get(
-    "/api/website/home/exams",homecontroller.findAllexams
+    "/api/website/home/exams", homecontroller.findAllexams
   );
 
-   /* End Home page apis*/ 
+  /* End Home page apis*/
   app.post(
-    "/api/website/home/enquiry",globalvalidation.enquirySchema,[globalvalidation.Validate],homecontroller.enquiry
-  );
-  app.post(
-    "/api/website/home/landingpageenquiry",globalvalidation.enquirySchema,[globalvalidation.Validate],homecontroller.landingpageenquiry
+    "/api/website/home/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], homecontroller.enquiry
   );
   app.post(
-    "/api/website/home/horizonschoolenquiry",globalvalidation.enquirySchema,[globalvalidation.Validate],homecontroller.horizonschoolenquiry
-  );
-  
-
-  app.post(
-    "/api/website/home/uploadpdf",homecontroller.uploadpdf
+    "/api/website/home/landingpageenquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], homecontroller.landingpageenquiry
   );
   app.post(
-    "/api/website/home/generalcourse",homecontroller.generalcourse
+    "/api/website/home/horizonschoolenquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], homecontroller.horizonschoolenquiry
+  );
+
+
+  app.post(
+    "/api/website/home/uploadpdf", homecontroller.uploadpdf
   );
   app.post(
-    "/api/website/home/courses/stream",homecontroller.coursesbystreamid
+    "/api/website/home/generalcourse", homecontroller.generalcourse
+  );
+  app.post(
+    "/api/website/home/courses/stream", homecontroller.coursesbystreamid
   );
   app.get(
-    "/api/website/home/courses/:slug",homecontroller.findOnecourse
-  );
-
-  app.get(
-    "/api/website/home/collegecourses/:slug",homecontroller.findcollegecourseone
-  );
- 
-  app.get(
-    "/api/website/home/allentranceexams",homecontroller.allentranceexams
-  );
-  app.get(
-    "/api/website/home/allentranceexams/get/:slug",homecontroller.findoneexam
-  );
-  app.get(
-    "/api/website/home/topcollegebangalore",homecontroller.topcollegebangalore
-  );
-  app.get(
-    "/api/website/home/college/get/:slug",homecontroller.findonecollege
-  );
-  app.get(
-    "/api/website/home/group",homecontroller.findallgroup
-  );
-  app.get(
-    "/api/website/home/collegetype",homecontroller.findAllcollegetype
-  );
-  app.get(
-    "/api/website/home/citys",homecontroller.findallcitys
-  );
-  app.get(
-    "/api/website/home/allgeneralcourse",homecontroller.findAllgeneralcourse
-  );
-  app.get(
-    "/api/website/home/accreditaions",homecontroller.findallaccreditaions
-  );
-  app.get(
-    "/api/website/home/managments",homecontroller.findallmanagments
+    "/api/website/home/courses/:slug", homecontroller.findOnecourse
   );
 
   app.get(
-    "/api/website/home/topschoolbangalore",homecontroller.topschoolbangalore
+    "/api/website/home/collegecourses/:slug", homecontroller.findcollegecourseone
+  );
+
+  app.get(
+    "/api/website/home/allentranceexams", homecontroller.allentranceexams
   );
   app.get(
-    "/api/website/home/school/get/:slug",homecontroller.findoneschool
+    "/api/website/home/allentranceexams/get/:slug", homecontroller.findoneexam
   );
   app.get(
-    "/api/website/home/schoolclassification",homecontroller.findAllschoolclassification
+    "/api/website/home/topcollegebangalore", homecontroller.topcollegebangalore
   );
   app.get(
-    "/api/website/home/schoolboards",homecontroller.findallschoolboards
+    "/api/website/home/college/get/:slug", homecontroller.findonecollege
   );
   app.get(
-    "/api/website/home/schoollevels",homecontroller.findallschoollevels
+    "/api/website/home/group", homecontroller.findallgroup
   );
   app.get(
-    "/api/website/home/schooltypes",homecontroller.findallschooltypes    
+    "/api/website/home/collegetype", homecontroller.findAllcollegetype
+  );
+  app.get(
+    "/api/website/home/citys", homecontroller.findallcitys
+  );
+  app.get(
+    "/api/website/home/allgeneralcourse", homecontroller.findAllgeneralcourse
+  );
+  app.get(
+    "/api/website/home/accreditaions", homecontroller.findallaccreditaions
+  );
+  app.get(
+    "/api/website/home/managments", homecontroller.findallmanagments
+  );
+
+  app.get(
+    "/api/website/home/topschoolbangalore", homecontroller.topschoolbangalore
+  );
+  app.get(
+    "/api/website/home/school/get/:slug", homecontroller.findoneschool
+  );
+  app.get(
+    "/api/website/home/schoolclassification", homecontroller.findAllschoolclassification
+  );
+  app.get(
+    "/api/website/home/schoolboards", homecontroller.findallschoolboards
+  );
+  app.get(
+    "/api/website/home/schoollevels", homecontroller.findallschoollevels
+  );
+  app.get(
+    "/api/website/home/schooltypes", homecontroller.findallschooltypes
   );
 
 
 
   app.get(
-    "/api/website/home/authors",homecontroller.findAllauthor
+    "/api/website/home/authors", homecontroller.findAllauthor
   );
   app.get(
-    "/api/website/home/categories",homecontroller.findAllcategories
+    "/api/website/home/categories", homecontroller.findAllcategories
   );
 
   app.get(
-    "/api/website/home/upcomingexam",homecontroller.findallupcommingexams
+    "/api/website/home/upcomingexam", homecontroller.findallupcommingexams
   );
 
 
   app.get(
-    "/api/website/blog/get",homecontroller.allblogs
+    "/api/website/blog/get", homecontroller.allblogs
   );
 
   app.get(
@@ -166,17 +176,17 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/website/home/news",homecontroller.allnews
+    "/api/website/home/news", homecontroller.allnews
   );
   app.get(
-    "/api/website/home/abroaduniversities",homecontroller.allabroaduniversities
+    "/api/website/home/abroaduniversities", homecontroller.allabroaduniversities
   );
   app.get(
-    "/api/website/home/abroadcountries",homecontroller.allabroadcountries
+    "/api/website/home/abroadcountries", homecontroller.allabroadcountries
   );
 
   app.get(
-    "/api/website/home/news/get/:slug",homecontroller.findonenews
+    "/api/website/home/news/get/:slug", homecontroller.findonenews
   );
 
   app.get(
@@ -185,57 +195,49 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/website/nri/get",homecontroller.nripage
+    "/api/website/nri/get", homecontroller.nripage
   );
   app.get(
-    "/api/website/recognitioneditor/get",homecontroller.recognitioneditorpage
+    "/api/website/recognitioneditor/get", homecontroller.recognitioneditorpage
   );
   app.get(
-    "/api/website/services/get",homecontroller.servicespage
+    "/api/website/services/get", homecontroller.servicespage
   );
   app.get(
-    "/api/website/about/get",homecontroller.aboutpage
+    "/api/website/about/get", homecontroller.aboutpage
   );
 
 
   app.get(
-    "/api/website/home/scholarship",homecontroller.allscholarships
+    "/api/website/home/scholarship", homecontroller.allscholarships
   );
   app.get(
-    "/api/website/home/scholarship/get/:slug",homecontroller.findonescholarship
+    "/api/website/home/scholarship/get/:slug", homecontroller.findonescholarship
   );
   app.get(
-    "/api/website/testimonial/get",homecontroller.alltestimonial
+    "/api/website/testimonial/get", homecontroller.alltestimonial
   );
 
   app.get(
-    "/api/website/home/team",homecontroller.allteam
-  );
-  
-
-  app.get(
-    "/api/website/promobanner",homecontroller.allpromotionalbanners
+    "/api/website/home/team", homecontroller.allteam
   );
 
 
-  /**  redirecturl Routes Start*/
   app.get(
-    "/api/website/redirecturl/get",redirecturlcontroller.findAll
+    "/api/website/promobanner", homecontroller.allpromotionalbanners
   );
 
-  /**  redirecturl Routes Start*/
-  app.get(
-    "/api/website/redirecturl/config",redirecturlcontroller.getFile
-  );
+
+
 
   app.get(
-    "/api/website/home/sitemap/get",homecontroller.sitemap
+    "/api/website/home/sitemap/get", homecontroller.sitemap
   );
   app.get(
-    "/api/website/home/seolink/get",homecontroller.seolink
+    "/api/website/home/seolink/get", homecontroller.seolink
   );
-  
-  
+
+
 
 };
 
