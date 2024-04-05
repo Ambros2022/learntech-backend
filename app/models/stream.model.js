@@ -24,7 +24,7 @@ module.exports = (sequelize, Sequelize) => {
     meta_description: {
       type: Sequelize.STRING
     },
-    meta_keyboard: {
+    meta_keyword: {
       type: Sequelize.TEXT
     },
     listing_order: {

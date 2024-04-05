@@ -12,22 +12,18 @@ module.exports = (sequelize, Sequelize) => {
     stream_id: {
       type: Sequelize.INTEGER
     }
+  }
+    ,
+    {
 
-    
-    
-  }
-  ,
-  {
-    
-    timestamps: true,
-    underscored: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at",
-    underscored: true 
-  }
-  
+      timestamps: true,
+      underscored: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+      underscored: true
+    }
+
   );
-
 
 
   return SubStream;

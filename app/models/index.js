@@ -40,6 +40,13 @@ db.city = require("../models/city.model.js")(sequelize, Sequelize);
 db.amenities = require("../models/amenities.model.js")(sequelize, Sequelize);
 db.schoolboards = require("../models/school_boards.model.js")(sequelize, Sequelize);
 db.school = require("../models/school.model.js")(sequelize, Sequelize);
+db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
+db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
+db.page = require("../models/page.model.js")(sequelize, Sequelize);
+db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
+
+
+
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
@@ -52,13 +59,13 @@ db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 
 db.area = require("../models/area.model.js")(sequelize, Sequelize);
 db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
-db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
-db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
+
+
 db.stream_faq = require("../models/stream_faq.model.js")(sequelize, Sequelize);
-db.page = require("../models/page.model.js")(sequelize, Sequelize);
+
 
 db.accreditation = require("../models/accreditation.model.js")(sequelize, Sequelize);
-db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
+
 db.management = require("../models/management.model.js")(sequelize, Sequelize);
 db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 db.affilition = require("../models/affilition.model.js")(sequelize, Sequelize);
@@ -157,18 +164,6 @@ db.generalcourse_faqs= require("../models/generalcourse_faq.model.js")(sequelize
 db.youtubevideos= require("../models/youtubevideos.model.js")(sequelize, Sequelize);
 
 
-/*** abroad_universities with country_id Relation ship  */
-// db.abroadcountries.hasMany(db.abroad_universities, { as: "abroaduniversities" });
-db.abroad_universities.belongsTo(db.abroadcountries, {
-  foreignKey: "country_id",
-  as: "country",
-});
-
-db.CollegeAndUniversity.hasMany(db.CollegeGalleries, { as: "CollegeGalleriess",foreignKey: 'college_id'  });
-db.CollegeGalleries.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "collegeAndUniversity",
-});
 
 /***  resettokens ship users  */
 
@@ -177,7 +172,6 @@ db.resettokens.belongsTo(db.user, {
   as: "users",
 });
 
-// State.belongsTo(Country, { foreignKey: 'countryId' }); 
 
 /*** states relationship */
 db.countries.hasMany(db.state, { as: "state" });
@@ -191,14 +185,6 @@ db.state.hasMany(db.city, { as: "city" });
 db.city.belongsTo(db.state, {
   foreignKey: "state_id",
   as: "state",
-});
-
-
-/*** studentform  Relation ship  */
-db.studentform.hasMany(db.commingform, { as: "stdform" });
-db.commingform.belongsTo(db.studentform, {
-  foreignKey: "students_coming_from_id",
-  as: "stdform",
 });
 
 /***  Relation ship school  */
@@ -223,22 +209,41 @@ db.school.belongsTo(db.schoolboards, {
   as: "schoolboard",
 });
 
-// db.school.belongsTo(db.area, {
-//   foreignKey: "area_id",
-//   as: "areas",
-// });``
 
 
-// db.school.belongsTo(db.schooltype, {
-//   foreignKey: "school_type_id",
-//   as: "schooltype",
-// });
 
 
-// db.school.belongsTo(db.schoollevel, {
-//   foreignKey: "school_level_id",
-//   as: "schoollevel",
-// });
+
+
+
+/*** abroad_universities with country_id Relation ship  */
+// db.abroadcountries.hasMany(db.abroad_universities, { as: "abroaduniversities" });
+db.abroad_universities.belongsTo(db.abroadcountries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+
+db.CollegeAndUniversity.hasMany(db.CollegeGalleries, { as: "CollegeGalleriess",foreignKey: 'college_id'  });
+db.CollegeGalleries.belongsTo(db.CollegeAndUniversity, {
+  foreignKey: "college_id",
+  as: "collegeAndUniversity",
+});
+
+
+
+// State.belongsTo(Country, { foreignKey: 'countryId' }); 
+
+
+
+/*** studentform  Relation ship  */
+db.studentform.hasMany(db.commingform, { as: "stdform" });
+db.commingform.belongsTo(db.studentform, {
+  foreignKey: "students_coming_from_id",
+  as: "stdform",
+});
+
+
+
 
 
 /***  Relation ship review  */
@@ -939,11 +944,11 @@ db.CollegeAndUniversity.belongsTo(db.area, {
   as: "area",
 });
 
-db.area.hasMany(db.school, { as: "school" });
-db.school.belongsTo(db.area, {
-  foreignKey: "area_id",
-  as: "area",
-});
+// db.area.hasMany(db.school, { as: "school" });
+// db.school.belongsTo(db.area, {
+//   foreignKey: "area_id",
+//   as: "area",
+// });
 
 
 
