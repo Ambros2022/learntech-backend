@@ -10,6 +10,8 @@ const substreamcontroller = require("../controllers/substream.controller");
 const pagecontroller = require("../controllers/page.controller");
 const bannercontroller = require("../controllers/banner.controller");
 
+
+
 const admincontroller = require("../controllers/admin.controller");
 const accreditationscontroller = require("../controllers/accreditations.controller");
 const systemconficontroller = require("../controllers/systemconfig.controller");
@@ -494,6 +496,12 @@ app.post(
   bannercontroller.update
 );
 /**  banner Routes End*/
+
+
+
+
+
+
 
 
   app.get(
