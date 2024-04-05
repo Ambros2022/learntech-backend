@@ -1,17 +1,23 @@
 const db = require("../models");
 const path = require("path");
+const fs = require("fs").promises;
 const Amenities = db.amenities;
-const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
-const Op = db.Sequelize.Op;
 const fileTypes = require("../config/fileTypes");
-// Array of allowed files
-const array_of_allowed_file_types = fileTypes.Imageformat;
-// const fs = require('fs');
-const fs = require('fs').promises;
 
-// Allowed file size in mb
+const array_of_allowed_file_types = fileTypes.Imageformat;
 const allowed_file_size = 2;
+// Function to remove a file
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -50,14 +56,6 @@ exports.create = async (req, res) => {
           status: 0,
         });
       }
-
-// if (avatar.size / (1024 * 1024) > allowed_file_size) {
-//   return res.status(400).send({
-//     message: "Invalid File type ",
-//     errors: {},
-//     status: 0,
-//   });
-// }
 
       let logoname = "logo" + Date.now() + path.extname(avatar.name);
 
@@ -132,7 +130,8 @@ exports.findAll = async (req, res) => {
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: err.message || "Some error occurred while retrieving amenities.",
+        message:
+          err.message || "Some error occurred while retrieving amenities.",
       });
     });
 };
@@ -188,62 +187,75 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.update = (req, res) => {
-  const id = req.body.id;
 
+
+
+exports.update = async (req, res) => {
   try {
-    let logonames = "";
+    // Check if the record exists in the database
+    const existingRecord = await Amenities.findOne({
+      where: { id: req.body.id },
+    });
 
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+    let amenitiesUpdates = {
+      amenities_name: req.body.amenities_name || existingRecord.amenities_name,
+      amenities_slug: req.body.amenities_slug || existingRecord.amenities_slug,
+    };
+
+    // Check if a new logo is provided
     if (req.files && req.files.amenities_logo) {
-      let avatar = req.files.amenities_logo;
+      const avatar = req.files.amenities_logo;
 
-      // Check if the uploaded file is allowed
+      // Check file type and size
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
         return res.status(400).send({
-          message: "Invalid File type ",
+          message: "Invalid file type",
           errors: {},
           status: 0,
         });
       }
-
       if (avatar.size / (1024 * 1024) > allowed_file_size) {
         return res.status(400).send({
-          message: "File too large ",
+          message: "File too large",
           errors: {},
           status: 0,
         });
       }
 
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/amenities_logo/" + logoname;
 
-      let IsUpload = avatar.mv("./storage/amenities_logo/" + logoname) ? 1 : 0;
+      await avatar.mv(uploadPath);
 
-      if (IsUpload) {
-        logonames = "amenities_logo/" + logoname;
+      amenitiesUpdates.amenities_logo = "amenities_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.amenities_logo) {
+        const oldLogoPath = "./storage/" + existingRecord.amenities_logo;
+        await removeFile(oldLogoPath);
       }
     }
 
-    Amenities.update(
-      {
-        amenities_name: req.body.amenities_name,
-        amenities_slug: req.body.amenities_slug,
-
-        amenities_logo: logonames,
-      },
-      {
-        where: { id: req.body.id },
-      }
-    );
+    // Update database record
+    await Amenities.update(amenitiesUpdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
-      message: "Data Save Successfully",
+      message: "Data saved successfully",
     });
   } catch (error) {
     return res.status(400).send({
       message: "Unable to update data",
-      errors: error,
+      errors: error.message,
       status: 0,
     });
   }
 };
+

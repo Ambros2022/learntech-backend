@@ -274,18 +274,6 @@ db.review.belongsTo(db.school, {
 
 
 
-/***  Relation ship schoolboards  */
-// db.schoolboards.belongsTo(db.city, {
-//   foreignKey: "city_id",
-//   as: "citys",
-// });
-
-// db.schoolboards.belongsTo(db.area, {
-//   foreignKey: "area_id",
-//   as: "areas",
-// });
-
-
 
 
 
