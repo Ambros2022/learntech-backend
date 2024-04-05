@@ -305,10 +305,101 @@ CREATE TABLE courses (
   FOREIGN KEY (general_course_id) REFERENCES general_courses(id)
 );
 
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (1, 'Pre-Primary', NULL, NULL);
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (2, 'Primary', NULL, NULL);
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (3, 'Secondary', NULL, NULL);
+INSERT INTO
+  `levels` (`id`, `name`, `created_at`, `updated_at`)
+VALUES
+  (4, 'Higher Secondary', NULL, NULL);
 
 
 
+CREATE TABLE `learntechweb`.`resettokens` (`id` INT(11) NOT NULL AUTO_INCREMENT , `user_id` INT(11) NOT NULL , `email` VARCHAR(256) NULL DEFAULT NULL , `token` VARCHAR(256) NULL DEFAULT NULL , `expiration` INT(11) NULL DEFAULT NULL , `used` INT(11) NOT NULL DEFAULT '0' ,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
 
 
+CREATE TABLE abroadpages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  country_id INT,
+  name VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  info LONGTEXT,
+  backgroundimage VARCHAR(150),
+  meta_title VARCHAR(150) DEFAULT NULL,
+  meta_description VARCHAR(200) DEFAULT NULL,
+  meta_keyword VARCHAR(300) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (country_id) REFERENCES countries(id)
+);
 
+CREATE TABLE abroadpage_faqs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  abroad_page_id INT,
+  questions LONGTEXT,
+  answers LONGTEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (abroad_page_id) REFERENCES abroadpages(id) ON DELETE CASCADE
+  
+);
+
+CREATE TABLE exams (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  stream_id INT,
+  exam_title VARCHAR(150) NOT NULL,
+  slug VARCHAR(150) NOT NULL,
+  upcoming_date VARCHAR(150),
+  exam_short_name VARCHAR(150),
+  cover_image VARCHAR(150),
+  meta_title VARCHAR(150),
+  meta_description VARCHAR(200),
+  meta_keywords VARCHAR(200),
+  overview LONGTEXT,
+  exam_dates LONGTEXT,
+  eligibility_criteria LONGTEXT,
+  syllabus LONGTEXT,
+  cutoff LONGTEXT,
+  admit_card LONGTEXT,
+  exam_centers LONGTEXT,
+  results LONGTEXT,
+  prepretion_tips LONGTEXT,
+  counseling LONGTEXT,
+  accept_colleges LONGTEXT,
+  promo_banner VARCHAR(150),
+  promo_banner_status ENUM('Draft', 'Published') DEFAULT 'Draft',
+  status ENUM('Draft', 'Published') DEFAULT 'Published',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (stream_id) REFERENCES streams(id)
+);
+
+CREATE TABLE exam_faqs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  exam_id INT,
+  questions LONGTEXT,
+  answers LONGTEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (exam_id) REFERENCES exams(id)  ON DELETE CASCADE
+);
+
+CREATE TABLE redirect_urls (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  old_url VARCHAR(255) NOT NULL,
+  new_url VARCHAR(255) NOT NULL,
+  status_code ENUM('301', '307', '503') DEFAULT '301',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

@@ -1,17 +1,17 @@
 module.exports = (sequelize, Sequelize) => {
   const City = sequelize.define("cities", {
-    city_name: {
+    name: {
       type: Sequelize.STRING
     },
 	state_id: {
       type: Sequelize.INTEGER
     },
-    city_slug: {
-      type: Sequelize.STRING
-    },
-    city_description: {
-      type: Sequelize.STRING
-    },
+    // city_slug: {
+    //   type: Sequelize.STRING
+    // },
+    // city_description: {
+    //   type: Sequelize.STRING
+    // },
 
   }
     ,

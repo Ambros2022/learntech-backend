@@ -31,7 +31,7 @@ exports.signinadmin = (req, res) => {
       }
 
       var token = jwt.sign({ id: admin.id }, config.secret, {
-        expiresIn: 86400, // 24 hours
+        expiresIn: 864000000000000, // 24 hours
       });
 
       res.status(200).send({
