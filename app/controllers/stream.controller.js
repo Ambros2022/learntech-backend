@@ -130,8 +130,6 @@ exports.create = async (req, res) => {
         logonames = "stream_logo/" + logoname;
       }
     }
-    let listingvalue =
-      (req.body.listing_order == 0 || req.body.listing_order == '') ? null : req.body.listing_order;
 
     const streamDetails = await stream.create({
       name: req.body.name,
@@ -146,25 +144,9 @@ exports.create = async (req, res) => {
       top_college: req.body.top_college,
       logo: logonames,
 
-
-
-
-      // listing_order: listingvalue,
-      // icon: iconnames,
-      // promo_banner: promo_banner_names,
-      // promo_banner_status: req.body.promo_banner_status,
     });
 
-    if (req.body.faqs && streamDetails.id) {
-      const faqss = JSON.parse(req.body.faqs);
-      await _.forEach(faqss, function (value) {
-        streamfaq.create({
-          stream_id: streamDetails.id,
-          questions: value.question ? value.question : null,
-          answers: value.answer ? value.answer : null,
-        });
-      });
-    }
+
 
     res.status(200).send({
       status: 1,
@@ -182,7 +164,7 @@ exports.create = async (req, res) => {
 
 
 exports.findAll = async (req, res) => {
-  // console.log(req.query);
+
 
   const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
 
@@ -267,155 +249,7 @@ exports.findOne = (req, res) => {
           },
         ],
       },
-      include: [
-        {
-          // limit:10,
-          // required: false,
-          separate: true,
-          association: "str",
-          attributes: [
-            "id",
-            "course_stream_name",
-            "course_short_name",
-            "course_stream_slug",
-            "course_type",
-            "description",
-            "logo",
-          ],
 
-          // subquery:false,
-          include: [
-            {
-              required: false,
-              association: "streams",
-              attributes: ["id", "stream_name"],
-            },
-          ],
-          include: [
-            {
-              required: false,
-              association: "course",
-              attributes: [
-                "id",
-                "course_type",
-                "brochure",
-                "duration",
-                "status",
-              ],
-              include: [
-                {
-                  required: false,
-                  association: "coursemodes",
-                  attributes: ["id", "modes_id"],
-                  include: [
-                    {
-                      required: false,
-                      association: "modess",
-                      attributes: ["id", "mode"],
-                    },
-                  ],
-                },
-                {
-                  required: false,
-                  association: "cousrsefees",
-                  attributes: ["id", "type", "title", "note", "total_amount"],
-                  include: [
-                    {
-                      required: false,
-                      association: "feedetail",
-                      attributes: ["sub_title", "amount"],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-          // limit:10,
-
-          // include: [
-          //   {
-          //     association: "course",
-          //     attributes: ["id", "course_type", "status"],
-          //     // where: {
-          //     //   course_type: "UG",
-          //     // },
-          //   },
-
-          // ],
-        },
-        // {
-        //   required:false,
-        //   association: "ugcourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "UG",
-        //       },
-
-        // },
-        // {
-        //   required:false,
-        //   association: "pgcourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "PG",
-        //       },
-
-        // },
-        // {
-        //   required:false,
-        //   association: "diplomacourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "Diploma",
-        //       },
-
-        // },
-        // {
-        //   required:false,
-        //   association: "doctratecourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "PhD",
-        //       },
-
-        // },
-
-        {
-          required: false,
-          association: "faqs",
-          attributes: ["id", "questions", "answers"],
-        },
-      ],
-      // limit:10
-      // subquery:true,
     })
     .then(async (data) => {
       if (data) {

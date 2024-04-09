@@ -97,69 +97,6 @@ exports.create = async (req, res) => {
       extracurriculars: req.body.extracurriculars,
     });
 
-    if (req.body.board_id && schoolDetails.id) {
-      const boards = JSON.parse(req.body.board_id);
-      _.forEach(boards, async function (value) {
-        await boardschools.create({
-          school_id: schoolDetails.id,
-          board_id: value.board_id,
-        });
-      });
-    }
-    if (req.body.level_id && schoolDetails.id) {
-      const levels = JSON.parse(req.body.level_id);
-      _.forEach(levels, async function (value) {
-        await schoollevels.create({
-          school_id: schoolDetails.id,
-          level_id: value.level_id,
-        });
-      });
-    }
-    if (req.body.accreditation_id && schoolDetails.id) {
-      const acccredations = JSON.parse(req.body.accreditation_id);
-      _.forEach(acccredations, function (value) {
-        schoolaccreditations.create({
-          school_id: schoolDetails.id,
-          accreditation_id: value.accreditation_id,
-        });
-      });
-    }
-    if (req.body.amenities_id && schoolDetails.id) {
-      const amenities = JSON.parse(req.body.amenities_id);
-      _.forEach(amenities, function (value) {
-        schoolamenities.create({
-          school_id: schoolDetails.id,
-          amenities_id: value.amenities_id ? value.amenities_id : null,
-        });
-      });
-    }
-    if (req.body.management_id && schoolDetails.id) {
-      const management = JSON.parse(req.body.management_id);
-      _.forEach(management, function (value) {
-        schoolmanagment.create({
-          school_id: schoolDetails.id,
-          management_id: value.management_id,
-        });
-      });
-    }
-    if (req.body.recognition_id && schoolDetails.id) {
-      const recognition = JSON.parse(req.body.recognition_id);
-      _.forEach(recognition, function (value) {
-        schoolrecognition.create({
-          school_id: schoolDetails.id,
-          recognition_id: value.recognition_id,
-        });
-      });
-    }
-    if (req.body.affiliations_id && schoolDetails.id) {
-      const affiliations = JSON.parse(req.body.affiliations_id);
-      _.forEach(affiliations, function (value) {
-        schoolaffiliations.create({
-          school_id: schoolDetails.id,
-          affiliations_id: value.affiliations_id,
-        });
-      });
-    }
 
     res.status(200).send({
       status: 1,
@@ -197,7 +134,6 @@ exports.update = async (req, res) => {
       meta_keyword: req.body.meta_keyword,
       address: req.body.address,
       map: req.body.map,
-      // icon: req.body.icon,
       // icon: icons,
       banner_image: req.body.banner_image,
       video_url: req.body.video_url,
@@ -261,9 +197,6 @@ exports.findAll = async (req, res) => {
     size,
     searchText,
     searchfrom,
-    city_id,
-    area_id,
-    school_type_id,
     columnname,
     orderby,
   } = req.query;
@@ -279,18 +212,11 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var conditioncityid = city_id ? { city_id: city_id } : null;
-  var conditionarea_id = area_id ? { area_id: area_id } : null;
-  var conditionschool_type_id = school_type_id
-    ? { school_type_id: school_type_id }
-    : null;
 
   var condition = sendsearch.customseacrh(searchText, searchfrom);
 
   let data_array = [];
-  conditioncityid ? data_array.push(conditioncityid) : null;
-  conditionarea_id ? data_array.push(conditionarea_id) : null;
-  conditionschool_type_id ? data_array.push(conditionschool_type_id) : null;
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -300,75 +226,8 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
-      // subQuery: false,
-      include: [
-        {
-          required: false,
-          association: "citys",
-          attributes: ["id", "city_name"],
-        },
-        // {  required: false,association: "schoolboard", attributes: ["id", "name"] },
-        {
-          required: false,
-          association: "areas",
-          attributes: ["id", "area_name"],
-        },
-        {
-          required: false,
-          association: "schooltype",
-          attributes: ["id", "type"],
-        },
-        // { association: "schoollevel", attributes: ["id", "level"] },
-        {
-          required: false,
-          association: "boardschools",
-          attributes: ["id", "board_id"],
-          include: [
-            {
-              required: false,
-              association: "schbrdname",
-              attributes: ["id", "name"],
-            },
-          ],
-        },
-        {
-          required: false,
-          association: "schoollevels",
-          attributes: ["id", "level_id"],
-          include: [
-            {
-              required: false,
-              association: "schlevelname",
-              attributes: ["id", "level_name"],
-            },
-          ],
-        },
-        {
-          required: false,
-          association: "schoolaccreditations",
-          attributes: ["id", "accreditation_id"],
-        },
-        {
-          required: false,
-          association: "schoolamenities",
-          attributes: ["id", "amenities_id"],
-        },
-        {
-          required: false,
-          association: "schoolmanagment",
-          attributes: ["id", "management_id"],
-        },
-        {
-          required: false,
-          association: "schoolrecognition",
-          attributes: ["id", "recognition_id"],
-        },
-        {
-          required: false,
-          association: "schoolaffiliations",
-          attributes: ["id", "affiliations_id"],
-        },
-      ],
+      subQuery: false,
+    
       order: [orderconfig],
     })
     .then((data) => {
@@ -377,7 +236,6 @@ exports.findAll = async (req, res) => {
       res.status(200).send({
         status: 1,
         message: "success",
-        // data: response,
         totalItems: response.totalItems,
         currentPage: response.currentPage,
         totalPages: response.totalPages,
@@ -396,93 +254,7 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
-      include: [
-        { association: "citys", attributes: ["id", "city_name"] },
-        // { association: "schoolboard", attributes: ["id", "name"] },
-        { association: "areas", attributes: ["id", "area_name"] },
-        { association: "schooltype", attributes: ["id", "type"] },
-        {
-          association: "schfaqs",
-          attributes: ["id", "questions", "answers"],
-        },
-        {
-          required: false,
-          association: "boardschools",
-          attributes: ["id", "board_id"],
-          include: [
-            {
-              required: false,
-              association: "schbrdname",
-              attributes: ["id", "name"],
-            },
-          ],
-        },
-        {
-          association: "schoollevels",
-          attributes: ["id", "level_id"],
-          include: [
-            {
-              association: "schlevelname",
-              attributes: ["id", "level_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolaccreditations",
-          attributes: ["id", "accreditation_id"],
-          include: [
-            {
-              association: "schaccreditationname",
-              attributes: ["id", "accreditation_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolamenities",
-          attributes: ["id", "amenities_id"],
-          include: [
-            {
-              association: "schamenitiename",
-              attributes: ["id", "amenities_name", "amenities_logo"],
-            },
-          ],
-        },
-        {
-          association: "schoolmanagment",
-          attributes: ["id", "management_id"],
-          include: [
-            {
-              association: "schmanagementname",
-              attributes: ["id", "management_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolrecognition",
-          attributes: ["id", "recognition_id"],
-          include: [
-            {
-              association: "schrecognitionname",
-              attributes: ["id", "recognition_approval_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolaffiliations",
-          attributes: ["id", "affiliations_id"],
-          include: [
-            {
-              association: "schaffiliationname",
-              attributes: ["id", "other_affiliations_name"],
-            },
-          ],
-        },
-        {
-          required: false,
-          association: "schoolgallery",
-          attributes: ["id", "image"],
-        },
-      ],
+  
     })
     .then((data) => {
       if (data) {

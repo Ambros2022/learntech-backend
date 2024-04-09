@@ -44,14 +44,15 @@ db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
 db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
 db.page = require("../models/page.model.js")(sequelize, Sequelize);
 db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
-
+db.College = require("../models/College.model.js")(sequelize, Sequelize);
+db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequelize);
 
 
 
 db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
 
-db.CollegeAndUniversity = require("../models/CollegeAndUniversity.model.js")(sequelize, Sequelize);
+
 
 db.polytechnic = require("../models/polytechnic.model.js")(sequelize, Sequelize);
 db.generalcourse = require("../models/generalcourse.model.js")(sequelize, Sequelize);
@@ -73,7 +74,7 @@ db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize)
 db.college_accreditation = require("../models/college_accreditation.model.js")(sequelize, Sequelize);
 db.college_affiliation = require("../models/college_affiliation.model.js")(sequelize, Sequelize);
 
-db.college_stream = require("../models/college_stream.model.js")(sequelize, Sequelize);
+// db.college_stream = require("../models/college_stream.model.js")(sequelize, Sequelize);
 
 db.college_management= require("../models/college_managements.model.js")(sequelize, Sequelize);
 db.college_amenities  = require("../models/college_amenities.model.js")(sequelize, Sequelize);
@@ -212,6 +213,14 @@ db.school.belongsTo(db.schoolboards, {
 
 
 
+/*  relation college stream  */
+
+db.college_stream.hasMany(db.stream, { as: "stream" });
+db.college_stream.belongsTo(db.College, {
+  foreignKey: "college_id",
+  as: "college",
+});
+
 
 
 
@@ -223,11 +232,11 @@ db.abroad_universities.belongsTo(db.abroadcountries, {
   as: "country",
 });
 
-db.CollegeAndUniversity.hasMany(db.CollegeGalleries, { as: "CollegeGalleriess",foreignKey: 'college_id'  });
-db.CollegeGalleries.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "collegeAndUniversity",
-});
+// db.CollegeAndUniversity.hasMany(db.CollegeGalleries, { as: "CollegeGalleriess",foreignKey: 'college_id'  });
+// db.CollegeGalleries.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "collegeAndUniversity",
+// });
 
 
 
@@ -252,10 +261,10 @@ db.review.belongsTo(db.user, {
   foreignKey: "user_id",
   as: "users",
 });
-db.review.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "item_id",
-  as: "CollegeAndUniversity",
-});
+// db.review.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "item_id",
+//   as: "CollegeAndUniversity",
+// });
 db.review.belongsTo(db.courses, {
   foreignKey: "item_id",
   as: "maincourse",
@@ -290,24 +299,24 @@ db.placements.belongsTo(db.companies, {
 
 
 
-db.CollegeAndUniversity.hasMany(db.board_colleges, { as: "board_colleges",foreignKey:"college_id" });
-db.board_colleges.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "board_id",
-  as: "boardname",
-});
+// db.CollegeAndUniversity.hasMany(db.board_colleges, { as: "board_colleges",foreignKey:"college_id" });
+// db.board_colleges.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "board_id",
+//   as: "boardname",
+// });
 
-db.CollegeAndUniversity.hasMany(db.board_colleges, { as: "college_board",foreignKey:"board_id" });
-db.board_colleges.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "college_name",
-});
+// db.CollegeAndUniversity.hasMany(db.board_colleges, { as: "college_board",foreignKey:"board_id" });
+// db.board_colleges.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "college_name",
+// });
 
 
-db.CollegeAndUniversity.hasMany(db.university_colleges, { as: "university_colleges",foreignKey:"college_id"} );
-db.university_colleges.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "university_id",
-  as: "uniname",
-});
+// db.CollegeAndUniversity.hasMany(db.university_colleges, { as: "university_colleges",foreignKey:"college_id"} );
+// db.university_colleges.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "university_id",
+//   as: "uniname",
+// });
 
 
 
@@ -325,11 +334,11 @@ db.university_colleges.belongsTo(db.CollegeAndUniversity, {
 
 
 
-db.CollegeAndUniversity.hasMany(db.college_affiliation, { as: "college_affiliation" });
-db.college_affiliation.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id ",
-  as: "college_affiliation",
-});
+// db.CollegeAndUniversity.hasMany(db.college_affiliation, { as: "college_affiliation" });
+// db.college_affiliation.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id ",
+//   as: "college_affiliation",
+// });
 
 db.college_affiliation.belongsTo(db.affilition, {
   foreignKey: "affiliations_id",
@@ -337,11 +346,11 @@ db.college_affiliation.belongsTo(db.affilition, {
 });
 
 
-db.CollegeAndUniversity.hasMany(db.college_stream, { as: "college_stream" });
-db.college_stream.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id ",
-  as: "college_stream",
-});
+// db.CollegeAndUniversity.hasMany(db.college_stream, { as: "college_stream" });
+// db.college_stream.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id ",
+//   as: "college_stream",
+// });
 
 db.college_stream.belongsTo(db.stream, {
   foreignKey: "stream_id",
@@ -351,53 +360,53 @@ db.college_stream.belongsTo(db.stream, {
 
 
 
-db.CollegeAndUniversity.hasMany(db.college_accreditation, { as: "college_accreditation" });
-db.college_accreditation.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id ",
-  as: "college_accreditation",
-});
+// db.CollegeAndUniversity.hasMany(db.college_accreditation, { as: "college_accreditation" });
+// db.college_accreditation.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id ",
+//   as: "college_accreditation",
+// });
 db.college_accreditation.belongsTo(db.accreditation, {
   foreignKey: "accreditation_id",
   as: "accreditationname",
 });
 
 
-db.CollegeAndUniversity.hasMany(db.college_amenities, { as: "college_amenities" });
-db.college_amenities.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id ",
-  as: "college_amenities",
-});
+// db.CollegeAndUniversity.hasMany(db.college_amenities, { as: "college_amenities" });
+// db.college_amenities.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id ",
+//   as: "college_amenities",
+// });
 db.college_amenities.belongsTo(db.amenities, {
   foreignKey: "amenities_id",
   as: "amenitiename",
 });
 
-db.CollegeAndUniversity.hasMany(db.collegeRecognition, { as: "collegeRecognition" });
-db.collegeRecognition.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id ",
-  as: "collegeRecognition",
-});
+// db.CollegeAndUniversity.hasMany(db.collegeRecognition, { as: "collegeRecognition" });
+// db.collegeRecognition.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id ",
+//   as: "collegeRecognition",
+// });
 db.collegeRecognition.belongsTo(db.recognition, {
   foreignKey: "recognition_id",
   as: "recognitionname",
 });
 
-db.CollegeAndUniversity.hasMany(db.college_management, { as: "college_management" });
-db.college_management.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id ",
-  as: "college_management",
-});
+// db.CollegeAndUniversity.hasMany(db.college_management, { as: "college_management" });
+// db.college_management.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id ",
+//   as: "college_management",
+// });
 
 db.college_management.belongsTo(db.management, {
   foreignKey: "management_id",
   as: "managementname",
 });
 
-db.CollegeAndUniversity.hasMany(db.college_groupss, { as: "college_groups" });
-db.college_groupss.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_and_university_id",
-  as: "college_groupss",
-});
+// db.CollegeAndUniversity.hasMany(db.college_groupss, { as: "college_groups" });
+// db.college_groupss.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_and_university_id",
+//   as: "college_groupss",
+// });
 
 db.groups.hasMany(db.college_groupss, { as: "colllegegroup" });
 db.college_groupss.belongsTo(db.groups, {
@@ -411,38 +420,38 @@ db.college_groupss.belongsTo(db.groups, {
 
 
 
-db.CollegeAndUniversity.hasMany(db.placements, { as: "placement",foreignKey:"college_id" });
-db.placements.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "placement",
-});
+// db.CollegeAndUniversity.hasMany(db.placements, { as: "placement",foreignKey:"college_id" });
+// db.placements.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "placement",
+// });
 
 
-db.CollegeAndUniversity.hasMany(db.f_a_qs, { as: "faqs",foreignKey:"college_id" });
-db.f_a_qs.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "placement",
-});
-
-
-
+// db.CollegeAndUniversity.hasMany(db.f_a_qs, { as: "faqs",foreignKey:"college_id" });
+// db.f_a_qs.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "placement",
+// });
 
 
 
 
-db.CollegeAndUniversity.hasMany(db.rankings, { as: "rankings",foreignKey:"college_id" });
-db.rankings.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "rankings",
-});
 
 
 
-db.CollegeAndUniversity.hasMany(db.collegegallery, { as: "collegegallery",foreignKey:"college_id" });
-db.collegegallery.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "collegegallery",
-});
+// db.CollegeAndUniversity.hasMany(db.rankings, { as: "rankings",foreignKey:"college_id" });
+// db.rankings.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "rankings",
+// });
+
+
+
+// db.CollegeAndUniversity.hasMany(db.collegegallery, { as: "collegegallery",foreignKey:"college_id" });
+// db.collegegallery.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "collegegallery",
+// });
 
 db.school.hasMany(db.schoolgallery, { as: "schoolgallery",foreignKey:"school_id" });
 db.schoolgallery.belongsTo(db.school, {
@@ -450,11 +459,11 @@ db.schoolgallery.belongsTo(db.school, {
   as: "schoolgallery",
 });
 
-db.CollegeAndUniversity.hasMany(db.cutoff, { as: "cutoff",foreignKey:"college_id" });
-db.cutoff.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "cutoff",
-});
+// db.CollegeAndUniversity.hasMany(db.cutoff, { as: "cutoff",foreignKey:"college_id" });
+// db.cutoff.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "cutoff",
+// });
 
 db.cutoff.hasMany(db.cutoffdetails, { as: "cutoffdetails",foreignKey:"cut_offs_id"});
 db.cutoffdetails.belongsTo(db.cutoff, {
@@ -484,36 +493,36 @@ db.eligibilities.belongsTo(db.courses, {
   foreignKey: "course_id",
   as: "course1",
 });
-db.CollegeAndUniversity.hasMany(db.courses, { as: "college",foreignKey:"college_id"});
-db.courses.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "college",
-});
-db.CollegeAndUniversity.hasMany(db.courses, { as: "courses_college",foreignKey:"college_id"});
-db.courses.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "courses_college",
-});
-db.CollegeAndUniversity.hasMany(db.courses, { as: "coursesug",foreignKey:"college_id"});
-db.courses.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "coursesug",
-});
-db.CollegeAndUniversity.hasMany(db.courses, { as: "coursespg",foreignKey:"college_id"});
-db.courses.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "coursespg",
-});
-db.CollegeAndUniversity.hasMany(db.courses, { as: "coursesdiploma",foreignKey:"college_id"});
-db.courses.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "coursesdiploma",
-});
-db.CollegeAndUniversity.hasMany(db.courses, { as: "coursesdoctorate",foreignKey:"college_id"});
-db.courses.belongsTo(db.CollegeAndUniversity, {
-  foreignKey: "college_id",
-  as: "coursesdoctorate",
-});
+// db.CollegeAndUniversity.hasMany(db.courses, { as: "college",foreignKey:"college_id"});
+// db.courses.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "college",
+// });
+// db.CollegeAndUniversity.hasMany(db.courses, { as: "courses_college",foreignKey:"college_id"});
+// db.courses.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "courses_college",
+// });
+// db.CollegeAndUniversity.hasMany(db.courses, { as: "coursesug",foreignKey:"college_id"});
+// db.courses.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "coursesug",
+// });
+// db.CollegeAndUniversity.hasMany(db.courses, { as: "coursespg",foreignKey:"college_id"});
+// db.courses.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "coursespg",
+// });
+// db.CollegeAndUniversity.hasMany(db.courses, { as: "coursesdiploma",foreignKey:"college_id"});
+// db.courses.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "coursesdiploma",
+// });
+// db.CollegeAndUniversity.hasMany(db.courses, { as: "coursesdoctorate",foreignKey:"college_id"});
+// db.courses.belongsTo(db.CollegeAndUniversity, {
+//   foreignKey: "college_id",
+//   as: "coursesdoctorate",
+// });
 
 db.generalcourse.hasMany(db.courses, { as: "course",foreignKey:"course_id"});
 db.courses.belongsTo(db.generalcourse, {
@@ -920,17 +929,17 @@ db.generalcourse.belongsTo(db.stream, {
 
 
 /*** CollegeAndUniversityRelation ship  */
-db.city.hasMany(db.CollegeAndUniversity, { as: "CollegeAndUniversity" });
-db.CollegeAndUniversity.belongsTo(db.city, {
-  foreignKey: "city_id",
-  as: "city",
-});
+// db.city.hasMany(db.CollegeAndUniversity, { as: "CollegeAndUniversity" });
+// db.CollegeAndUniversity.belongsTo(db.city, {
+//   foreignKey: "city_id",
+//   as: "city",
+// });
 
-db.area.hasMany(db.CollegeAndUniversity, { as: "CollegeAndUniversity" });
-db.CollegeAndUniversity.belongsTo(db.area, {
-  foreignKey: "area_id",
-  as: "area",
-});
+// db.area.hasMany(db.CollegeAndUniversity, { as: "CollegeAndUniversity" });
+// db.CollegeAndUniversity.belongsTo(db.area, {
+//   foreignKey: "area_id",
+//   as: "area",
+// });
 
 // db.area.hasMany(db.school, { as: "school" });
 // db.school.belongsTo(db.area, {

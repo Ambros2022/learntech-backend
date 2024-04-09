@@ -1,6 +1,6 @@
 const db = require("../models");
 const path = require('path');
-const stream = db.sub_stream;
+const College = db.college_stream;
 const streamT = db.stream;
 const Op = db.Sequelize.Op;
 
@@ -29,22 +29,16 @@ exports.create = async (req, res) => {
 
   try {
 
-
-
-
-
-    const streamDetails = await stream.create({
-      stream_id: req.body.stream_id,
-      sub_stream_name: req.body.sub_stream_name,
-      sub_stream_slug: req.body.sub_stream_slug,
-      sub_stream_description: req.body.sub_stream_description ? req.body.sub_stream_description : null,
+ const CollegeDetails = await College.create({
+    stream_id: req.body.stream_id,
+    college_id: req.body.college_id,
     });
 
 
     res.status(200).send({
       status: 1,
       message: 'Data Save Successfully',
-      data: streamDetails
+      data: CollegeDetails
     });
   }
   catch (error) {
@@ -91,9 +85,10 @@ var data_array = [];
 
 
   const { limit, offset } = getPagination(page, size);
-  stream.findAndCountAll({
+  College.findAndCountAll({
     where: data_array, limit, offset,
-    include: { association: 'stream', attributes: ['id', 'name']} ,order:[orderconfig] 
+    // include: { association: 'stream', attributes: ['id', 'name']} ,
+    order:[orderconfig] 
   })
     .then(data => {
       const response = getPagingData(data, page, limit);

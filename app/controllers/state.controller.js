@@ -98,7 +98,7 @@ exports.findAll = async (req, res) => {
 
 exports.delete = (req, res) => {
     const id = req.params.id;
-    city.destroy({
+    state.destroy({
         where: { id: id }
     })
         .then(num => {
@@ -106,14 +106,14 @@ exports.delete = (req, res) => {
 
                 res.status(200).send({
                     status: 1,
-                    message: 'city deleted successfully',
+                    message: 'state deleted successfully',
 
                 });
 
             } else {
                 res.status(400).send({
                     status: 0,
-                    message: `city  with id=${id}. Maybe city id  was not found!`
+                    message: `state  with id=${id}. Maybe state id  was not found!`
 
                 });
             }
@@ -121,7 +121,7 @@ exports.delete = (req, res) => {
         .catch(err => {
             res.status(500).send({
                 status: 0,
-                message: "Could not delete city with id=" + id
+                message: "Could not delete state with id=" + id
 
             });
 

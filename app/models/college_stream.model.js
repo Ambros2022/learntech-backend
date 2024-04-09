@@ -4,7 +4,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER
       },
   
-      college_and_university_id: {
+      college_id: {
         type: Sequelize.INTEGER
       },
       
