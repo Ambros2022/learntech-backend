@@ -47,7 +47,7 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-    const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
     var column = columnname ? columnname : 'name';
     var order = orderby ? orderby : 'ASC';
@@ -60,7 +60,7 @@ exports.findAll = async (req, res) => {
         column = myArray[1];
         orderconfig = [table, column, order];
     }
-    var condition = sendsearch.customseacrh(searchText, searchfrom);
+    var condition = sendsearch.customseacrh(searchtext, searchfrom);
     const { limit, offset } = getPagination(page, size);
     state.findAndCountAll({
         where: condition, limit, offset,
@@ -98,7 +98,7 @@ exports.findAll = async (req, res) => {
 
 exports.delete = (req, res) => {
     const id = req.params.id;
-    city.destroy({
+    state.destroy({
         where: { id: id }
     })
         .then(num => {
@@ -106,14 +106,14 @@ exports.delete = (req, res) => {
 
                 res.status(200).send({
                     status: 1,
-                    message: 'city deleted successfully',
+                    message: 'state deleted successfully',
 
                 });
 
             } else {
                 res.status(400).send({
                     status: 0,
-                    message: `city  with id=${id}. Maybe city id  was not found!`
+                    message: `state  with id=${id}. Maybe state id  was not found!`
 
                 });
             }
@@ -121,7 +121,7 @@ exports.delete = (req, res) => {
         .catch(err => {
             res.status(500).send({
                 status: 0,
-                message: "Could not delete city with id=" + id
+                message: "Could not delete state with id=" + id
 
             });
 

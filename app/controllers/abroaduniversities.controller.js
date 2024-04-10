@@ -19,7 +19,7 @@ const getPagingData = (data, page, limit) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, country_id, searchfrom, columnname, orderby } =
+  const { page, size, searchtext, country_id, searchfrom, columnname, orderby } =
     req.query;
   // console.log(req.query);
   var column = columnname ? columnname : "id";
@@ -34,7 +34,7 @@ exports.findAll = async (req, res) => {
   }
 
   var conditioncountry_id = country_id ? { country_id: country_id } : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditioncountry_id ? data_array.push(conditioncountry_id) : null;

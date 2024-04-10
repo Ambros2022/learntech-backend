@@ -145,7 +145,7 @@ exports.update = (req, res) => {
 
 
 
-        const { page, size, searchText, medium_id, college_id, columnname, orderby } = req.query;
+        const { page, size, searchtext, medium_id, college_id, columnname, orderby } = req.query;
 
         var column = columnname ? columnname : 'id';
         var order = orderby ? orderby : 'ASC';
@@ -161,7 +161,7 @@ exports.update = (req, res) => {
 
 
 
-        var condition = searchText ?
+        var condition = searchtext ?
 
             {
 
@@ -169,14 +169,14 @@ exports.update = (req, res) => {
                     {
                         course_id:
                         {
-                            [Op.like]: `%${searchText}%`
+                            [Op.like]: `%${searchtext}%`
                         }
                     },
                 
                     {
                         title:
                         {
-                            [Op.like]: `%${searchText}%`
+                            [Op.like]: `%${searchtext}%`
                         }
                     },
 

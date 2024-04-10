@@ -135,7 +135,7 @@ exports.findAll = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     user_id,
     item_id,
@@ -182,7 +182,7 @@ exports.findAll = async (req, res) => {
     : null;
     
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditionuser_id ? data_array.push(conditionuser_id) : null;

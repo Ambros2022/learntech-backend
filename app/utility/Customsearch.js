@@ -5,8 +5,10 @@ const Op = db.Sequelize.Op;
 module.exports = {
 
     customseacrh: function (text, columnname) 
+   
     {
         try {
+            console.log(text,columnname);
             var column = columnname ? columnname : 'id';
 
             var result = [];

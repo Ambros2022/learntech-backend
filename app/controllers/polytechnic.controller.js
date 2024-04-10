@@ -219,7 +219,7 @@ exports.findAll = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     city_id,
     area_id,
@@ -245,7 +245,7 @@ exports.findAll = async (req, res) => {
     ? { polytechnic_type_id: polytechnic_type_id }
     : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditioncityid ? data_array.push(conditioncityid) : null;
@@ -374,7 +374,7 @@ exports.delete = (req, res) => {
 };
 
 exports.PolytechnictypefindAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -387,7 +387,7 @@ exports.PolytechnictypefindAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   condition ? data_array.push(condition) : null;

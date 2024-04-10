@@ -82,7 +82,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -94,7 +94,7 @@ exports.findAll = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   testimonial
