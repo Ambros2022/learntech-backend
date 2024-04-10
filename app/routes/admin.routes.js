@@ -201,14 +201,14 @@ module.exports = function (app) {
     statecontroller.create
   );
 
-  app.post(
+  app.put(
     "/api/admin/state/update",
     globalvalidation.updatestateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     statecontroller.update
   );
 
-  app.post(
+  app.delete(
     "/api/admin/state/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     statecontroller.delete
@@ -234,16 +234,16 @@ module.exports = function (app) {
     globalvalidation.citySchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     citycontroller.create
-  );
+  ); 
 
-  app.post(
+  app.put(
     "/api/admin/city/update",
     globalvalidation.cityUpdateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     citycontroller.update
   );
 
-  app.post(
+  app.delete(
     "/api/admin/city/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     citycontroller.delete
