@@ -8,7 +8,7 @@ module.exports = {
    
     {
         try {
-            console.log(text,columnname);
+
             var column = columnname ? columnname : 'id';
 
             var result = [];

@@ -11,6 +11,7 @@ const pagecontroller = require("../controllers/page.controller");
 const bannercontroller = require("../controllers/banner.controller");
 const Collegecontroller = require("../controllers/College.controller");
 const collegestreamcontroller = require("../controllers/collegestream.controller");
+const databackupcontroller = require("../controllers/databackup.controller");
 
 
 const admincontroller = require("../controllers/admin.controller");
@@ -60,7 +61,7 @@ const promopagecontroller = require("../controllers/promopage.controller");
 const newsandeventscontroller = require("../controllers/newsandevents.controller");
 const examcontroller = require("../controllers/exam.controller");
 const usercontroller = require("../controllers/user.controller");
-const databackupcontroller = require("../controllers/databackup.controller");
+
 const scholarshipcontroller = require("../controllers/scholarship.controller");
 
 const abroadcountriescontroller = require("../controllers/abroadcountries.controller");
@@ -111,6 +112,28 @@ module.exports = function (app) {
     );
     next();
   });
+  
+  /** Data backup  start*/
+
+
+  app.get(
+    "/api/admin/backup/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    databackupcontroller.findAll
+  );
+  app.get(
+    "/api/admin/backup/download/:file",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    databackupcontroller.downloadfile
+  );
+  app.get(
+    "/api/admin/backup/request",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    databackupcontroller.backuprequest
+  );
+
+
+  /** Data backup  End*/
 
   /**  redirecturl Routes Start  **/
   
@@ -168,7 +191,7 @@ module.exports = function (app) {
 
 
 
-  app.put(
+  app.post(
     "/api/admin/countries/update",
     globalvalidation.countriesUpdateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
@@ -201,14 +224,14 @@ module.exports = function (app) {
     statecontroller.create
   );
 
-  app.put(
+  app.post(
     "/api/admin/state/update",
     globalvalidation.updatestateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     statecontroller.update
   );
 
-  app.delete(
+  app.post(
     "/api/admin/state/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     statecontroller.delete
@@ -236,14 +259,14 @@ module.exports = function (app) {
     citycontroller.create
   ); 
 
-  app.put(
+  app.post(
     "/api/admin/city/update",
     globalvalidation.cityUpdateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     citycontroller.update
   );
 
-  app.delete(
+  app.post(
     "/api/admin/city/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     citycontroller.delete
@@ -754,27 +777,6 @@ app.post(
     usercontroller.changestatus
   );
 
-  /** Data backup  start*/
-
-
-  app.get(
-    "/api/admin/backup/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    databackupcontroller.findAll
-  );
-  app.get(
-    "/api/admin/backup/download/:file",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    databackupcontroller.downloadfile
-  );
-  app.get(
-    "/api/admin/backup/request",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    databackupcontroller.backuprequest
-  );
-
-
-  /** Data backup  End*/
 
 
 
