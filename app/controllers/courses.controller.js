@@ -269,7 +269,7 @@ exports.findAll = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     medium_id,
     college_id,
     course_id,
@@ -292,7 +292,7 @@ exports.findAll = async (req, res) => {
   var conditionmedium_id = medium_id ? { medium_id: medium_id } : null;
   var conditioncollege_id = college_id ? { college_id: college_id } : null;
   var conditioncourse_id = course_id ? { course_id: course_id } : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
   conditionmedium_id ? data_array.push(conditionmedium_id) : null;
   conditioncollege_id ? data_array.push(conditioncollege_id) : null;
@@ -439,7 +439,7 @@ exports.findOne = (req, res) => {
     });
 };
 exports.mediumfindAll = (req, res) => {
-  const { searchText, searchfrom, columnname, orderby } = req.query;
+  const { searchtext, searchfrom, columnname, orderby } = req.query;
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
   var orderconfig = [column, order];
@@ -450,7 +450,7 @@ exports.mediumfindAll = (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
 
   condition ? data_array.push(condition) : null;
@@ -475,7 +475,7 @@ exports.mediumfindAll = (req, res) => {
     });
 };
 exports.modesfindAll = (req, res) => {
-  const { searchText, searchfrom, columnname, orderby } = req.query;
+  const { searchtext, searchfrom, columnname, orderby } = req.query;
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
   var orderconfig = [column, order];
@@ -486,7 +486,7 @@ exports.modesfindAll = (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
 
   condition ? data_array.push(condition) : null;

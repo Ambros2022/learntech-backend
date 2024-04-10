@@ -243,7 +243,7 @@ exports.update = (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, author_id, columnname, orderby } =
+  const { page, size, searchtext, searchfrom, author_id, columnname, orderby } =
     req.query;
 
   var column = columnname ? columnname : "id";
@@ -258,7 +258,7 @@ exports.findAll = async (req, res) => {
   }
 
   var conditionStreamId = author_id ? { author_id: author_id } : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditionStreamId ? data_array.push(conditionStreamId) : null;

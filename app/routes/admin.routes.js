@@ -9,7 +9,8 @@ const streamcontroller = require("../controllers/stream.controller");
 const substreamcontroller = require("../controllers/substream.controller");
 const pagecontroller = require("../controllers/page.controller");
 const bannercontroller = require("../controllers/banner.controller");
-
+const Collegecontroller = require("../controllers/College.controller");
+const collegestreamcontroller = require("../controllers/collegestream.controller");
 
 
 const admincontroller = require("../controllers/admin.controller");
@@ -27,7 +28,7 @@ const generalcoursecontroller = require("../controllers/generalcourse.controller
 const recognitioncontroller = require("../controllers/recognition.controller");
 const affilitioncontroller = require("../controllers/affilition.controller");
 const Companycontroller = require("../controllers/company.controller");
-const CollegeAndUniversitycontroller = require("../controllers/CollegeAndUniversity.controller");
+// const CollegeAndUniversitycontroller = require("../controllers/CollegeAndUniversity.controller");
 const aboutcontroller = require("../controllers/about.controller");
 const servicecontroller = require("../controllers/service.controller");
 const authorcontroller = require("../controllers/author.controller");
@@ -531,6 +532,96 @@ app.post(
 );
 /**  banner Routes End*/
 
+/** CollegeAndUniversity route start*/
+
+app.get(
+  "/api/admin/College/get",
+  Collegecontroller.findAll
+);
+app.get(
+  "/api/admin/College/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.findOne
+);
+app.post(
+  "/api/admin/College/add",
+  globalvalidation.CollegeSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.create
+);
+app.post(
+  "/api/admin/College/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.delete
+);
+app.post(
+  "/api/admin/College/update",
+  globalvalidation.CollegeUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.update
+);
+
+app.post(
+  "/api/admin/College/updateplacements",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.updateplacements
+);
+app.post(
+  "/api/admin/College/updatefaqs",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.updatefaqs
+);
+app.post(
+  "/api/admin/College/updaterankings",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.updateranking
+);
+app.post(
+  "/api/admin/College/updategallery",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.updategallery
+);
+app.post(
+  "/api/admin/College/updatecutoff",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  Collegecontroller.updatecutoff
+);
+/** CollegeAndUniversity route end   */
+
+
+
+/* abroaduniversitiescontroller Routes start*/
+app.get(
+  "/api/admin/collegestream/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  collegestreamcontroller.findAll
+);
+
+app.get(
+  "/api/admin/collegestream/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  collegestreamcontroller.findOne
+);
+
+app.post(
+  "/api/admin/collegestream/add",
+  globalvalidation.collegestreamSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  collegestreamcontroller.create
+);
+
+app.post(
+  "/api/admin/collegestream/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  collegestreamcontroller.delete
+);
+
+app.post(
+  "/api/admin/collegestream/update",
+  globalvalidation.collegestreamSchemaUpdate,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  collegestreamcontroller.update
+);
 
 
 
@@ -1512,58 +1603,58 @@ app.post(
 
   /** CollegeAndUniversity route start*/
 
-  app.get(
-    "/api/admin/CollegeAndUniversity/get",
-    CollegeAndUniversitycontroller.findAll
-  );
-  app.get(
-    "/api/admin/CollegeAndUniversity/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.findOne
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/add",
-    globalvalidation.CollegeAndUniversitySchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.create
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.delete
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/update",
-    globalvalidation.CollegeAndUniversityUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.update
-  );
+  // app.get(
+  //   "/api/admin/CollegeAndUniversity/get",
+  //   CollegeAndUniversitycontroller.findAll
+  // );
+  // app.get(
+  //   "/api/admin/CollegeAndUniversity/get/:id",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.findOne
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/add",
+  //   globalvalidation.CollegeAndUniversitySchema,
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.create
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/delete/:id",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.delete
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/update",
+  //   globalvalidation.CollegeAndUniversityUpdateSchema,
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.update
+  // );
 
-  app.post(
-    "/api/admin/CollegeAndUniversity/updateplacements",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.updateplacements
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/updatefaqs",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.updatefaqs
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/updaterankings",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.updateranking
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/updategallery",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.updategallery
-  );
-  app.post(
-    "/api/admin/CollegeAndUniversity/updatecutoff",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    CollegeAndUniversitycontroller.updatecutoff
-  );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/updateplacements",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.updateplacements
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/updatefaqs",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.updatefaqs
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/updaterankings",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.updateranking
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/updategallery",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.updategallery
+  // );
+  // app.post(
+  //   "/api/admin/CollegeAndUniversity/updatecutoff",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   CollegeAndUniversitycontroller.updatecutoff
+  // );
   /** CollegeAndUniversity route end   */
 
   /** Companies route  start*/

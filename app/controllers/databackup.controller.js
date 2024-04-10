@@ -22,7 +22,7 @@ const getPagingData = (data, page, limit) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "created_at";
   var order = orderby ? orderby : "DESC";
@@ -35,7 +35,7 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   condition ? data_array.push(condition) : null;

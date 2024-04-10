@@ -86,7 +86,7 @@ const getPagingDataA = (data, page, limit) => {
 };
 
 exports.allabroadcountries = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -99,7 +99,7 @@ exports.allabroadcountries = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   abroadcountries
@@ -145,7 +145,7 @@ exports.blogsandnews = async (req, res) => {
   var {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
@@ -288,7 +288,7 @@ exports.topcollege = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
@@ -606,7 +606,7 @@ exports.pagetdata = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
@@ -1394,7 +1394,7 @@ exports.horizonschoolenquiry = async (req, res) => {
 };
 
 exports.generalcourse = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1406,7 +1406,7 @@ exports.generalcourse = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   stream
@@ -1462,7 +1462,7 @@ exports.generalcourse = async (req, res) => {
       });
     });
 
-  // const { page, size, searchText, stream_id, searchfrom, columnname, orderby } =
+  // const { page, size, searchtext, stream_id, searchfrom, columnname, orderby } =
   //   req.query;
 
   // var column = columnname ? columnname : "id";
@@ -1478,7 +1478,7 @@ exports.generalcourse = async (req, res) => {
 
   // var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
 
-  // var condition = sendsearch.customseacrh(searchText, searchfrom);
+  // var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   // let data_array = [];
   // conditionStreamId ? data_array.push(conditionStreamId) : null;
@@ -1521,7 +1521,7 @@ exports.coursesbystreamid = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     medium_id,
     college_id,
     course_id,
@@ -1553,7 +1553,7 @@ exports.coursesbystreamid = async (req, res) => {
     : null;
   var condtioncourse_type = course_type ? { course_type: course_type } : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
   let conditionstream = [];
 
@@ -1656,7 +1656,7 @@ exports.allentranceexams = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     stream_id,
     exam_id,
@@ -1677,7 +1677,7 @@ exports.allentranceexams = async (req, res) => {
   let conditionstreamid = stream_id ? { stream_id: stream_id } : null;
   let conditionexamm_id = exam_id ? { id: { [Op.ne]: exam_id } } : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
   condition ? data_array.push(condition) : null;
   conditionstreamid ? data_array.push(conditionstreamid) : null;
@@ -1799,7 +1799,7 @@ exports.topcollegebangalore = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
@@ -1865,7 +1865,7 @@ exports.topcollegebangalore = async (req, res) => {
 
   var conditionarea_id = area_id ? { area_id: area_id } : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [{ status: "Published" }];
 
@@ -2668,7 +2668,7 @@ exports.findcollegecourseone = (req, res) => {
 };
 
 exports.findallgroup = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2680,7 +2680,7 @@ exports.findallgroup = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   groups
@@ -2730,7 +2730,7 @@ exports.findAllcollegetype = async (req, res) => {
 };
 
 exports.findAllgeneralcourse = async (req, res) => {
-  const { page, size, searchText, stream_id, searchfrom, columnname, orderby } =
+  const { page, size, searchtext, stream_id, searchfrom, columnname, orderby } =
     req.query;
 
   var column = columnname ? columnname : "id";
@@ -2746,7 +2746,7 @@ exports.findAllgeneralcourse = async (req, res) => {
 
   var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditionStreamId ? data_array.push(conditionStreamId) : null;
@@ -2787,7 +2787,7 @@ exports.findAllgeneralcourse = async (req, res) => {
     });
 };
 exports.findallcitys = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2799,7 +2799,7 @@ exports.findallcitys = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   city
@@ -2827,7 +2827,7 @@ exports.findallcitys = async (req, res) => {
     });
 };
 exports.findallaccreditaions = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2839,7 +2839,7 @@ exports.findallaccreditaions = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   Accreditation.findAndCountAll({
@@ -2866,7 +2866,7 @@ exports.findallaccreditaions = async (req, res) => {
     });
 };
 exports.findallmanagments = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2878,7 +2878,7 @@ exports.findallmanagments = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   management
@@ -2910,7 +2910,7 @@ exports.topschoolbangalore = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
@@ -2980,7 +2980,7 @@ exports.topschoolbangalore = async (req, res) => {
 
   var conditionarea_id = area_id ? { area_id: area_id } : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [{ status: "published" }];
   data_array.push();
@@ -3397,7 +3397,7 @@ exports.findAllschoolclassification = async (req, res) => {
 };
 
 exports.findallschoolboards = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3409,7 +3409,7 @@ exports.findallschoolboards = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   schoolboards
@@ -3438,7 +3438,7 @@ exports.findallschoolboards = async (req, res) => {
 };
 
 exports.findallschoollevels = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3450,7 +3450,7 @@ exports.findallschoollevels = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   schoollevel
@@ -3476,7 +3476,7 @@ exports.findallschoollevels = async (req, res) => {
     });
 };
 exports.findallschooltypes = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3488,7 +3488,7 @@ exports.findallschooltypes = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   schooltype
@@ -3523,7 +3523,7 @@ exports.allblogs = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     author_id,
     category_id,
@@ -3564,7 +3564,7 @@ exports.allblogs = async (req, res) => {
   var conditionviewstatus = home_view_status
     ? { home_view_status: home_view_status }
     : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   condition_author_id ? data_array.push(condition_author_id) : null;
@@ -3699,7 +3699,7 @@ exports.findoneblog = async (req, res) => {
 };
 
 exports.findAllauthor = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3712,7 +3712,7 @@ exports.findAllauthor = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   author
@@ -3738,7 +3738,7 @@ exports.findAllauthor = async (req, res) => {
 };
 
 exports.findAllcategories = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3751,7 +3751,7 @@ exports.findAllcategories = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   categories
@@ -3778,7 +3778,7 @@ exports.findAllcategories = async (req, res) => {
 };
 
 exports.findallupcommingexams = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3801,7 +3801,7 @@ exports.findallupcommingexams = async (req, res) => {
   condition_examdate ? data_array.push(condition_examdate) : null;
   // console.log(data_array);
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   exam
@@ -3880,7 +3880,7 @@ exports.allnews = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     columnname,
     news_type,
     is_top_featured,
@@ -3905,7 +3905,7 @@ exports.allnews = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   conditionType ? data_array.push(conditionType) : null;
   condition ? data_array.push(condition) : null;
   conditionfeaturednews ? data_array.push(conditionfeaturednews) : null;
@@ -3941,7 +3941,7 @@ exports.allabroaduniversities = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     country_id,
     searchfrom,
     columnname,
@@ -3960,7 +3960,7 @@ exports.allabroaduniversities = async (req, res) => {
   }
 
   var conditioncountry_id = country_id ? { country_id: country_id } : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditioncountry_id ? data_array.push(conditioncountry_id) : null;
@@ -4189,7 +4189,7 @@ exports.aboutpage = (req, res) => {
 };
 
 exports.allscholarships = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -4202,7 +4202,7 @@ exports.allscholarships = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
 
@@ -4283,7 +4283,7 @@ exports.findonescholarship = (req, res) => {
 };
 
 exports.findhomepagevideos = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -4299,7 +4299,7 @@ exports.findhomepagevideos = async (req, res) => {
 
   let data_array = [];
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   condition ? data_array.push(condition) : null;
 
@@ -4340,7 +4340,7 @@ exports.findAllstreams = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     home_view_status,
     columnname,
@@ -4365,7 +4365,7 @@ exports.findAllstreams = async (req, res) => {
     ? { home_view_status: home_view_status }
     : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   condition ? data_array.push(condition) : null;
   conditionhomestatus ? data_array.push(conditionhomestatus) : null;
@@ -4416,7 +4416,7 @@ exports.findAllexams = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     home_view_status,
     columnname,
@@ -4436,7 +4436,7 @@ exports.findAllexams = async (req, res) => {
   var conditionhomestatus = home_view_status
     ? { home_view_status: home_view_status }
     : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
   /*let data_array = [
     { [Op.not]: [{ listing_order: null }] },
@@ -4487,7 +4487,7 @@ exports.findAllexams = async (req, res) => {
     });
 };
 exports.alltestimonial = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -4499,7 +4499,7 @@ exports.alltestimonial = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   const newcolumn = "role";
   const regex = /^https?:\/\/youtu\.be\/([a-zA-Z0-9_-]{11})$/;
   const { limit, offset } = getPagination(page, size);
@@ -4546,7 +4546,7 @@ exports.alltestimonial = async (req, res) => {
     });
 };
 exports.allteam = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -4558,7 +4558,7 @@ exports.allteam = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   team
@@ -4587,7 +4587,7 @@ exports.allpromotionalbanners = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     promo_banner,
     columnname,
@@ -4606,7 +4606,7 @@ exports.allpromotionalbanners = async (req, res) => {
   let data_array = [];
 
   var conditionpage = promo_banner ? { promo_banner: promo_banner } : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   condition ? data_array.push(condition) : null;
   conditionpage ? data_array.push(conditionpage) : null;
@@ -4650,7 +4650,7 @@ exports.sitemap = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
@@ -4984,7 +4984,7 @@ exports.seolink = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     city_id,
     area_id,
     searchfrom,
