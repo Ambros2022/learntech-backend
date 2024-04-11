@@ -113,38 +113,51 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  const id = req.body.id;
-  try {
-    let logonames = "";
 
-    let STREAD = {
-      country_id: req.body.country_id,
-      state_id: req.body.state_id,
-      city_id: req.body.city_id,
-      school_board_id: req.body.school_board_id,
-      name: req.body.name,
-      slug: req.body.slug,
-      status: req.body.status,
-      home_view_status: req.body.home_view_status,
-      school_type: req.body.school_type,
-      listing_order: req.body.listing_order,
-      established: req.body.established,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      address: req.body.address,
-      map: req.body.map,
-      // icon: icons,
-      banner_image: req.body.banner_image,
-      video_url: req.body.video_url,
-      avg_rating: req.body.avg_rating,
-      info: req.body.info,
-      admissions_process: req.body.admissions_process,
-      extracurriculars: req.body.extracurriculars,
+  try {
+
+    const existingRecord = await school.findOne({
+      where: { id: req.body.id },
+    });
+
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+
+    let Schoolupdates = {
+      country_id: req.body.country_id || existingRecord.country_id,
+      state_id: req.body.state_id || existingRecord.state_id,
+      city_id: req.body.city_id || existingRecord.city_id,
+      school_board_id: req.body.school_board_id || existingRecord.school_board_id,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      status: req.body.status || existingRecord.status,
+      home_view_status: req.body.home_view_status || existingRecord.home_view_status,
+      school_type: req.body.school_type || existingRecord.school_type,
+      listing_order: req.body.listing_order || existingRecord.listing_order,
+      established: req.body.established || existingRecord.established,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
+      address: req.body.address || existingRecord.address,
+      map: req.body.map || existingRecord.map,
+      banner_image: req.body.banner_image || existingRecord.banner_image,
+      video_url: req.body.video_url || existingRecord.video_url,
+      avg_rating: req.body.avg_rating || existingRecord.avg_rating,
+      info: req.body.info || existingRecord.info,
+      admissions_process: req.body.admissions_process || existingRecord.admissions_process,
+      extracurriculars: req.body.extracurriculars || existingRecord.extracurriculars,
+
     };
 
     if (req.files && req.files.icon) {
-      let avatar = req.files.icon;
+      const avatar = req.files.icon;
+
+
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -163,19 +176,26 @@ exports.update = async (req, res) => {
         });
       }
 
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
 
-      let IsUpload = avatar.mv("./storage/school_logo/" + logoname) ? 1 : 0;
+      const uploadPath = "./storage/school_logo/" + logoname;
+      // const uploadPath = "./storage/amenities_logo/" + logoname;
 
-      if (IsUpload) {
-        icons = "school_logo/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      Schoolupdates.icon = "school_logo" + logoname;
+
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.icon) {
+        const oldLogoPath = "./storage/" + existingRecord.icon;
+        await removeFile(oldLogoPath);
       }
-      STREAD["school_logo"] = logonames;
     }
 
-    await school.update(STREAD, {
-      where: { id },
-    });
+    // Update database record
+    await school.update(Schoolupdates, { where: { id: req.body.id } });
 
 
     res.status(200).send({
@@ -227,7 +247,7 @@ exports.findAll = async (req, res) => {
       limit,
       offset,
       subQuery: false,
-    
+
       order: [orderconfig],
     })
     .then((data) => {
@@ -254,7 +274,7 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
-  
+
     })
     .then((data) => {
       if (data) {
