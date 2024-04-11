@@ -183,6 +183,8 @@ const Test = [
     .withMessage("User name should be string"),
 ];
 
+
+
 const RedirecturlSchema = [
   body("old_url")
     .exists({ checkFalsy: true })
@@ -260,6 +262,41 @@ const RedirecturlSchemaUpdate = [
   body("status_code")
     .exists({ checkFalsy: true })
     .withMessage(" status_code is required"),
+
+];
+
+const recognitionSchema = [
+  checkField('recognition_approval_name', 150, recognition, true),
+
+
+  body("recognition_approval_full_name")
+    .exists({ checkFalsy: true })
+    .withMessage("full name is required"),
+
+  body("recognition_approval_slug")
+    .exists({ checkFalsy: true })
+    .withMessage("recognition_approval_slug is required"),
+
+
+];
+const recognitionUpdateSchema = [
+  ...validateIdRequired_id(recognition, "id"),
+  checkField_update('recognition_approval_name', 150, recognition, true),
+
+
+
+  body("recognition_approval_full_name")
+    .exists({ checkFalsy: true })
+    .withMessage("recognition_approval_full_name is required")
+    .isLength({ max: 150 })
+    .withMessage("recognition_approval_full_name be less than 150 character"),
+
+  body("recognition_approval_slug")
+    .exists({ checkFalsy: true })
+    .withMessage("recognition_approval_slug is required")
+    .isLength({ max: 150 })
+    .withMessage("recognition_approval_slug be less than 150 character"),
+
 
 ];
 const countrySchema = [
@@ -340,69 +377,50 @@ const AmenitiesSchemaUpdate = [
 
 const schoolboardSchema = [
   checkField('name', 150, schoolboards, true),
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
 ];
 
 const schoolboardUpdateSchema = [
   ...validateIdRequired_id(schoolboards, "id"),
   checkField_update('name', 150, schoolboards, true),
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
 
 ];
 
+
 const schoolSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("School  name is required")
-    .isLength({ max: 150 })
-    .withMessage("School  name should be less than 150 character"),
-    checkField('name', 150, school, true),
-
   checkField('name', 150, school, true),
-
-  body("school_board_id")
+  body("slug")
     .exists({ checkFalsy: true })
-    .withMessage("school board id  is required"),
-
-  body("country_id")
-    .exists({ checkFalsy: true })
-    .withMessage("country id  is required"),
-
-  body("state_id")
-    .exists({ checkFalsy: true })
-    .withMessage("state id  is required"),
-
-  body("city_id")
-    .exists({ checkFalsy: true })
-    .withMessage("city id  is required")
-
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
 
 const schoolUpdateSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("School  name is required")
-    .isLength({ max: 150 })
-    .withMessage("School  name should be less than 150 character"),
-    checkField_update('name', 150, school, true),
-    
-
   ...validateIdRequired_id(school, "id"),
-
-  body("school_board_id")
+  checkField_update('name', 150, school, true),
+  body("slug")
     .exists({ checkFalsy: true })
-    .withMessage("school board id  is required"),
-
-  body("country_id")
-    .exists({ checkFalsy: true })
-    .withMessage("country id  is required"),
-
-  body("state_id")
-    .exists({ checkFalsy: true })
-    .withMessage("state id  is required"),
-
-  body("city_id")
-    .exists({ checkFalsy: true })
-    .withMessage("city id  is required")
+    .withMessage("Slug is required")
+    .isLength({ max: 150 }),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 
 ];
@@ -413,7 +431,7 @@ const StreamSchema = [
     .withMessage("Stream name is required")
     .isLength({ max: 150 })
     .withMessage("Stream name should be less than 150 character"),
-    checkField('name', 150, stream, true),
+  checkField('name', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
@@ -443,7 +461,7 @@ const StreamSchemaUpdate = [
     .withMessage("Stream name is required")
     .isLength({ max: 150 })
     .withMessage("Stream name should be less than 150 character"),
-    checkField_update('name', 150, stream, true),
+  checkField_update('name', 150, stream, true),
 
   ...validateIdRequired_id(stream, "id"),
 
@@ -586,68 +604,22 @@ const SubStreamSchemaUpdate = [
 
 
 const PageSchema = [
-   
-  body("url")
-    .exists({ checkFalsy: true })
-    .withMessage("url is required")
-    .isLength({ max: 150 })
-    .withMessage("url should be less than 150 character"),
-    checkField('url', 150, pages, true),
-
-
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta Title is required")
-    .isLength({ max: 200 })
-    .withMessage("Meta Title should be less than 200 character"),
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta keyword is required")
-    .isLength({ max: 200 })
-    .withMessage("Meta keyword should be less than 200 character"),
-
-  body("meta_description")
-    .optional({ nullable: true })
-    .isLength({ max: 200 })
-    .withMessage("Meta Description should be less than 200 character"),
+  checkField('url', 250, pages, true),
 ];
 
 const PageUpdateSchema = [
-  body("url")
-  .exists({ checkFalsy: true })
-  .withMessage("url is required")
-  .isLength({ max: 150 })
-  .withMessage("url should be less than 150 character"),
-  checkField_update('url', 150, pages, true),
-
-
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta Title is required")
-    .isLength({ max: 200 })
-    .withMessage("Meta Title should be less than 200 character"),
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("meta keyword is required")
-    .isLength({ max: 200 })
-    .withMessage("Meta keyword should be less than 200 character"),
-
-  body("meta_description")
-    .optional({ nullable: true })
-    .isLength({ max: 200 })
-    .withMessage("Meta Description should be less than 200 character"),
-
   ...validateIdRequired_id(pages, "id"),
+  checkField_update('url', 250, pages, true),
 
 ];
 
 const bannerSchema = [
-  body("title")
+  checkField('title', 150, banner, true),
+  body("link")
     .exists({ checkFalsy: true })
-    .withMessage("title is required")
+    .withMessage("link is required")
     .isLength({ max: 150 })
-    .withMessage("title should be less than 150 character"),
-    checkField('title', 150, banner, true),
+    .withMessage("link should be less than 150 character"),
 
   body("status")
     .exists({ checkFalsy: true })
@@ -655,25 +627,12 @@ const bannerSchema = [
     .isLength({ max: 150 })
     .withMessage("status should be less than 150 character"),
 
-  body("link")
-    .exists({ checkFalsy: true })
-    .withMessage("link is required")
-    .isLength({ max: 150 })
-    .withMessage("link should be less than 150 character"),
+
 ];
 
 const bannerUpdateSchema = [
   ...validateIdRequired_id(banner, "id"),
-  body("title")
-    .exists({ checkFalsy: true })
-    .withMessage("title is required")
-    .isLength({ max: 150 })
-    .withMessage("title should be less than 150 character"),
-    checkField_update('title', 150, banner, true),
-
- 
-
-
+  checkField_update('title', 150, banner, true),
   body("link")
     .exists({ checkFalsy: true })
     .withMessage("link is required")
@@ -692,18 +651,18 @@ const CollegeSchema = [
   body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField('name', 150, college, true),
 
-  
 
-body("slug")
+
+  body("slug")
     .exists({ checkFalsy: true })
     .withMessage("slug is required")
     .isLength({ max: 150 })
     .withMessage("slug should be less than 150 character"),
-    checkField('slug', 150, college, true),
+  checkField('slug', 150, college, true),
 
-    body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
-    body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
-    body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
+  body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
+  body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
+  body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
 
 
   body("meta_title")
@@ -740,14 +699,14 @@ const CollegeUpdateSchema = [
 
   body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField_update('name', 150, college, true),
-  
+
 
 
   body("slug")
-  .exists({ checkFalsy: true })
-  .withMessage("slug is required")
-  .isLength({ max: 150 })
-  .withMessage("slug should be less than 150 character"),
+    .exists({ checkFalsy: true })
+    .withMessage("slug is required")
+    .isLength({ max: 150 })
+    .withMessage("slug should be less than 150 character"),
 
 
   body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
@@ -789,7 +748,7 @@ const collegestreamSchemaUpdate = [
 
   ...validateIdRequired_id(stream, "stream_id"),
   ...validateIdRequired_id(college, "college_id"),
-  
+
 
 ];
 
@@ -2136,45 +2095,7 @@ const affilitionSchema = [
     }),
 ];
 
-const recognitionSchema = [
-  body("recognition_approval_name")
-    .exists({ checkFalsy: true })
-    .withMessage(" name is required")
-    .isLength({ max: 150 })
-    .withMessage("name should be less than 150 character"),
 
-  body("recognition_approval_full_name")
-    .exists({ checkFalsy: true })
-    .withMessage("full name is required"),
-
-  body("recognition_approval_slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return recognition
-        .findOne({
-          where: {
-            recognition_approval_slug: value,
-          },
-        })
-        .then((recognition) => {
-          if (recognition) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("keywords")
-    .exists({ checkFalsy: true })
-    .withMessage("Keywors is required")
-    .isLength({ max: 150 })
-    .withMessage("keywords should be less than 150 character"),
-];
 
 const affilitionUpdateSchema = [
   body("id")
@@ -2225,70 +2146,7 @@ const affilitionUpdateSchema = [
     }),
 ];
 
-const recognitionUpdateSchema = [
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return recognition
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((recognition) => {
-          if (recognition) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("recognition Does not exist");
-          }
-        });
-    }),
 
-  body("recognition_approval_full_name")
-    .exists({ checkFalsy: true })
-    .withMessage("full name is required"),
-
-  body("recognition_approval_name")
-    .exists({ checkFalsy: true })
-    .withMessage("name is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character"),
-
-  body("recognition_approval_slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return recognition
-        .findOne({
-          where: {
-            recognition_approval_slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((recognition) => {
-          if (recognition) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("keywords")
-    .exists({ checkFalsy: true })
-    .withMessage("keywords is required")
-    .isLength({ max: 150 })
-    .withMessage("keywords should be less than 150 character"),
-];
 
 
 
@@ -3646,7 +3504,8 @@ const globalvalidation = {
   CollegeUpdateSchema: CollegeUpdateSchema,
   collegestreamSchema: collegestreamSchema,
   collegestreamSchemaUpdate: collegestreamSchemaUpdate,
-
+  recognitionSchema: recognitionSchema,
+  recognitionUpdateSchema: recognitionUpdateSchema,
 
 
 
@@ -3662,11 +3521,11 @@ const globalvalidation = {
   enquiryUpdateSchema: enquiryUpdateSchema,
   GeneralcoursesSchema: GeneralcoursesSchema,
   GeneralcoursesSchemaupdate: GeneralcoursesSchemaupdate,
-  recognitionSchema: recognitionSchema,
+
   affilitionUpdateSchema: affilitionUpdateSchema,
   affilitionSchema: affilitionSchema,
-  recognitionUpdateSchema: recognitionUpdateSchema,
-  
+
+
   CompanySchema: CompanySchema,
   CompanyUpdateSchema: CompanyUpdateSchema,
   bannerUpdateSchema: bannerUpdateSchema,

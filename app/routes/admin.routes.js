@@ -12,6 +12,7 @@ const bannercontroller = require("../controllers/banner.controller");
 const Collegecontroller = require("../controllers/College.controller");
 const collegestreamcontroller = require("../controllers/collegestream.controller");
 const databackupcontroller = require("../controllers/databackup.controller");
+const recognitioncontroller = require("../controllers/recognition.controller");
 
 
 const admincontroller = require("../controllers/admin.controller");
@@ -26,7 +27,7 @@ const enquirycontroller = require("../controllers/enquiry.controller");
 const areacontroller = require("../controllers/area.controller");
 
 const generalcoursecontroller = require("../controllers/generalcourse.controller.js");
-const recognitioncontroller = require("../controllers/recognition.controller");
+
 const affilitioncontroller = require("../controllers/affilition.controller");
 const Companycontroller = require("../controllers/company.controller");
 // const CollegeAndUniversitycontroller = require("../controllers/CollegeAndUniversity.controller");
@@ -113,6 +114,45 @@ module.exports = function (app) {
     next();
   });
   
+
+  /*  Recognisation route End    */
+  
+  app.post(
+    "/api/admin/recognition/add",
+    globalvalidation.recognitionSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    recognitioncontroller.create
+  );
+
+  app.get(
+    "/api/admin/recognition/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    recognitioncontroller.findAll
+  );
+
+  app.post(
+    "/api/admin/recognition/update",
+    globalvalidation.recognitionUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    recognitioncontroller.update
+  );
+
+  app.get(
+    "/api/admin/recognition/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    recognitioncontroller.findOne
+  );
+
+  
+
+  app.post(
+    "/api/admin/recognition/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    recognitioncontroller.delete
+  );
+
+  
+  /** Recognisation route  End*/
   /** Data backup  start*/
 
 
@@ -648,7 +688,7 @@ app.post(
 
 
 
-
+////////////////////////old apis-------------------------------------------------------------------------------
 
 
 
@@ -1533,40 +1573,7 @@ app.post(
   );
   /**  management Routes End        */
 
-  /*  Recognisation route End    */
-
-  app.get(
-    "/api/admin/recognition/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    recognitioncontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/recognition/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    recognitioncontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/recognition/add",
-    globalvalidation.recognitionSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    recognitioncontroller.create
-  );
-
-  app.post(
-    "/api/admin/recognition/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    recognitioncontroller.delete
-  );
-
-  app.post(
-    "/api/admin/recognition/update",
-    globalvalidation.recognitionUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    recognitioncontroller.update
-  );
-  /** Recognisation route  End*/
+  
 
   /* Affilition route start*/
 

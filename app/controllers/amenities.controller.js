@@ -1,6 +1,6 @@
 const db = require("../models");
 const path = require("path");
-const fs = require("fs").promises;
+
 const Amenities = db.amenities;
 const sendsearch = require("../utility/Customsearch");
 const fileTypes = require("../config/fileTypes");
@@ -8,6 +8,7 @@ const fileTypes = require("../config/fileTypes");
 const array_of_allowed_file_types = fileTypes.Imageformat;
 const allowed_file_size = 2;
 // Function to remove a file
+const fs = require("fs").promises;
 async function removeFile(filePath) {
   try {
     await fs.unlink(filePath);
@@ -238,6 +239,7 @@ exports.update = async (req, res) => {
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.amenities_logo) {
+        console.log("existingRecord.icon",existingRecord.amenities_logo);
         const oldLogoPath = "./storage/" + existingRecord.amenities_logo;
         await removeFile(oldLogoPath);
       }
