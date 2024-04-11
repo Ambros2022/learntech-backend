@@ -48,6 +48,7 @@ db.accesstokens = require("../models/accesstokens.model.js")(sequelize, Sequeliz
 
 db.College = require("../models/College.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequelize);
+db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
 
 
 
@@ -72,7 +73,7 @@ db.accreditation = require("../models/accreditation.model.js")(sequelize, Sequel
 db.management = require("../models/management.model.js")(sequelize, Sequelize);
 db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 db.affilition = require("../models/affilition.model.js")(sequelize, Sequelize);
-db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
+
 db.college_accreditation = require("../models/college_accreditation.model.js")(sequelize, Sequelize);
 db.college_affiliation = require("../models/college_affiliation.model.js")(sequelize, Sequelize);
 
@@ -388,10 +389,10 @@ db.college_amenities.belongsTo(db.amenities, {
 //   foreignKey: "college_and_university_id ",
 //   as: "collegeRecognition",
 // });
-db.collegeRecognition.belongsTo(db.recognition, {
-  foreignKey: "recognition_id",
-  as: "recognitionname",
-});
+// db.collegeRecognition.belongsTo(db.recognition, {
+//   foreignKey: "recognition_id",
+//   as: "recognitionname",
+// });
 
 // db.CollegeAndUniversity.hasMany(db.college_management, { as: "college_management" });
 // db.college_management.belongsTo(db.CollegeAndUniversity, {
@@ -747,10 +748,10 @@ db.schoolrecognition.belongsTo(db.school, {
   as: "schoolrecognition",
 });
 
-db.schoolrecognition.belongsTo(db.recognition, {
-  foreignKey: "recognition_id",
-  as: "schrecognitionname",
-});
+// db.schoolrecognition.belongsTo(db.recognition, {
+//   foreignKey: "recognition_id",
+//   as: "schrecognitionname",
+// });
 
 db.fees.hasMany(db.fee_details, { as: "fees" });
 db.fee_details.belongsTo(db.fees, {

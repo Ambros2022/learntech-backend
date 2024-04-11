@@ -1,9 +1,8 @@
 const db = require("../models");
 const path = require("path");
 const banner = db.banner;
-const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -68,7 +67,7 @@ exports.create = async (req, res) => {
         link: req.body.link,
         description: req.body.description,
         status: req.body.status,
-        promo_banner: req.body.promo_banner ? req.body.promo_banner:"Draft",
+        promo_banner: req.body.promo_banner ? req.body.promo_banner : "Draft",
         image: images,
       });
 
@@ -88,7 +87,7 @@ exports.create = async (req, res) => {
 };
 
 exports.update = (req, res) => {
-  const id = req.body.id;
+
   try {
     let images = " ";
 
@@ -97,7 +96,7 @@ exports.update = (req, res) => {
       link: req.body.link,
       description: req.body.description,
       status: req.body.status,
-      promo_banner: req.body.promo_banner ? req.body.promo_banner:"Draft",
+      promo_banner: req.body.promo_banner ? req.body.promo_banner : "Draft",
     };
     if (req.files && req.files.image) {
       let avatar = req.files.image;
