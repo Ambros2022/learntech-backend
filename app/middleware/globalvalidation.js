@@ -426,179 +426,64 @@ const schoolUpdateSchema = [
 ];
 
 const StreamSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Stream name should be less than 150 character"),
   checkField('name', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("Slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            return true;
-          }
-        });
-    }),
+    .withMessage("Slug should be less than 150 character"),
+
+  body("h1_title")
+    .exists({ checkFalsy: true })
+    .withMessage("h1 title is required")
+    .isLength({ max: 150 })
+    .withMessage("h1 title should be less than 150 character"),
 ];
 
 const StreamSchemaUpdate = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Stream name should be less than 150 character"),
-  checkField_update('name', 150, stream, true),
-
   ...validateIdRequired_id(stream, "id"),
-
+  checkField_update('name', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("Slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return stream
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
+    .withMessage("Slug should be less than 150 character"),
+
+  body("h1_title")
+    .exists({ checkFalsy: true })
+    .withMessage("h1 title is required")
+    .isLength({ max: 150 })
+    .withMessage("h1 title should be less than 150 character"),
+
 ];
 
 const SubStreamSchema = [
-  body("sub_stream_name")
-    .exists({ checkFalsy: true })
-    .withMessage("Sub Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Sub Stream name should be less than 150 character"),
+  checkField('sub_stream_name', 150, substream, true),
 
   body("sub_stream_slug")
     .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
+    .withMessage("sub stream slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return substream
-        .findOne({
-          where: {
-            sub_stream_slug: value,
-          },
-        })
-        .then((substream) => {
-          if (substream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            return true;
-          }
-        });
-    }),
+    .withMessage("sub stream slug should be less than 150 character"),
 
-  body("stream_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream Id is required")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Stream Id Not exist");
-          }
-        });
-    }),
+  ...validateIdRequired_id(stream, "stream_id"),
+
 ];
 
 const SubStreamSchemaUpdate = [
-  body("sub_stream_name")
-    .exists({ checkFalsy: true })
-    .withMessage("Sub Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Stream name should be less than 150 character"),
-
   ...validateIdRequired_id(substream, "id"),
 
+  checkField_update('sub_stream_name', 150, substream, true),
 
   body("sub_stream_slug")
     .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
+    .withMessage("sub stream slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return substream
-        .findOne({
-          where: {
-            sub_stream_slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((substream) => {
-          if (substream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
+    .withMessage("sub stream slug should be less than 150 character"),
 
-  body("stream_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream Id is required")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Stream Id Not exist");
-          }
-        });
-    }),
+  ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 

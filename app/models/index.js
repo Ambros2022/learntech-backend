@@ -218,11 +218,11 @@ db.school.belongsTo(db.schoolboards, {
 
 /*  relation college stream  */
 
-db.college_stream.hasMany(db.stream, { as: "stream" });
-db.college_stream.belongsTo(db.College, {
-  foreignKey: "college_id",
-  as: "college",
-});
+// db.college_stream.hasMany(db.stream, { as: "stream" });
+// db.college_stream.belongsTo(db.College, {
+//   foreignKey: "college_id",
+//   as: "college",
+// });
 
 
 
@@ -874,11 +874,11 @@ db.sub_stream.belongsTo(db.stream, {
 
 
 /*** sub stream Relation ship  */
-db.stream.hasMany(db.stream_faq, { as: "faqs" });
-db.stream_faq.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "stream",
-});
+// db.stream.hasMany(db.stream_faq, { as: "faqs" });
+// db.stream_faq.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "stream",
+// });
 
 
 /*** generl course Relation ship  */
