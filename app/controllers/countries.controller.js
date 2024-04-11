@@ -30,13 +30,13 @@ exports.findAll = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  console.log("searchtext",searchtext);
+
 
   let condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   condition ? data_array.push(condition) : null;
-console.log("data_array",data_array);
+
   const { limit, offset } = getPagination(page, size);
   countries
     .findAndCountAll({

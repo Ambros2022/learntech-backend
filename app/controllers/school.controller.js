@@ -17,6 +17,17 @@ const schoolgallery = db.schoolgallery;
 const Op = db.Sequelize.Op;
 // Array of allowed files
 const fileTypes = require("../config/fileTypes");
+// Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -36,10 +47,12 @@ const getPagingData = (data, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return { totalItems, school, totalPages, currentPage };
 };
+// Function to remove a file
 
 exports.create = async (req, res) => {
   try {
     let icons = "";
+    let bannerimages = "";
 
     if (req.files && req.files.icon) {
       let avatar = req.files.icon;
@@ -70,6 +83,35 @@ exports.create = async (req, res) => {
       }
     }
 
+    if (req.files && req.files.banner_image) {
+      let avatar = req.files.banner_image;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/school_banner_image/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        bannerimages = "school_banner_image/" + logoname;
+      }
+    }
+
     const schoolDetails = await school.create({
       country_id: req.body.country_id,
       state_id: req.body.state_id,
@@ -89,7 +131,7 @@ exports.create = async (req, res) => {
       map: req.body.map,
       // icon: req.body.icon,
       icon: icons,
-      banner_image: req.body.banner_image,
+      banner_image: bannerimages,
       video_url: req.body.video_url,
       avg_rating: req.body.avg_rating,
       info: req.body.info,
@@ -145,7 +187,6 @@ exports.update = async (req, res) => {
       meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
       address: req.body.address || existingRecord.address,
       map: req.body.map || existingRecord.map,
-      banner_image: req.body.banner_image || existingRecord.banner_image,
       video_url: req.body.video_url || existingRecord.video_url,
       avg_rating: req.body.avg_rating || existingRecord.avg_rating,
       info: req.body.info || existingRecord.info,
@@ -154,42 +195,70 @@ exports.update = async (req, res) => {
 
     };
 
+    // Check if a new logo is provided
     if (req.files && req.files.icon) {
       const avatar = req.files.icon;
 
-
-
-      // Check if the uploaded file is allowed
+      // Check file type and size
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
         return res.status(400).send({
-          message: "Invalid File type ",
+          message: "Invalid file type",
           errors: {},
           status: 0,
         });
       }
-
       if (avatar.size / (1024 * 1024) > allowed_file_size) {
         return res.status(400).send({
-          message: "File too large ",
+          message: "File too large",
           errors: {},
           status: 0,
         });
       }
 
       const logoname = "logo" + Date.now() + path.extname(avatar.name);
-
       const uploadPath = "./storage/school_logo/" + logoname;
-      // const uploadPath = "./storage/amenities_logo/" + logoname;
-
 
       await avatar.mv(uploadPath);
 
-      Schoolupdates.icon = "school_logo" + logoname;
-
+      Schoolupdates.icon = "school_logo/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.icon) {
+
         const oldLogoPath = "./storage/" + existingRecord.icon;
+        await removeFile(oldLogoPath);
+      }
+    }
+    if (req.files && req.files.banner_image) {
+      const avatar = req.files.banner_image;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/school_banner_image/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      Schoolupdates.banner_image = "school_banner_image/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner_image) {
+
+        const oldLogoPath = "./storage/" + existingRecord.banner_image;
         await removeFile(oldLogoPath);
       }
     }
@@ -246,6 +315,29 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schoolboard",
+          attributes: ["id", "name"],
+        },
+
+      ],
       subQuery: false,
 
       order: [orderconfig],
@@ -274,6 +366,29 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schoolboard",
+          attributes: ["id", "name"],
+        },
+
+      ],
 
     })
     .then((data) => {

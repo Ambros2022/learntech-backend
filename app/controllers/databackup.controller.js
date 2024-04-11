@@ -69,7 +69,7 @@ exports.downloadfile = async (req, res) => {
   const file = req.params.file;
   // const { file } = req.query;
   var filepath = file ? file : "";
-  const diractoryname = "storage/app/backup/";
+  const diractoryname = "storage/database_backup/";
   const filename = filepath;
 
 
@@ -100,7 +100,7 @@ exports.backuprequest = async (req, res) => {
     let datefromat =
       year + "-" + month + "-" + day + "-" + h + "_" + m + "_" + s;
 
-    let filePath = "./storage/app/backup/backup-" + datefromat + ".sql";
+    let filePath = "./storage/database_backup/backup-" + datefromat + ".sql";
 
     let filename = "backup-" + datefromat + ".sql";
     const streamDetails = await databackup.create({
@@ -118,15 +118,7 @@ exports.backuprequest = async (req, res) => {
       },
       dumpToFile: filePath,
     });
-    // const result = await mysqldump({
-    //   connection: {
-    //     host: "localhost",
-    //     user: "root",
-    //     password: "",
-    //     database: "bstudy",
-    //   },
-    //   dumpToFile: filePath,
-    // });
+
     if (result) {
       await databackup.update(
         { status: 2 },
