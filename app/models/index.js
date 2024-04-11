@@ -230,10 +230,10 @@ db.college_stream.belongsTo(db.College, {
 
 /*** abroad_universities with country_id Relation ship  */
 // db.abroadcountries.hasMany(db.abroad_universities, { as: "abroaduniversities" });
-db.abroad_universities.belongsTo(db.abroadcountries, {
-  foreignKey: "country_id",
-  as: "country",
-});
+// db.abroad_universities.belongsTo(db.abroadcountries, {
+//   foreignKey: "country_id",
+//   as: "country",
+// });
 
 // db.CollegeAndUniversity.hasMany(db.CollegeGalleries, { as: "CollegeGalleriess",foreignKey: 'college_id'  });
 // db.CollegeGalleries.belongsTo(db.CollegeAndUniversity, {

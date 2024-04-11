@@ -378,79 +378,49 @@ const AmenitiesSchemaUpdate = [
 const schoolboardSchema = [
   checkField('name', 150, schoolboards, true),
   body("slug")
-  .exists({ checkFalsy: true })
-  .withMessage("Slug is required")
-  .isLength({ max: 150 })
-  .withMessage("Slug should be less than 150 character"),
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
 ];
 
 const schoolboardUpdateSchema = [
   ...validateIdRequired_id(schoolboards, "id"),
   checkField_update('name', 150, schoolboards, true),
   body("slug")
-  .exists({ checkFalsy: true })
-  .withMessage("Slug is required")
-  .isLength({ max: 150 })
-  .withMessage("Slug should be less than 150 character"),
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
 
 ];
 
 
 const schoolSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("School  name is required")
-    .isLength({ max: 150 })
-    .withMessage("School  name should be less than 150 character"),
-    checkField('name', 150, school, true),
-
   checkField('name', 150, school, true),
-
-  body("school_board_id")
+  body("slug")
     .exists({ checkFalsy: true })
-    .withMessage("school board id  is required"),
-
-  body("country_id")
-    .exists({ checkFalsy: true })
-    .withMessage("country id  is required"),
-
-  body("state_id")
-    .exists({ checkFalsy: true })
-    .withMessage("state id  is required"),
-
-  body("city_id")
-    .exists({ checkFalsy: true })
-    .withMessage("city id  is required")
-
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
 
 const schoolUpdateSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("School  name is required")
-    .isLength({ max: 150 })
-    .withMessage("School  name should be less than 150 character"),
-    checkField_update('name', 150, school, true),
-    
-
   ...validateIdRequired_id(school, "id"),
-
-  body("school_board_id")
+  checkField_update('name', 150, school, true),
+  body("slug")
     .exists({ checkFalsy: true })
-    .withMessage("school board id  is required"),
-
-  body("country_id")
-    .exists({ checkFalsy: true })
-    .withMessage("country id  is required"),
-
-  body("state_id")
-    .exists({ checkFalsy: true })
-    .withMessage("state id  is required"),
-
-  body("city_id")
-    .exists({ checkFalsy: true })
-    .withMessage("city id  is required")
+    .withMessage("Slug is required")
+    .isLength({ max: 150 }),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 
 ];
@@ -461,7 +431,7 @@ const StreamSchema = [
     .withMessage("Stream name is required")
     .isLength({ max: 150 })
     .withMessage("Stream name should be less than 150 character"),
-    checkField('name', 150, stream, true),
+  checkField('name', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
@@ -491,7 +461,7 @@ const StreamSchemaUpdate = [
     .withMessage("Stream name is required")
     .isLength({ max: 150 })
     .withMessage("Stream name should be less than 150 character"),
-    checkField_update('name', 150, stream, true),
+  checkField_update('name', 150, stream, true),
 
   ...validateIdRequired_id(stream, "id"),
 
@@ -640,16 +610,16 @@ const PageSchema = [
 const PageUpdateSchema = [
   ...validateIdRequired_id(pages, "id"),
   checkField_update('url', 250, pages, true),
- 
+
 ];
 
 const bannerSchema = [
   checkField('title', 150, banner, true),
   body("link")
-  .exists({ checkFalsy: true })
-  .withMessage("link is required")
-  .isLength({ max: 150 })
-  .withMessage("link should be less than 150 character"),
+    .exists({ checkFalsy: true })
+    .withMessage("link is required")
+    .isLength({ max: 150 })
+    .withMessage("link should be less than 150 character"),
 
   body("status")
     .exists({ checkFalsy: true })
@@ -681,18 +651,18 @@ const CollegeSchema = [
   body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField('name', 150, college, true),
 
-  
 
-body("slug")
+
+  body("slug")
     .exists({ checkFalsy: true })
     .withMessage("slug is required")
     .isLength({ max: 150 })
     .withMessage("slug should be less than 150 character"),
-    checkField('slug', 150, college, true),
+  checkField('slug', 150, college, true),
 
-    body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
-    body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
-    body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
+  body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
+  body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
+  body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
 
 
   body("meta_title")
@@ -729,14 +699,14 @@ const CollegeUpdateSchema = [
 
   body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField_update('name', 150, college, true),
-  
+
 
 
   body("slug")
-  .exists({ checkFalsy: true })
-  .withMessage("slug is required")
-  .isLength({ max: 150 })
-  .withMessage("slug should be less than 150 character"),
+    .exists({ checkFalsy: true })
+    .withMessage("slug is required")
+    .isLength({ max: 150 })
+    .withMessage("slug should be less than 150 character"),
 
 
   body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
@@ -778,7 +748,7 @@ const collegestreamSchemaUpdate = [
 
   ...validateIdRequired_id(stream, "stream_id"),
   ...validateIdRequired_id(college, "college_id"),
-  
+
 
 ];
 
@@ -3551,11 +3521,11 @@ const globalvalidation = {
   enquiryUpdateSchema: enquiryUpdateSchema,
   GeneralcoursesSchema: GeneralcoursesSchema,
   GeneralcoursesSchemaupdate: GeneralcoursesSchemaupdate,
-  
+
   affilitionUpdateSchema: affilitionUpdateSchema,
   affilitionSchema: affilitionSchema,
 
-  
+
   CompanySchema: CompanySchema,
   CompanyUpdateSchema: CompanyUpdateSchema,
   bannerUpdateSchema: bannerUpdateSchema,

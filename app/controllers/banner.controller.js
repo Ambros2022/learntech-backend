@@ -86,64 +86,7 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.update = (req, res) => {
 
-  try {
-    let images = " ";
-
-    let addeddata = {
-      title: req.body.title,
-      link: req.body.link,
-      description: req.body.description,
-      status: req.body.status,
-      promo_banner: req.body.promo_banner ? req.body.promo_banner : "Draft",
-    };
-    if (req.files && req.files.image) {
-      let avatar = req.files.image;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let image = "image" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/banners/" + image) ? 1 : 0;
-
-      if (IsUpload) {
-        images = "banners/" + image;
-
-        addeddata.image = images; //req.body.image,
-      }
-    }
-
-    banner.update(addeddata, {
-      where: { id: req.body.id },
-    });
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to update data",
-      errors: error,
-      status: 0,
-    });
-  }
-};
 
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -229,4 +172,77 @@ exports.findOne = (req, res) => {
         message: "Error retrieving banner with id=" + id,
       });
     });
+};
+
+
+exports.update = async (req, res) => {
+  try {
+    // Check if the record exists in the database
+    const existingRecord = await banner.findOne({
+      where: { id: req.body.id },
+    });
+
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+    let newdata = {
+      title: req.body.title,
+      link: req.body.link,
+      description: req.body.description,
+      status: req.body.status,
+      promo_banner: req.body.promo_banner ? req.body.promo_banner : "Draft",
+    };
+
+    // Check if a new logo is provided
+    if (req.files && req.files.image) {
+      const avatar = req.files.image;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/banners/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      newdata.image = "banners/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.image) {
+        const oldLogoPath = "./storage/" + existingRecord.image;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Update database record
+    await banner.update(newdata, { where: { id: req.body.id } });
+
+    res.status(200).send({
+      status: 1,
+      message: "Data saved successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to update data",
+      errors: error.message,
+      status: 0,
+    });
+  }
 };
