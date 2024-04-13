@@ -136,10 +136,7 @@ exports.update = (req, res) => {
         city.update
             ({
                 name: req.body.name,
-                // city_slug: req.body.city_slug,
-                // city_description: req.body.city_description,
                 state_id: req.body.state_id,
-                //state_id: req.body.state_id ? req.body.state_id : null,
             },
                 {
                     where: { id: req.body.id }
@@ -171,11 +168,6 @@ exports.findOne = (req, res) => {
                             [Op.eq]: id,
                         },
                     },
-                    // {
-                    //   stream_slug: {
-                    //     [Op.eq]: id,
-                    //   },
-                    // },
                 ],
             },
             include: [

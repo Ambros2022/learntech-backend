@@ -129,7 +129,6 @@ exports.create = async (req, res) => {
       meta_keyword: req.body.meta_keyword,
       address: req.body.address,
       map: req.body.map,
-      // icon: req.body.icon,
       icon: icons,
       banner_image: bannerimages,
       video_url: req.body.video_url,

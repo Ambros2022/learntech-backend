@@ -177,7 +177,9 @@ exports.findOne = (req, res) => {
 exports.create = async (req, res) => {
   try {
     let icons = "";
+    let logos = "";
     let bannerimages = "";
+
 
     if (req.files && req.files.icon) {
       let avatar = req.files.icon;
@@ -205,6 +207,35 @@ exports.create = async (req, res) => {
 
       if (IsUpload) {
         icons = "college_icon/" + logoname;
+      }
+    }
+
+    if (req.files && req.files.logo) {
+      let avatar = req.files.logo;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/college_logo/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        logos = "college_logo/" + logoname;
       }
     }
 
@@ -392,7 +423,7 @@ exports.update = async (req, res) => {
 
       await avatar.mv(uploadPath);
 
-      Schoolupdates.icon = "college_logo/" + logoname;
+      collegeupdate.icon = "college_logo/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.icon) {
@@ -426,7 +457,7 @@ exports.update = async (req, res) => {
 
       await avatar.mv(uploadPath);
 
-      Schoolupdates.logo = "college_logo/" + logoname;
+      collegeupdate.logo = "college_logo/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.logo) {
@@ -460,7 +491,7 @@ exports.update = async (req, res) => {
 
       await avatar.mv(uploadPath);
 
-      Schoolupdates.banner_image = "college_banner_image/" + logoname;
+      collegeupdate.banner_image = "college_banner_image/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.banner_image) {
@@ -471,7 +502,7 @@ exports.update = async (req, res) => {
     }
 
     // Update database record
-    await school.update(Schoolupdates, { where: { id: req.body.id } });
+    await College.update(collegeupdate, { where: { id: req.body.id } });
 
 
     res.status(200).send({
