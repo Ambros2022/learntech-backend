@@ -41,18 +41,17 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-  const { count: totalItems, rows: CollegeAndUniversity } = data;
+  const { count: totalItems, rows: College } = data;
   const currentPage = page ? +page : 1;
   const totalPages = Math.ceil(totalItems / limit);
-  return { totalItems, CollegeAndUniversity, totalPages, currentPage };
+  return { totalItems, College, totalPages, currentPage };
 };
+
 exports.findAll = async (req, res) => {
   const {
     page,
     size,
     searchtext,
-    // city_id,
-    // area_id,
     searchfrom,
     columnname,
     orderby,
@@ -69,65 +68,41 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  // var conditioncity_id = city_id ? { city_id: city_id } : null;
-  // var conditionarea_id = area_id ? { area_id: area_id } : null;
-
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
-  // conditioncity_id ? data_array.push(conditioncity_id) : null;
-  // conditionarea_id ? data_array.push(conditionarea_id) : null;
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
+  await College
+    .findAndCountAll({
+      distinct: true,
+      where: data_array,
+      limit,
+      offset,
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
 
-  let exclude_value = [
-    // "established",
-    // "areaId",
-    // "cityId",
-    // "rank",
-    // "slug",
-    // "meta_title",
-    // "meta_description",
-    // "meta_keyword",
-    // "code_before_head",
-    // "code_before_body",
-    // "facts",
-    // "listing_order",
-    // "keywords",
-    // "top_featured_order",
-    // "is_top_featured",
-    // "created_at",
-    // "updated_at",
-    // "college_type",
-    // "genders_accepted",
-    // "campus_size",
-    // "campus_size_type",
-    // "address",
-    // "map",
-    // "home_view_status",
-    // "order",
-    // "about",
-    // "video_full_url",
-    // "Scholarships",
-    // "admissions",
-    // "exam_data",
-    // "why_choose",
-    // "career_opportunities",
-  ];
+      ],
+      subQuery: false,
 
-  College.findAndCountAll({
-    where: data_array,
-    limit,
-    offset,
-    attributes: { exclude: exclude_value },
-    include: [
-      // { association: "city", attributes: ["id", "city_name"] },
-      // { association: "area", attributes: ["id", "area_name"] },
-    ],
-    order: [orderconfig],
-  })
-
+      order: [orderconfig],
+    })
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
@@ -143,15 +118,34 @@ exports.findAll = async (req, res) => {
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message:
-          err.message || "Some error occurred while retrieving colleges.",
+        message: err.message || "Some error occurred while retrieving college.",
       });
     });
 };
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  College.findByPk(id)
+  College.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "country",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "state",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "citys",
+        attributes: ["id", "name"],
+      },
+
+    ],
+    // ],
+  })
     .then((data) => {
       if (data) {
         res.status(200).send({
@@ -299,11 +293,11 @@ exports.create = async (req, res) => {
     });
 
 
-   if (
+    if (
       req.body.stream &&
-      CollegeDetails.id 
+      CollegeDetails.id
     ) {
-    
+
       const stream = JSON.parse(req.body.stream);
 
       await _.forEach(stream, function (value) {
@@ -398,8 +392,8 @@ exports.update = async (req, res) => {
     };
 
 
-     // Check if a new logo is provided
-     if (req.files && req.files.icon) {
+    // Check if a new logo is provided
+    if (req.files && req.files.icon) {
       const avatar = req.files.icon;
 
       // Check file type and size

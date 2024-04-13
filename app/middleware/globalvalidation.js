@@ -526,66 +526,24 @@ const bannerUpdateSchema = [
 ];
 
 const CollegeSchema = [
-  body("established")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 150 })
-    .withMessage("established should be less than 150 character"),
-
-  body("type").exists({ checkFalsy: true }).withMessage(" type is required"),
-
-  body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField('name', 150, college, true),
-
-
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("slug is required")
     .isLength({ max: 150 })
     .withMessage("slug should be less than 150 character"),
-  checkField('slug', 150, college, true),
 
-  body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
-  body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
-  body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 
-
-  body("meta_title")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta title should be less than 200 character"),
-
-  body("meta_description")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta description should be less than 200 character"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 300 })
-    .withMessage("meta keyword should be less than 300 character"),
-
-
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
 ];
 
 const CollegeUpdateSchema = [
   ...validateIdRequired_id(college, "id"),
 
-  body("established")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 150 })
-    .withMessage("established should be less than 150 character"),
-
-
-  body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField_update('name', 150, college, true),
-
-
 
   body("slug")
     .exists({ checkFalsy: true })
@@ -593,32 +551,11 @@ const CollegeUpdateSchema = [
     .isLength({ max: 150 })
     .withMessage("slug should be less than 150 character"),
 
-
-  body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
-  body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
-  body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
-
-  body("meta_title")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta title should be less than 200 character"),
-
-  body("meta_description")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta description should be less than 200 character"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 300 })
-    .withMessage("meta keyword should be less than 300 character"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 
 
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
 ];
 
 

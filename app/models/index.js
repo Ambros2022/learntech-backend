@@ -214,6 +214,22 @@ db.school.belongsTo(db.schoolboards, {
 });
 
 
+/***  Relation ship college  */
+
+db.College.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+
+db.College.belongsTo(db.state, {
+  foreignKey: "state_id",
+  as: "state",
+});
+
+db.College.belongsTo(db.city, {
+  foreignKey: "city_id",
+  as: "citys",
+});
 
 
 /*  relation college stream  */
