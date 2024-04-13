@@ -47,7 +47,7 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby,state_id } = req.query;
 
     var column = columnname ? columnname : 'name';
     var order = orderby ? orderby : 'ASC';
@@ -60,10 +60,19 @@ exports.findAll = async (req, res) => {
         column = myArray[1];
         orderconfig = [table, column, order];
     }
-    var condition = sendsearch.customseacrh(searchtext, searchfrom);
+    let data_array = [];
+    let conditionstate_id= state_id ? { state_id: state_id } : null;
+
+
+    let condition = sendsearch.customseacrh(searchtext, searchfrom);
+    condition ? data_array.push(condition) : null;
+    
+    conditionstate_id ? data_array.push(conditionstate_id) : null;
+
     const { limit, offset } = getPagination(page, size);
+
     city.findAndCountAll({
-        where: condition, limit, offset, 
+        where: data_array, limit, offset, 
 
         include: [
             {
