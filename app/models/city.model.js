@@ -6,12 +6,6 @@ module.exports = (sequelize, Sequelize) => {
 	state_id: {
       type: Sequelize.INTEGER
     },
-    // city_slug: {
-    //   type: Sequelize.STRING
-    // },
-    // city_description: {
-    //   type: Sequelize.STRING
-    // },
 
   }
     ,

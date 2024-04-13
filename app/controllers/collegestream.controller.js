@@ -194,11 +194,9 @@ exports.update = (req, res) => {
   try {
 
 
-    stream.update({
+    College.update({
       stream_id: req.body.stream_id,
-      sub_stream_name: req.body.sub_stream_name,
-      sub_stream_slug: req.body.sub_stream_slug,
-      sub_stream_description: req.body.sub_stream_description ? req.body.sub_stream_description : null,
+      college_id: req.body.college_id,
     }, {
       where: { id: req.body.id }
     });

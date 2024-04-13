@@ -30,59 +30,6 @@ module.exports = (sequelize, Sequelize) => {
     listing_order: {
       type: Sequelize.INTEGER
     },
-
-    // stream_description: {
-    //   type: Sequelize.TEXT
-    // },
-
-
-    // keywords: {
-    //   type: Sequelize.STRING
-    // },
-
-    // ug_box: {
-    //   type: Sequelize.TEXT
-    // },
-    // pg_box: {
-    //   type: Sequelize.TEXT
-    // },
-    // diploma_box: {
-    //   type: Sequelize.STRING
-    // },
-    // doctorate_box: {
-    //   type: Sequelize.TEXT
-    // },
-    // description_box: {
-    //   type: Sequelize.TEXT
-    // },
-    // eligibility_criteria: {
-    //   type: Sequelize.TEXT
-    // },
-    // placement_career: {
-    //   type: Sequelize.TEXT
-    // },
-    // top_recruiters: {
-    //   type: Sequelize.TEXT
-    // },
-    // job_analysis: {
-    //   type: Sequelize.TEXT
-    // },
-
-    // icon: {
-    //   type: Sequelize.STRING
-    // },
-    // home_view_status: {
-    //   type: Sequelize.STRING
-    // },
-
-    // promo_banner: {
-    //   type: Sequelize.STRING
-    // },
-    // promo_banner_status: {
-    //   type: Sequelize.STRING
-    // },
-
-
   }
     ,
     {
