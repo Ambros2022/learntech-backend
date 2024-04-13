@@ -426,179 +426,64 @@ const schoolUpdateSchema = [
 ];
 
 const StreamSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Stream name should be less than 150 character"),
   checkField('name', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("Slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            return true;
-          }
-        });
-    }),
+    .withMessage("Slug should be less than 150 character"),
+
+  body("h1_title")
+    .exists({ checkFalsy: true })
+    .withMessage("h1 title is required")
+    .isLength({ max: 150 })
+    .withMessage("h1 title should be less than 150 character"),
 ];
 
 const StreamSchemaUpdate = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Stream name should be less than 150 character"),
-  checkField_update('name', 150, stream, true),
-
   ...validateIdRequired_id(stream, "id"),
-
+  checkField_update('name', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("Slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return stream
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
+    .withMessage("Slug should be less than 150 character"),
+
+  body("h1_title")
+    .exists({ checkFalsy: true })
+    .withMessage("h1 title is required")
+    .isLength({ max: 150 })
+    .withMessage("h1 title should be less than 150 character"),
+
 ];
 
 const SubStreamSchema = [
-  body("sub_stream_name")
-    .exists({ checkFalsy: true })
-    .withMessage("Sub Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Sub Stream name should be less than 150 character"),
+  checkField('sub_stream_name', 150, substream, true),
 
   body("sub_stream_slug")
     .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
+    .withMessage("sub stream slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return substream
-        .findOne({
-          where: {
-            sub_stream_slug: value,
-          },
-        })
-        .then((substream) => {
-          if (substream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            return true;
-          }
-        });
-    }),
+    .withMessage("sub stream slug should be less than 150 character"),
 
-  body("stream_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream Id is required")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Stream Id Not exist");
-          }
-        });
-    }),
+  ...validateIdRequired_id(stream, "stream_id"),
+
 ];
 
 const SubStreamSchemaUpdate = [
-  body("sub_stream_name")
-    .exists({ checkFalsy: true })
-    .withMessage("Sub Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("Stream name should be less than 150 character"),
-
   ...validateIdRequired_id(substream, "id"),
 
+  checkField_update('sub_stream_name', 150, substream, true),
 
   body("sub_stream_slug")
     .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
+    .withMessage("sub stream slug is required")
     .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return substream
-        .findOne({
-          where: {
-            sub_stream_slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((substream) => {
-          if (substream) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
+    .withMessage("sub stream slug should be less than 150 character"),
 
-  body("stream_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream Id is required")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Stream Id Not exist");
-          }
-        });
-    }),
+  ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 
@@ -641,66 +526,24 @@ const bannerUpdateSchema = [
 ];
 
 const CollegeSchema = [
-  body("established")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 150 })
-    .withMessage("established should be less than 150 character"),
-
-  body("type").exists({ checkFalsy: true }).withMessage(" type is required"),
-
-  body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField('name', 150, college, true),
-
-
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("slug is required")
     .isLength({ max: 150 })
     .withMessage("slug should be less than 150 character"),
-  checkField('slug', 150, college, true),
 
-  body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
-  body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
-  body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 
-
-  body("meta_title")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta title should be less than 200 character"),
-
-  body("meta_description")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta description should be less than 200 character"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 300 })
-    .withMessage("meta keyword should be less than 300 character"),
-
-
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
 ];
 
 const CollegeUpdateSchema = [
   ...validateIdRequired_id(college, "id"),
 
-  body("established")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 150 })
-    .withMessage("established should be less than 150 character"),
-
-
-  body("name").exists({ checkFalsy: true }).withMessage(" name is required"),
   checkField_update('name', 150, college, true),
-
-
 
   body("slug")
     .exists({ checkFalsy: true })
@@ -708,32 +551,11 @@ const CollegeUpdateSchema = [
     .isLength({ max: 150 })
     .withMessage("slug should be less than 150 character"),
 
-
-  body("country_id").exists({ checkFalsy: true }).withMessage(" country is required"),
-  body("state_id").exists({ checkFalsy: true }).withMessage(" state is required"),
-  body("city_id").exists({ checkFalsy: true }).withMessage(" city is required"),
-
-  body("meta_title")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta title should be less than 200 character"),
-
-  body("meta_description")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 200 })
-    .withMessage("meta description should be less than 200 character"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: false })
-    .isLength({ max: 300 })
-    .withMessage("meta keyword should be less than 300 character"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 
 
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
 ];
 
 
