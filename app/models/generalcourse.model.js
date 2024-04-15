@@ -1,67 +1,75 @@
 module.exports = (sequelize, Sequelize) => {
   const generalcourse = sequelize.define("general_courses", {
-  
-    course_stream_name: {
-      type: Sequelize.STRING
-    },
-    is_deleted: {
+
+    stream_id: {
       type: Sequelize.INTEGER
     },
-    course_short_name: {
+    sub_streams_id: {
+      type: Sequelize.INTEGER
+    },
+    course_type: {
+      type: Sequelize.ENUM("UG", "PG", "Diploma", "Doctorate", "Default"),
+    },
+    name: {
       type: Sequelize.STRING
     },
-    course_stream_slug: {
+    slug: {
+      type: Sequelize.STRING
+    },
+    short_name: {
+      type: Sequelize.STRING
+    },
+    duration: {
+      type: Sequelize.INTEGER
+    },
+    meta_title: {
+      type: Sequelize.STRING
+    },
+    meta_description: {
+      type: Sequelize.TEXT
+    },
+    meta_keywords: {
       type: Sequelize.STRING
     },
     description: {
       type: Sequelize.TEXT
     },
-    admission: {
+    syllabus: {
       type: Sequelize.TEXT
     },
-    carrier_opportunities: {
-      type: Sequelize.TEXT
-    }
-    ,
-    course_type: {
-      type: Sequelize.TEXT
-    }
-    ,
-    meta_description: {
+    admissions: {
       type: Sequelize.TEXT
     },
-    meta_title: {
+    career_opportunities: {
+      type: Sequelize.TEXT
+    },
+    top_college: {
       type: Sequelize.STRING
-    }
-    ,
+    },
     logo: {
       type: Sequelize.STRING
     },
-    stream_id: {
-      type: Sequelize.INTEGER
-    }
+    is_trending: {
+      type: Sequelize.STRING
+    },
+    is_top_rank: {
+      type: Sequelize.STRING
+    },
+    status: {
+      type: Sequelize.ENUM("Draft", "Published"),
+    },
+
+  }
     ,
-    sub_stream_id: {
-      type: Sequelize.INTEGER
-    },
-    promo_banner: {
-      type: Sequelize.STRING
-    },
-    promo_banner_status: {
-      type: Sequelize.STRING
-    },
-    
-  }
-  ,
-  {
-    
-    timestamps: true,
-    underscored: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
-  }
-  
-  
+    {
+
+      timestamps: true,
+      underscored: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at"
+    }
+
+
   );
 
   return generalcourse;

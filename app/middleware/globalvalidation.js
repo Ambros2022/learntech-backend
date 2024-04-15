@@ -13,8 +13,8 @@ const pages = db.page;
 const banner = db.banner;
 const college = db.College;
 const collegestream = db.college_stream;
-
-
+const generalcourse = db.generalcourse;
+const stream_faq = db.stream_faq;
 
 
 
@@ -24,7 +24,7 @@ const area = db.area;
 
 const enquiry = db.enquiry;
 const management = db.management;
-const generalcourse = db.generalcourse;
+
 const author = db.author;
 const categories = db.categories;
 const blog = db.blog;
@@ -574,7 +574,42 @@ const collegestreamSchemaUpdate = [
 
 ];
 
+const GeneralcoursesSchema = [
+  checkField('name', 150, generalcourse, true),
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+  ...validateIdRequired_id(stream, "stream_id"),
+  ...validateIdRequired_id(substream, "sub_streams_id"),
 
+
+];
+
+const GeneralcoursesSchemaupdate = [
+  ...validateIdRequired_id(generalcourse, "id"),
+  checkField_update('name', 150, generalcourse, true),
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+  ...validateIdRequired_id(stream, "stream_id"),
+  ...validateIdRequired_id(substream, "sub_streams_id"),
+
+];
+
+const stream_faqSchema = [
+ ...validateIdRequired_id(stream, "stream_id"),
+];
+
+const stream_faqSchemaupdate = [
+  ...validateIdRequired_id(stream_faq, "id"),
+
+  ...validateIdRequired_id(stream, "stream_id"),
+
+];
 
 
 
@@ -902,135 +937,7 @@ const enquirySchema = [
   //   .withMessage("course_in_mind is required"),
 ];
 
-const GeneralcoursesSchema = [
-  body("course_stream_name")
-    .exists({ checkFalsy: true })
-    .withMessage("course Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("course Stream name should be less than 150 character"),
 
-  body("course_stream_slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return generalcourse
-        .findOne({
-          where: {
-            course_stream_slug: value,
-          },
-        })
-        .then((generalcourse) => {
-          if (generalcourse) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("stream_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream Id is required")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Stream Id Not exist");
-          }
-        });
-    }),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
-const GeneralcoursesSchemaupdate = [
-  body("course_stream_name")
-    .exists({ checkFalsy: true })
-    .withMessage("course Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("course name should be less than 150 character"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return generalcourse
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((generalcourse) => {
-          if (generalcourse) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("generalcourse Does not exist");
-          }
-        });
-    }),
-
-  body("course_stream_slug")
-    .exists({ checkFalsy: true })
-    .withMessage("course is required")
-    .isLength({ max: 150 })
-    .withMessage("course should be less than 150 character")
-    .custom((value, { req }) => {
-      return generalcourse
-        .findOne({
-          where: {
-            course_stream_slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((generalcourse) => {
-          if (generalcourse) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("stream_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Stream Id is required")
-    .custom((value) => {
-      return stream
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((stream) => {
-          if (stream) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Stream Id Not exist");
-          }
-        });
-    }),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
 const authorSchema = [
   body("author_name")
     .exists({ checkFalsy: true })
@@ -3328,6 +3235,12 @@ const globalvalidation = {
   collegestreamSchemaUpdate: collegestreamSchemaUpdate,
   recognitionSchema: recognitionSchema,
   recognitionUpdateSchema: recognitionUpdateSchema,
+  GeneralcoursesSchema: GeneralcoursesSchema,
+  GeneralcoursesSchemaupdate: GeneralcoursesSchemaupdate,
+  stream_faqSchema: stream_faqSchema,
+  stream_faqSchemaupdate: stream_faqSchemaupdate,
+
+
 
 
 
@@ -3341,8 +3254,7 @@ const globalvalidation = {
   managementUpdateSchema: managementUpdateSchema,
   enquirySchema: enquirySchema,
   enquiryUpdateSchema: enquiryUpdateSchema,
-  GeneralcoursesSchema: GeneralcoursesSchema,
-  GeneralcoursesSchemaupdate: GeneralcoursesSchemaupdate,
+ 
 
   affilitionUpdateSchema: affilitionUpdateSchema,
   affilitionSchema: affilitionSchema,
@@ -3354,8 +3266,6 @@ const globalvalidation = {
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
   enquiryUpdateSchema: enquiryUpdateSchema,
-  GeneralcoursesSchema: GeneralcoursesSchema,
-  GeneralcoursesSchemaupdate: GeneralcoursesSchemaupdate,
   authorSchema: authorSchema,
   authorUpdateSchema: authorUpdateSchema,
   categoriesSchema: categoriesSchema,
