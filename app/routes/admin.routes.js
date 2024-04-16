@@ -14,7 +14,7 @@ const collegestreamcontroller = require("../controllers/collegestream.controller
 const databackupcontroller = require("../controllers/databackup.controller");
 const recognitioncontroller = require("../controllers/recognition.controller");
 const generalcoursecontroller = require("../controllers/generalcourse.controller.js");
-const streamfaqcontroller = require("../controllers/streamfaq.controller.js");
+
 
 
 const admincontroller = require("../controllers/admin.controller");
@@ -478,7 +478,7 @@ module.exports = function (app) {
   app.post(
     "/api/admin/stream/updatefaq",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    streamcontroller.updatefaq
+    streamcontroller.updatefaqs
   );
 
   app.post(
@@ -692,42 +692,7 @@ module.exports = function (app) {
   /** generalcourse Routes End*/
 
 
-  /**  Stream_faq Routes Start*/
-  app.get(
-    "/api/admin/streamfaq/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    streamfaqcontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/streamfaq/get/:id",
-    [globalvalidation.Validate],
-    streamfaqcontroller.findOne
-  );
-
-
-  app.post(
-    "/api/admin/streamfaq/add",
-    globalvalidation.stream_faqSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    streamfaqcontroller.create
-  );
-
-  app.post(
-    "/api/admin/streamfaq/update",
-    globalvalidation.stream_faqSchemaupdate,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    streamfaqcontroller.update
-  );
-
-  app.post(
-    "/api/admin/streamfaq/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    streamfaqcontroller.delete
-  );
-
-  /**  Stream Routes End*/
-
+  
 
 
 
