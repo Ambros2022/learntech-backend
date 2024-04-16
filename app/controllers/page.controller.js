@@ -7,8 +7,6 @@ const Op = db.Sequelize.Op;
 // Array of allowed files
 
 
-
-
 const getPagination = (page, size) => {
 
   const pages = page > 0 ? page : 1;
@@ -29,10 +27,6 @@ exports.create = async (req, res) => {
 
   try {
 
-
-
-
-
     const PageDetails = await pages.create({
       url: req.body.url ? req.body.url : null,
       top_description: req.body.top_description ? req.body.top_description : null,
@@ -40,7 +34,6 @@ exports.create = async (req, res) => {
       meta_title: req.body.meta_title ? req.body.meta_title : null,
       meta_description: req.body.meta_description ? req.body.meta_description : null,
       meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
-      // meta_description: req.body.meta_description?req.body.meta_description:null,
     });
 
 
@@ -57,7 +50,6 @@ exports.create = async (req, res) => {
       status: 0
     });
   }
-
 
 }
 
@@ -82,10 +74,6 @@ exports.findAll = async (req, res) => {
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
 
-
-
-
-
   const { limit, offset } = getPagination(page, size);
   pages.findAndCountAll({ where: condition, limit, offset, order: [orderconfig] },)
     .then(data => {
@@ -99,9 +87,6 @@ exports.findAll = async (req, res) => {
         totalPages: response.totalPages,
         data: response.pages
       });
-
-
-
 
 
     })
@@ -193,9 +178,7 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
   const id = req.body.id;
 
-
   try {
-
 
     pages.update({
       url: req.body.url ? req.body.url : null,
@@ -207,7 +190,6 @@ exports.update = (req, res) => {
     }, {
       where: { id: req.body.id }
     });
-
 
     res.status(200).send({
       status: 1,

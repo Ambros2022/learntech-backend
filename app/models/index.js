@@ -293,6 +293,39 @@ db.College.belongsTo(db.city, {
 });
 
 
+/***  Relation ship generalcourses  */
+
+db.sub_stream.hasMany(db.generalcourse, { as: "sub_stream" });
+db.generalcourse.belongsTo(db.sub_stream, {
+  foreignKey: "sub_streams_id",
+  as: "sub_stream",
+});
+db.stream.hasMany(db.generalcourse, { as: "str" });
+db.generalcourse.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "streams",
+});
+// db.stream.hasMany(db.generalcourse, { as: "ugcourse" });
+// db.generalcourse.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "ugcourse",
+// });
+// db.stream.hasMany(db.generalcourse, { as: "pgcourse" });
+// db.generalcourse.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "pgcourse",
+// });
+// db.stream.hasMany(db.generalcourse, { as: "diplomacourse" });
+// db.generalcourse.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "diplomacourse",
+// });
+// db.stream.hasMany(db.generalcourse, { as: "doctratecourse" });
+// db.generalcourse.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "doctratecourse",
+// });
+
 /*  relation college stream  */
 
 // db.college_stream.hasMany(db.stream, { as: "stream" });
@@ -860,38 +893,6 @@ db.city.hasMany(db.area, { as: "area" });
 db.area.belongsTo(db.city, {
   foreignKey: "city_id",
   as: "city",
-});
-/***  Relation ship generalcourses  */
-
-db.sub_stream.hasMany(db.generalcourse, { as: "sub_stream" });
-db.generalcourse.belongsTo(db.sub_stream, {
-  foreignKey: "sub_stream_id",
-  as: "sub_stream",
-});
-db.stream.hasMany(db.generalcourse, { as: "str" });
-db.generalcourse.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "streams",
-});
-db.stream.hasMany(db.generalcourse, { as: "ugcourse" });
-db.generalcourse.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "ugcourse",
-});
-db.stream.hasMany(db.generalcourse, { as: "pgcourse" });
-db.generalcourse.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "pgcourse",
-});
-db.stream.hasMany(db.generalcourse, { as: "diplomacourse" });
-db.generalcourse.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "diplomacourse",
-});
-db.stream.hasMany(db.generalcourse, { as: "doctratecourse" });
-db.generalcourse.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "doctratecourse",
 });
 
 
