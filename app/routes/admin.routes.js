@@ -419,11 +419,13 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     schoolcontroller.update
   );
-  app.get(
-    "/api/admin/schooltype/get",
+
+  app.post(
+    "/api/admin/school/updatefaqs",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.schooltypefindAll
+    schoolcontroller.updatefaqs
   );
+
   app.get(
     "/api/admin/schoollevel/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
@@ -431,11 +433,7 @@ module.exports = function (app) {
   );
 
 
-  app.post(
-    "/api/admin/school/updatefaqs",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    schoolcontroller.updatefaqs
-  );
+ 
 
   app.post(
     "/api/admin/school/updategallery",

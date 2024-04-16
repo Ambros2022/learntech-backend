@@ -34,7 +34,7 @@ const affilition = db.affilition;
 const recognition = db.recognition;
 
 const companies = db.companies;
-const schooltype = db.schooltype;
+
 const schoollevel = db.schoollevel;
 
 const polytechnic = db.polytechnic;

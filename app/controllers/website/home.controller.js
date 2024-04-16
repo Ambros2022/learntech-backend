@@ -49,7 +49,7 @@ const nri = db.nri;
 const recognitioneditor = db.recognitioneditor;
 const service = db.service;
 const scholarships = db.scholarships;
-const schooltype = db.schooltype;
+
 const videotestimonial = db.videotestimonial;
 const abroad_universities = db.abroad_universities;
 const abroadcountries = db.abroadcountries;

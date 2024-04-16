@@ -1,12 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
-    const schoolamenities = sequelize.define("school_amenities", {
-        amenities_id : {
-            type: Sequelize.INTEGER
-        },
-        school_id : {
-            type: Sequelize.INTEGER
-        },
-    } ,
+  const schoolamenities = sequelize.define("school_amenities", {
+    amenitie_id: {
+      type: Sequelize.INTEGER
+    },
+    school_id: {
+      type: Sequelize.INTEGER
+    },
+  },
     {
 
       timestamps: true,
