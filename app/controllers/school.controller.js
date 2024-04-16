@@ -2,17 +2,11 @@ const db = require("../models");
 const path = require("path");
 const school = db.school;
 const _ = require("lodash");
-const schoolaccreditations = db.schoolaccreditations;
 const schoollevels = db.schoollevels;
-const schooltype = db.schooltype;
 const level = db.level;
 const schoolamenities = db.schoolamenities;
-const schoolmanagment = db.schoolmanagment;
-const schoolaffiliations = db.schoolaffiliations;
-const schoolrecognition = db.schoolrecognition;
 const school_faqs = db.school_faqs;
 const sendsearch = require("../utility/Customsearch");
-const boardschools = db.boardschools;
 const schoolgallery = db.schoolgallery;
 const Op = db.Sequelize.Op;
 // Array of allowed files
@@ -139,6 +133,28 @@ exports.create = async (req, res) => {
     });
 
 
+    if (req.body.amenities && schoolDetails.id) {
+      const amndata = JSON.parse(req.body.amenities);
+      _.forEach(amndata, async function (value) {
+
+        await  schoolamenities.create({
+          school_id: schoolDetails.id,
+          amenitie_id: value.id,
+        });
+      });
+    }
+
+    if (req.body.levels && schoolDetails.id) {
+      const amndata = JSON.parse(req.body.levels);
+      _.forEach(amndata, async function (value) {
+        await  schoollevels.create({
+          school_id: schoolDetails.id,
+          level_id: value.id,
+        });
+      });
+    }
+
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -167,7 +183,6 @@ exports.update = async (req, res) => {
         status: 0,
       });
     }
-
 
     let Schoolupdates = {
       country_id: req.body.country_id || existingRecord.country_id,
@@ -264,6 +279,31 @@ exports.update = async (req, res) => {
 
     // Update database record
     await school.update(Schoolupdates, { where: { id: req.body.id } });
+
+    if (req.body.amenities && req.body.id) {
+      await schoolamenities.destroy({
+        where: { school_id: req.body.id },
+      });
+      const amndata = JSON.parse(req.body.amenities);
+      _.forEach(amndata, async function (value) {
+        await schoolamenities.create({
+          school_id: req.body.id,
+          amenitie_id: value.id,
+        });
+      });
+    }
+    if (req.body.levels && req.body.id) {
+      await schoollevels.destroy({
+        where: { school_id: req.body.id },
+      });
+      const amndata = JSON.parse(req.body.levels);
+      _.forEach(amndata, async function (value) {
+        await schoollevels.create({
+          school_id: req.body.id,
+          level_id: value.id,
+        });
+      });
+    }
 
 
     res.status(200).send({
@@ -386,16 +426,52 @@ exports.findOne = (req, res) => {
           association: "schoolboard",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "schoolamenities",
+          attributes: ["id", "amenitie_id"],
+          include: [
+            {
+              association: "schamenities",
+              attributes: ["id", "amenities_name"],
+            },
+          ],
+        },
+        {
+          required: false,
+          association: "schoollevels",
+          attributes: ["id"],
+          include: [
+            {
+              association: "schlevelname",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+
+        {
+          required: false,
+          association: "schfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
 
       ],
 
     })
     .then((data) => {
+      // Extracting only the necessary information from schoolamenities
+      // console.log(data.schoolamenities);
+      // const amenities = data.schoolamenities.map((item) => ({
+      //   id: item.id,
+      //   amenities_name: item.schamenities.amenities_name,
+      // }));
       if (data) {
+
         res.status(200).send({
           status: 1,
-          message: "successfully retrieved",
+          message: "Successfully retrieved",
           data: data,
+          // data: [{ schoolamenities: amenities }, ...data],
         });
       } else {
         res.status(400).send({
@@ -439,109 +515,14 @@ exports.delete = (req, res) => {
     });
 };
 
-exports.schooltypefindAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-
-  let data_array = [];
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  schooltype
-    .findAndCountAll({
-      where: data_array,
-      limit,
-      offset,
-
-      order: [orderconfig],
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.school,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message || "Some error occurred while retrieving schooltype",
-      });
-    });
-};
-exports.schoollevelfindAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-
-  let data_array = [];
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  level
-    .findAndCountAll({
-      where: data_array,
-      limit,
-      offset,
-
-      order: [orderconfig],
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.school,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message || "Some error occurred while retrieving schooltype",
-      });
-    });
-};
 exports.updatefaqs = async (req, res) => {
+
   try {
-    if (req.body.schfaqs && req.body.id) {
+    if (req.body.faqs && req.body.id) {
       await school_faqs.destroy({
         where: { school_id: req.body.id },
       });
-      const faqss = JSON.parse(req.body.schfaqs);
+      const faqss = JSON.parse(req.body.faqs);
       await _.forEach(faqss, function (value) {
         school_faqs.create({
           school_id: req.body.id,
@@ -699,4 +680,53 @@ exports.updategallery = async (req, res) => {
       status: 0,
     });
   }
+};
+
+exports.schoollevelfindAll = async (req, res) => {
+  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  var condition = sendsearch.customseacrh(searchText, searchfrom);
+
+  let data_array = [];
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  level
+    .findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+
+      order: [orderconfig],
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.school,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message || "Some error occurred while retrieving schooltype",
+      });
+    });
 };
