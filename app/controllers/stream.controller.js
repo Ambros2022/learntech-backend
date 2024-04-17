@@ -240,9 +240,21 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  stream.findByPk(id)
+  stream.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "streamfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+      
+      ],
+  })
     .then((data) => {
       if (data) {
+
+
+
         res.status(200).send({
           status: 1,
           message: "successfully retrieved",

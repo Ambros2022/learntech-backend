@@ -292,6 +292,13 @@ db.College.belongsTo(db.city, {
   as: "citys",
 });
 
+/***  Relation ship stream  */
+
+db.stream.hasMany(db.stream_faq, { as: "streamfaqs",foreignKey:"stream_id" });
+db.stream_faq.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "streamfaqs",
+});
 
 /***  Relation ship generalcourses  */
 
