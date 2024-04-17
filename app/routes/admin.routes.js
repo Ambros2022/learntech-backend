@@ -673,12 +673,6 @@ module.exports = function (app) {
     generalcoursecontroller.update
   );
 
-  // app.post(
-  //   "/api/admin/generalcourse/updatefaq",
-  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  //   generalcoursecontroller.updatefaqs
-  // );
-
   app.post(
     "/api/admin/generalcourse/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
@@ -696,7 +690,6 @@ module.exports = function (app) {
     generalcoursecontroller.updatefaq
   );
   /** generalcourse Routes End*/
-
 
   
 

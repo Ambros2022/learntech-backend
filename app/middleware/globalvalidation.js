@@ -13,7 +13,7 @@ const pages = db.page;
 const banner = db.banner;
 const college = db.College;
 const collegestream = db.college_stream;
-const generalcourse = db.generalcourse;
+const generalcourse = db.general_course;
 const stream_faq = db.stream_faq;
 
 
