@@ -57,6 +57,7 @@ db.level = require("./level.model.js")(sequelize, Sequelize);
 db.College = require("../models/College.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequelize);
 db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
+db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
 
 
 
@@ -66,7 +67,7 @@ db.role = require("../models/role.model.js")(sequelize, Sequelize);
 
 
 db.polytechnic = require("../models/polytechnic.model.js")(sequelize, Sequelize);
-db.generalcourse = require("../models/generalcourse.model.js")(sequelize, Sequelize);
+db.general_course = require("./general_course.model.js")(sequelize, Sequelize);
 db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 
 db.area = require("../models/area.model.js")(sequelize, Sequelize);
@@ -170,7 +171,7 @@ db.CollegeGalleries = require("./CollegeGalleries.model.js")(sequelize, Sequeliz
 
 db.abroadcountries= require("../models/abroadcountries.model.js")(sequelize, Sequelize);
 db.abroad_universities= require("../models/abroaduniversities.model.js")(sequelize, Sequelize);
-db.generalcourse_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
+
 db.youtubevideos= require("../models/youtubevideos.model.js")(sequelize, Sequelize);
 
 
@@ -292,19 +293,33 @@ db.College.belongsTo(db.city, {
   as: "citys",
 });
 
+/***  Relation ship stream  */
+
+db.stream.hasMany(db.stream_faq, { as: "streamfaqs",foreignKey:"stream_id" });
+db.stream_faq.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "streamfaqs",
+});
 
 /***  Relation ship generalcourses  */
 
-db.sub_stream.hasMany(db.generalcourse, { as: "sub_stream" });
-db.generalcourse.belongsTo(db.sub_stream, {
-  foreignKey: "sub_streams_id",
-  as: "sub_stream",
+db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs",foreignKey:"general_course_id" });
+db.general_course_faqs.belongsTo(db.general_course, {
+  foreignKey: "general_course_id",
+  as: "generalcoursefaqs",
 });
-db.stream.hasMany(db.generalcourse, { as: "str" });
-db.generalcourse.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "streams",
-});
+
+
+// db.sub_stream.hasMany(db.general_course, { as: "sub_stream" });
+// db.general_course.belongsTo(db.sub_stream, {
+//   foreignKey: "sub_streams_id",
+//   as: "sub_stream",
+// });
+// db.stream.hasMany(db.general_course, { as: "str" });
+// db.general_course.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "streams",
+// });
 // db.stream.hasMany(db.generalcourse, { as: "ugcourse" });
 // db.generalcourse.belongsTo(db.stream, {
 //   foreignKey: "stream_id",
@@ -576,7 +591,7 @@ db.cutoffdetails.belongsTo(db.cutoff, {
   as: "cutoffdetails",
 });
 
-db.cutoffdetails.belongsTo(db.generalcourse, {
+db.cutoffdetails.belongsTo(db.general_course, {
   foreignKey: "course_id",
   as: "coursecutoff",
 });
@@ -629,8 +644,8 @@ db.eligibilities.belongsTo(db.courses, {
 //   as: "coursesdoctorate",
 // });
 
-db.generalcourse.hasMany(db.courses, { as: "course",foreignKey:"course_id"});
-db.courses.belongsTo(db.generalcourse, {
+db.general_course.hasMany(db.courses, { as: "course",foreignKey:"course_id"});
+db.courses.belongsTo(db.general_course, {
   foreignKey: "course_id",
   as: "course",
 });
@@ -879,11 +894,11 @@ db.sub_stream.belongsTo(db.stream, {
 
 
 /*** generl course Relation ship  */
-db.generalcourse.hasMany(db.generalcourse_faqs, { as: "faqs",foreignKey:"generalcourse_id" });
-db.generalcourse_faqs.belongsTo(db.generalcourse, {
-  foreignKey: "generalcourse_id",
-  as: "generalcourse",
-});
+// db.general_course.hasMany(db.generalcourse_faqs, { as: "faqs",foreignKey:"generalcourse_id" });
+// db.generalcourse_faqs.belongsTo(db.general_course, {
+//   foreignKey: "generalcourse_id",
+//   as: "generalcourse",
+// });
 
 
 

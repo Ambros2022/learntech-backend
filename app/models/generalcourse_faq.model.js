@@ -1,14 +1,15 @@
 module.exports = (sequelize, Sequelize) => {
-  const generalcourse_faqs= sequelize.define("generalcourse_faqs", {
+  const generalcourse_faqs= sequelize.define("general_course_faqs", {
+    general_course_id: {
+      type: Sequelize.INTEGER
+    },
     questions: {
       type: Sequelize.STRING
     },
     answers: {
       type: Sequelize.STRING
     },
-    generalcourse_id: {
-      type: Sequelize.INTEGER
-    }
+   
        
   }
   ,
