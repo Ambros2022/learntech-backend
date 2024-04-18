@@ -137,7 +137,7 @@ exports.create = async (req, res) => {
       const amndata = JSON.parse(req.body.amenities);
       _.forEach(amndata, async function (value) {
 
-        await  schoolamenities.create({
+        await schoolamenities.create({
           school_id: schoolDetails.id,
           amenitie_id: value.id,
         });
@@ -147,7 +147,7 @@ exports.create = async (req, res) => {
     if (req.body.levels && schoolDetails.id) {
       const amndata = JSON.parse(req.body.levels);
       _.forEach(amndata, async function (value) {
-        await  schoollevels.create({
+        await schoollevels.create({
           school_id: schoolDetails.id,
           level_id: value.id,
         });
@@ -544,143 +544,316 @@ exports.updatefaqs = async (req, res) => {
     });
   }
 };
-
 exports.updategallery = async (req, res) => {
   try {
-    let oldimageids = [];
-    if (req.body.oldimage) {
-      let dataArray = JSON.parse(req.body.oldimage);
-      if (dataArray && dataArray.length > 0) {
-        oldimageids = dataArray.map((item) => item.id);
+      const images = Object.values(req.files);
+
+      // Process uploaded images
+      for (const imageData of images) {
+          // Save the image to the server
+          console.log(images);
+          const imgname = "image" + Date.now() + Math.random() + ".png";
+          const imagePath = path.join(__dirname, "storage", "schoolgallery", imgname);
+          imageData.mv(imagePath);
+
+          // Save image path or URL to database if needed
+          // Example: 
+          // await schoolgallery.create({
+          //   school_id: req.body.id,
+          //   image: imagePath,
+          // });
       }
-    }
 
-    let images = [];
-
-    if (!req.files) {
-      await schoolgallery.destroy({
-        where: {
-          school_id: req.body.id,
-          id: {
-            [Op.notIn]: oldimageids,
-          },
-        },
-      });
       return res.status(200).send({
-        status: 1,
-        message: "olf files removed successfully",
+          status: 1,
+          message: "Data saved successfully",
       });
-    }
-    if (!req.body.id) {
-      return res.status(400).send({
-        message: "Invalid request, please provide gallery ID and image",
-        status: 0,
-      });
-    }
-
-    const avatar = req.files.image;
-
-    if (Array.isArray(avatar)) {
-      for (const element of avatar) {
-        if (!array_of_allowed_file_types.includes(element.mimetype)) {
-          return res.status(400).send({
-            message: "Invalid file type",
-            status: 0,
-          });
-        }
-
-        if (element.size / (1024 * 1024) > allowed_file_size) {
-          return res.status(400).send({
-            message: "File too large",
-            status: 0,
-          });
-        }
-
-        const imgname =
-          "image" + Date.now() + Math.random() + path.extname(element.name);
-        // console.log("imgname",imgname);
-
-        let isUploaded;
-        try {
-          await element.mv("./storage/schoolgallery/" + imgname);
-          isUploaded = true;
-        } catch (error) {
-          isUploaded = false;
-          console.error("File upload error: ", error);
-        }
-        if (isUploaded) {
-          images.push("schoolgallery/" + imgname);
-        }
-      }
-    } else {
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid file type",
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large",
-          status: 0,
-        });
-      }
-
-      const imgname = "image" + Date.now() + path.extname(avatar.name);
-
-      let isUploaded;
-      try {
-        await avatar.mv("./storage/schoolgallery/" + imgname);
-        isUploaded = true;
-      } catch (error) {
-        isUploaded = false;
-        console.error("File upload error: ", error);
-      }
-      if (isUploaded) {
-        images.push("schoolgallery/" + imgname);
-      }
-    }
-
-    if (images.length === 0) {
-      return res.status(400).send({
-        message: "Please insert images",
-        status: 0,
-      });
-    }
-
-    // await schoolgallery.destroy({
-    //   where: { school_id: req.body.id },
-    //   id: { [Op.notIn]: [16,19] }
-    // });
-    await schoolgallery.destroy({
-      where: {
-        school_id: req.body.id,
-        id: {
-          [Op.notIn]: oldimageids,
-        },
-      },
-    });
-    for (const value of images) {
-      await schoolgallery.create({
-        school_id: req.body.id,
-        image: value,
-        // status: "featured",
-      });
-    }
-
-    return res.status(200).send({
-      status: 1,
-      message: "Data saved successfully",
-    });
   } catch (error) {
-    console.error(error);
-    return res.status(500).send({
-      message: "Unable to process the request",
-      status: 0,
-    });
+      console.error(error);
+      return res.status(500).send({
+          message: "Unable to process the request",
+          status: 0,
+      });
   }
 };
+
+
+// exports.updategallery = async (req, res) => {
+//   try {
+//     console.log(req.body.images[0])
+//     return
+
+//     // let oldimageids = [];
+//     // if (req.body.oldimage) {
+//     //   let dataArray = JSON.parse(req.body.oldimage);
+//     //   if (dataArray && dataArray.length > 0) {
+//     //     oldimageids = dataArray.map((item) => item.id);
+//     //   }
+//     // }
+
+//     // let images = [];
+
+//     // if (!req.files) {
+//     //   await schoolgallery.destroy({
+//     //     where: {
+//     //       school_id: req.body.id,
+//     //       id: {
+//     //         [Op.notIn]: oldimageids,
+//     //       },
+//     //     },
+//     //   });
+//     //   return res.status(200).send({
+//     //     status: 1,
+//     //     message: "olf files removed successfully",
+//     //   });
+//     // }
+//     // if (!req.body.id) {
+//     //   return res.status(400).send({
+//     //     message: "Invalid request, please provide gallery ID and image",
+//     //     status: 0,
+//     //   });
+//     // }
+
+//     // const avatar = req.files.image;
+
+//     // if (Array.isArray(avatar)) {
+//     //   for (const element of avatar) {
+//     //     if (!array_of_allowed_file_types.includes(element.mimetype)) {
+//     //       return res.status(400).send({
+//     //         message: "Invalid file type",
+//     //         status: 0,
+//     //       });
+//     //     }
+
+//     //     if (element.size / (1024 * 1024) > allowed_file_size) {
+//     //       return res.status(400).send({
+//     //         message: "File too large",
+//     //         status: 0,
+//     //       });
+//     //     }
+
+//     //     const imgname =
+//     //       "image" + Date.now() + Math.random() + path.extname(element.name);
+//     //     // console.log("imgname",imgname);
+
+//     //     let isUploaded;
+//     //     try {
+//     //       await element.mv("./storage/schoolgallery/" + imgname);
+//     //       isUploaded = true;
+//     //     } catch (error) {
+//     //       isUploaded = false;
+//     //       console.error("File upload error: ", error);
+//     //     }
+//     //     if (isUploaded) {
+//     //       images.push("schoolgallery/" + imgname);
+//     //     }
+//     //   }
+//     // } else {
+//     //   if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+//     //     return res.status(400).send({
+//     //       message: "Invalid file type",
+//     //       status: 0,
+//     //     });
+//     //   }
+
+//     //   if (avatar.size / (1024 * 1024) > allowed_file_size) {
+//     //     return res.status(400).send({
+//     //       message: "File too large",
+//     //       status: 0,
+//     //     });
+//     //   }
+
+//     //   const imgname = "image" + Date.now() + path.extname(avatar.name);
+
+//     //   let isUploaded;
+//     //   try {
+//     //     await avatar.mv("./storage/schoolgallery/" + imgname);
+//     //     isUploaded = true;
+//     //   } catch (error) {
+//     //     isUploaded = false;
+//     //     console.error("File upload error: ", error);
+//     //   }
+//     //   if (isUploaded) {
+//     //     images.push("schoolgallery/" + imgname);
+//     //   }
+//     // }
+
+//     // if (images.length === 0) {
+//     //   return res.status(400).send({
+//     //     message: "Please insert images",
+//     //     status: 0,
+//     //   });
+//     // }
+
+//     // // await schoolgallery.destroy({
+//     // //   where: { school_id: req.body.id },
+//     // //   id: { [Op.notIn]: [16,19] }
+//     // // });
+//     // await schoolgallery.destroy({
+//     //   where: {
+//     //     school_id: req.body.id,
+//     //     id: {
+//     //       [Op.notIn]: oldimageids,
+//     //     },
+//     //   },
+//     // });
+//     // for (const value of images) {
+//     //   await schoolgallery.create({
+//     //     school_id: req.body.id,
+//     //     image: value,
+//     //     // status: "featured",
+//     //   });
+//     // }
+
+//     return res.status(200).send({
+//       status: 1,
+//       message: "Data saved successfully",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).send({
+//       message: "Unable to process the request",
+//       status: 0,
+//     });
+//   }
+// };
+// exports.updategallery = async (req, res) => {
+//   try {
+
+//     let oldimageids = [];
+//     if (req.body.oldimage) {
+//       let dataArray = JSON.parse(req.body.oldimage);
+//       if (dataArray && dataArray.length > 0) {
+//         oldimageids = dataArray.map((item) => item.id);
+//       }
+//     }
+
+//     let images = [];
+
+//     if (!req.files) {
+//       await schoolgallery.destroy({
+//         where: {
+//           school_id: req.body.id,
+//           id: {
+//             [Op.notIn]: oldimageids,
+//           },
+//         },
+//       });
+//       return res.status(200).send({
+//         status: 1,
+//         message: "olf files removed successfully",
+//       });
+//     }
+//     if (!req.body.id) {
+//       return res.status(400).send({
+//         message: "Invalid request, please provide gallery ID and image",
+//         status: 0,
+//       });
+//     }
+
+//     const avatar = req.files.image;
+
+//     if (Array.isArray(avatar)) {
+//       for (const element of avatar) {
+//         if (!array_of_allowed_file_types.includes(element.mimetype)) {
+//           return res.status(400).send({
+//             message: "Invalid file type",
+//             status: 0,
+//           });
+//         }
+
+//         if (element.size / (1024 * 1024) > allowed_file_size) {
+//           return res.status(400).send({
+//             message: "File too large",
+//             status: 0,
+//           });
+//         }
+
+//         const imgname =
+//           "image" + Date.now() + Math.random() + path.extname(element.name);
+//         // console.log("imgname",imgname);
+
+//         let isUploaded;
+//         try {
+//           await element.mv("./storage/schoolgallery/" + imgname);
+//           isUploaded = true;
+//         } catch (error) {
+//           isUploaded = false;
+//           console.error("File upload error: ", error);
+//         }
+//         if (isUploaded) {
+//           images.push("schoolgallery/" + imgname);
+//         }
+//       }
+//     } else {
+//       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+//         return res.status(400).send({
+//           message: "Invalid file type",
+//           status: 0,
+//         });
+//       }
+
+//       if (avatar.size / (1024 * 1024) > allowed_file_size) {
+//         return res.status(400).send({
+//           message: "File too large",
+//           status: 0,
+//         });
+//       }
+
+//       const imgname = "image" + Date.now() + path.extname(avatar.name);
+
+//       let isUploaded;
+//       try {
+//         await avatar.mv("./storage/schoolgallery/" + imgname);
+//         isUploaded = true;
+//       } catch (error) {
+//         isUploaded = false;
+//         console.error("File upload error: ", error);
+//       }
+//       if (isUploaded) {
+//         images.push("schoolgallery/" + imgname);
+//       }
+//     }
+
+//     if (images.length === 0) {
+//       return res.status(400).send({
+//         message: "Please insert images",
+//         status: 0,
+//       });
+//     }
+
+//     // await schoolgallery.destroy({
+//     //   where: { school_id: req.body.id },
+//     //   id: { [Op.notIn]: [16,19] }
+//     // });
+//     await schoolgallery.destroy({
+//       where: {
+//         school_id: req.body.id,
+//         id: {
+//           [Op.notIn]: oldimageids,
+//         },
+//       },
+//     });
+//     for (const value of images) {
+//       await schoolgallery.create({
+//         school_id: req.body.id,
+//         image: value,
+//         // status: "featured",
+//       });
+//     }
+
+//     return res.status(200).send({
+//       status: 1,
+//       message: "Data saved successfully",
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).send({
+//       message: "Unable to process the request",
+//       status: 0,
+//     });
+//   }
+// };
 
 exports.schoollevelfindAll = async (req, res) => {
   const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
