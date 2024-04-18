@@ -4,7 +4,7 @@ const College = db.College;
 const _ = require("lodash");
 const streamfaq = db.stream_faq;
 const city = db.city;
-const college_stream = db.college_stream;
+const collegestream = db.college_stream;
 const placements = db.placements;
 const board_colleges = db.board_colleges;
 const f_a_qs = db.f_a_qs;
@@ -141,6 +141,17 @@ exports.findOne = (req, res) => {
         required: false,
         association: "citys",
         attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "college_stream",
+        attributes: ["id", "stream_id"],
+        include: [
+          {
+            association: "colegestreams",
+            attributes: ["id", "name"],
+          },
+        ],
       },
 
     ],
@@ -293,21 +304,16 @@ exports.create = async (req, res) => {
     });
 
 
-    if (
-      req.body.stream &&
-      CollegeDetails.id
-    ) {
+    if (req.body.streams && CollegeDetails.id) {
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
 
-      const stream = JSON.parse(req.body.stream);
-
-      await _.forEach(stream, function (value) {
-        college_stream.create({
-          stream_id: value.stream,
+        await collegestream.create({
+          stream_id: value.id,
           college_id: CollegeDetails.id,
         });
       });
     }
-
 
     res.status(200).send({
       status: 1,
@@ -363,7 +369,6 @@ exports.update = async (req, res) => {
       });
     }
 
-
     const collegeupdate = {
       country_id: req.body.country_id || existingRecord.country_id,
       state_id: req.body.state_id || existingRecord.state_id,
@@ -391,7 +396,6 @@ exports.update = async (req, res) => {
       hostel: req.body.hostel || existingRecord.hostel,
     };
 
-
     // Check if a new logo is provided
     if (req.files && req.files.icon) {
       const avatar = req.files.icon;
@@ -413,11 +417,11 @@ exports.update = async (req, res) => {
       }
 
       const logoname = "logo" + Date.now() + path.extname(avatar.name);
-      const uploadPath = "./storage/college_logo/" + logoname;
+      const uploadPath = "./storage/college_icon/" + logoname;
 
       await avatar.mv(uploadPath);
 
-      collegeupdate.icon = "college_logo/" + logoname;
+      collegeupdate.icon = "college_icon/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.icon) {
@@ -497,6 +501,20 @@ exports.update = async (req, res) => {
 
     // Update database record
     await College.update(collegeupdate, { where: { id: req.body.id } });
+
+
+    if (req.body.streams && req.body.id) {
+      await collegestream.destroy({
+        where: { college_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
+        await collegestream.create({
+          college_id: req.body.id,
+          stream_id: value.id,
+        });
+      });
+    }
 
 
     res.status(200).send({

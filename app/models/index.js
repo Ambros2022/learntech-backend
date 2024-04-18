@@ -50,12 +50,12 @@ db.page = require("../models/page.model.js")(sequelize, Sequelize);
 db.banner = require("../models/banner.model.js")(sequelize, Sequelize);
 db.accesstokens = require("../models/accesstokens.model.js")(sequelize, Sequelize);
 db.level = require("./level.model.js")(sequelize, Sequelize);
-
-
-
-
 db.College = require("../models/College.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequelize);
+
+
+
+
 db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
 db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
 
@@ -291,6 +291,28 @@ db.College.belongsTo(db.state, {
 db.College.belongsTo(db.city, {
   foreignKey: "city_id",
   as: "citys",
+});
+
+// db.school.hasMany(db.schoolamenities, { as: "schoolamenities" });
+// db.schoolamenities.belongsTo(db.school, {
+//   foreignKey:"school_id",
+//   as: "schoolamenities",
+// });
+
+// db.schoolamenities.belongsTo(db.amenities, {
+//   foreignKey: "amenitie_id",
+//   as: "schamenities",
+// });
+
+db.College.hasMany(db.college_stream, { as: "college_stream" });
+db.college_stream.belongsTo(db.College, {
+  foreignKey:"school_id",
+  as: "collegestreams",
+});
+
+db.college_stream.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "colegestreams",
 });
 
 /***  Relation ship stream  */
