@@ -174,9 +174,9 @@ exports.update = async (req, res) => {
       generalcourseupdates.logo = "course_logo/" + logoname;
 
       // If there's an old logo associated with the record, remove it
-      if (existingRecord.icon) {
+      if (existingRecord.logo) {
 
-        const oldLogoPath = "./storage/" + existingRecord.icon;
+        const oldLogoPath = "./storage/" + existingRecord.logo;
         await removeFile(oldLogoPath);
       }
     }
@@ -254,6 +254,16 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   generalcourse.findByPk(id, {
     include: [
+      {
+        required: false,
+        association: "streams",
+        attributes: ["id","name"],
+      },
+      {
+        required: false,
+        association: "sub_streams",
+        attributes: ["id","sub_stream_name"],
+      },
       {
         required: false,
         association: "generalcoursefaqs",

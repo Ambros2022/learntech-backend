@@ -57,6 +57,7 @@ db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequ
 
 
 db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
+db.general_course = require("./general_course.model.js")(sequelize, Sequelize);
 db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
 
 
@@ -67,7 +68,7 @@ db.role = require("../models/role.model.js")(sequelize, Sequelize);
 
 
 db.polytechnic = require("../models/polytechnic.model.js")(sequelize, Sequelize);
-db.general_course = require("./general_course.model.js")(sequelize, Sequelize);
+
 db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 
 db.area = require("../models/area.model.js")(sequelize, Sequelize);
@@ -332,16 +333,19 @@ db.general_course_faqs.belongsTo(db.general_course, {
 });
 
 
-// db.sub_stream.hasMany(db.general_course, { as: "sub_stream" });
-// db.general_course.belongsTo(db.sub_stream, {
-//   foreignKey: "sub_streams_id",
-//   as: "sub_stream",
-// });
-// db.stream.hasMany(db.general_course, { as: "str" });
-// db.general_course.belongsTo(db.stream, {
-//   foreignKey: "stream_id",
-//   as: "streams",
-// });
+
+
+db.general_course.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "streams",
+});
+
+db.general_course.belongsTo(db.sub_stream, {
+  foreignKey: "sub_streams_id",
+  as: "sub_streams",
+});
+
+
 // db.stream.hasMany(db.generalcourse, { as: "ugcourse" });
 // db.generalcourse.belongsTo(db.stream, {
 //   foreignKey: "stream_id",
@@ -915,12 +919,7 @@ db.sub_stream.belongsTo(db.stream, {
 // });
 
 
-/*** generl course Relation ship  */
-// db.general_course.hasMany(db.generalcourse_faqs, { as: "faqs",foreignKey:"generalcourse_id" });
-// db.generalcourse_faqs.belongsTo(db.general_course, {
-//   foreignKey: "generalcourse_id",
-//   as: "generalcourse",
-// });
+
 
 
 
