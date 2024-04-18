@@ -42,8 +42,8 @@ db.schoolboards = require("../models/school_boards.model.js")(sequelize, Sequeli
 db.school = require("../models/school.model.js")(sequelize, Sequelize);
 db.schoolamenities = require("../models/schoolamenities.model.js")(sequelize, Sequelize);
 db.schoollevels = require("../models/schoollevel.model.js")(sequelize, Sequelize);
-db.school_faqs= require("../models/school_faqs.model.js")(sequelize, Sequelize);
-db.schoolgallery= require("../models/school_galleries.model.js")(sequelize, Sequelize);
+db.school_faqs = require("../models/school_faqs.model.js")(sequelize, Sequelize);
+db.schoolgallery = require("../models/school_galleries.model.js")(sequelize, Sequelize);
 db.stream = require("../models/stream.model.js")(sequelize, Sequelize);
 db.sub_stream = require("../models/sub_stream.model.js")(sequelize, Sequelize);
 db.page = require("../models/page.model.js")(sequelize, Sequelize);
@@ -58,7 +58,7 @@ db.College = require("../models/College.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequelize);
 db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
 db.general_course = require("./general_course.model.js")(sequelize, Sequelize);
-db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
+db.general_course_faqs = require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
 
 
 
@@ -89,16 +89,16 @@ db.college_affiliation = require("../models/college_affiliation.model.js")(seque
 
 // db.college_stream = require("../models/college_stream.model.js")(sequelize, Sequelize);
 
-db.college_management= require("../models/college_managements.model.js")(sequelize, Sequelize);
-db.college_amenities  = require("../models/college_amenities.model.js")(sequelize, Sequelize);
+db.college_management = require("../models/college_managements.model.js")(sequelize, Sequelize);
+db.college_amenities = require("../models/college_amenities.model.js")(sequelize, Sequelize);
 db.college_groupss = require("../models/college_groups.model.js")(sequelize, Sequelize);
 db.board_colleges = require("../models/board_colleges.model.js")(sequelize, Sequelize);
 db.university_colleges = require("../models/university_colleges.model.js")(sequelize, Sequelize);
 db.collegeRecognition = require("../models/collegeRecognition.model.js")(sequelize, Sequelize);
 db.companies = require("../models/companies.model.js")(sequelize, Sequelize);
 db.placements = require("../models/placements.model.js")(sequelize, Sequelize);
-db.f_a_qs= require("../models/f_a_qs.model.js")(sequelize, Sequelize);
-db.rankings= require("../models/rankings.model.js")(sequelize, Sequelize);
+db.f_a_qs = require("../models/f_a_qs.model.js")(sequelize, Sequelize);
+db.rankings = require("../models/rankings.model.js")(sequelize, Sequelize);
 db.author = require("../models/author.model.js")(sequelize, Sequelize);
 db.categories = require("../models/categories.model.js")(sequelize, Sequelize);
 
@@ -117,22 +117,22 @@ db.polytechnicmanagment = require("../models/polytechnicmanagment.model.js")(seq
 db.review = require("../models/review.model.js")(sequelize, Sequelize);
 db.upcoming_courses = require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
 db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
-db.course_modes= require("./course_modes.model.js")(sequelize, Sequelize);
-db.course_exams= require("./course_exams.model.js")(sequelize, Sequelize);
-db.course_companies= require("./course_companies.model.js")(sequelize, Sequelize);
+db.course_modes = require("./course_modes.model.js")(sequelize, Sequelize);
+db.course_exams = require("./course_exams.model.js")(sequelize, Sequelize);
+db.course_companies = require("./course_companies.model.js")(sequelize, Sequelize);
 db.modes = require("../models/modes.model.js")(sequelize, Sequelize);
 db.mediums = require("../models/mediums.model.js")(sequelize, Sequelize);
 db.eligibilities = require("../models/eligibilities.model.js")(sequelize, Sequelize);
-db.salary= require("../models/salary.model.js")(sequelize, Sequelize);
-db.job= require("../models/course_job_analyses.model.js")(sequelize, Sequelize);
-db.gallery= require("../models/gallery.model.js")(sequelize, Sequelize);
-db.fees= require("../models/fees.model.js")(sequelize, Sequelize);
-db.fee_details= require("../models/fee_details.model.js")(sequelize, Sequelize);
-db.syllabus= require("../models/syllabus.model.js")(sequelize, Sequelize);
-db.syllabus_details= require("../models/syllabus_details.model.js")(sequelize, Sequelize);
-db.upcoming_courses= require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
+db.salary = require("../models/salary.model.js")(sequelize, Sequelize);
+db.job = require("../models/course_job_analyses.model.js")(sequelize, Sequelize);
+db.gallery = require("../models/gallery.model.js")(sequelize, Sequelize);
+db.fees = require("../models/fees.model.js")(sequelize, Sequelize);
+db.fee_details = require("../models/fee_details.model.js")(sequelize, Sequelize);
+db.syllabus = require("../models/syllabus.model.js")(sequelize, Sequelize);
+db.syllabus_details = require("../models/syllabus_details.model.js")(sequelize, Sequelize);
+db.upcoming_courses = require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
 db.abouts = require("../models/about.model.js")(sequelize, Sequelize);
-db.service= require("../models/service.model.js")(sequelize, Sequelize);
+db.service = require("../models/service.model.js")(sequelize, Sequelize);
 db.resettokens = require("../models/resettoken.model.js")(sequelize, Sequelize);
 db.groups = require("../models/groups.model.js")(sequelize, Sequelize);
 db.testimonial = require("../models/testimonial.model.js")(sequelize, Sequelize);
@@ -150,19 +150,19 @@ db.redirecturl = require("../models/redirecturl.model.js")(sequelize, Sequelize)
 db.promopage = require("../models/promo.model.js")(sequelize, Sequelize);
 db.newsandevents = require("./newsandeventes.model.js")(sequelize, Sequelize);
 
-db.collegegallery= require("../models/collegegallery.model.js")(sequelize, Sequelize);
+db.collegegallery = require("../models/collegegallery.model.js")(sequelize, Sequelize);
 
-db.cutoff= require("../models/cutoff.model.js")(sequelize, Sequelize);
-db.cutoffdetails= require("../models/cutoff_details.model.js")(sequelize, Sequelize);
+db.cutoff = require("../models/cutoff.model.js")(sequelize, Sequelize);
+db.cutoffdetails = require("../models/cutoff_details.model.js")(sequelize, Sequelize);
 
-db.exam= require("../models/exam.model.js")(sequelize, Sequelize);
-db.exam_eligibilities= require("../models/exam_eligibilities.model.js")(sequelize, Sequelize);
-db.exam_feedetails= require("../models/exam_feedetails.model.js")(sequelize, Sequelize);
-db.exam_dates= require("../models/exam_dates.model.js")(sequelize, Sequelize);
-db.exam_agelimits= require("../models/exam_agelimits.model.js")(sequelize, Sequelize);
-db.exam_id_proof_details= require("../models/exam_id_proofs.model.js")(sequelize, Sequelize);
-db.exam_faqs= require("../models/exam_faq.model.js")(sequelize, Sequelize);
-db.databackup= require("../models/databackup.model.js")(sequelize, Sequelize);
+db.exam = require("../models/exam.model.js")(sequelize, Sequelize);
+db.exam_eligibilities = require("../models/exam_eligibilities.model.js")(sequelize, Sequelize);
+db.exam_feedetails = require("../models/exam_feedetails.model.js")(sequelize, Sequelize);
+db.exam_dates = require("../models/exam_dates.model.js")(sequelize, Sequelize);
+db.exam_agelimits = require("../models/exam_agelimits.model.js")(sequelize, Sequelize);
+db.exam_id_proof_details = require("../models/exam_id_proofs.model.js")(sequelize, Sequelize);
+db.exam_faqs = require("../models/exam_faq.model.js")(sequelize, Sequelize);
+db.databackup = require("../models/databackup.model.js")(sequelize, Sequelize);
 
 
 db.scholarships = require("./scholarship.model.js")(sequelize, Sequelize);
@@ -170,10 +170,10 @@ db.exams = require("./exams.model.js")(sequelize, Sequelize);
 db.CollegeGalleries = require("./CollegeGalleries.model.js")(sequelize, Sequelize);
 
 
-db.abroadcountries= require("../models/abroadcountries.model.js")(sequelize, Sequelize);
-db.abroad_universities= require("../models/abroaduniversities.model.js")(sequelize, Sequelize);
+db.abroadcountries = require("../models/abroadcountries.model.js")(sequelize, Sequelize);
+db.abroad_universities = require("../models/abroaduniversities.model.js")(sequelize, Sequelize);
 
-db.youtubevideos= require("../models/youtubevideos.model.js")(sequelize, Sequelize);
+db.youtubevideos = require("../models/youtubevideos.model.js")(sequelize, Sequelize);
 
 
 
@@ -201,22 +201,18 @@ db.school.belongsTo(db.schoolboards, {
 });
 db.review.belongsTo(db.school, {
   foreignKey: "item_id",
-  where:{type:'school'},
+  where: { type: 'school' },
   as: "reviewschools",
 });
 
-db.school.hasMany(db.schoolgallery, { as: "schoolgallery",foreignKey:"school_id" });
-db.schoolgallery.belongsTo(db.school, {
-  foreignKey: "school_id",
-  as: "schoolgallery",
-});
+
 
 
 
 
 db.school.hasMany(db.schoolamenities, { as: "schoolamenities" });
 db.schoolamenities.belongsTo(db.school, {
-  foreignKey:"school_id",
+  foreignKey: "school_id",
   as: "schoolamenities",
 });
 
@@ -239,11 +235,14 @@ db.schoollevels.belongsTo(db.level, {
 });
 
 
-db.school.hasMany(db.school_faqs, { as: "schfaqs",foreignKey:"school_id" });
+db.school.hasMany(db.school_faqs, { as: "schfaqs", foreignKey: "school_id" });
 db.school_faqs.belongsTo(db.school, {
   foreignKey: "school_id",
   as: "schoolfaqs",
 });
+
+db.school.hasMany(db.schoolgallery, { as: "schgallery", foreignKey: "school_id" });
+
 
 
 
@@ -296,7 +295,7 @@ db.College.belongsTo(db.city, {
 
 /***  Relation ship stream  */
 
-db.stream.hasMany(db.stream_faq, { as: "streamfaqs",foreignKey:"stream_id" });
+db.stream.hasMany(db.stream_faq, { as: "streamfaqs", foreignKey: "stream_id" });
 db.stream_faq.belongsTo(db.stream, {
   foreignKey: "stream_id",
   as: "streamfaqs",
@@ -304,7 +303,7 @@ db.stream_faq.belongsTo(db.stream, {
 
 /***  Relation ship generalcourses  */
 
-db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs",foreignKey:"general_course_id" });
+db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
 db.general_course_faqs.belongsTo(db.general_course, {
   foreignKey: "general_course_id",
   as: "generalcoursefaqs",
@@ -589,7 +588,7 @@ db.college_groupss.belongsTo(db.groups, {
 //   as: "cutoff",
 // });
 
-db.cutoff.hasMany(db.cutoffdetails, { as: "cutoffdetails",foreignKey:"cut_offs_id"});
+db.cutoff.hasMany(db.cutoffdetails, { as: "cutoffdetails", foreignKey: "cut_offs_id" });
 db.cutoffdetails.belongsTo(db.cutoff, {
   foreignKey: "cut_offs_id",
   as: "cutoffdetails",
@@ -648,7 +647,7 @@ db.eligibilities.belongsTo(db.courses, {
 //   as: "coursesdoctorate",
 // });
 
-db.general_course.hasMany(db.courses, { as: "course",foreignKey:"course_id"});
+db.general_course.hasMany(db.courses, { as: "course", foreignKey: "course_id" });
 db.courses.belongsTo(db.general_course, {
   foreignKey: "course_id",
   as: "course",
@@ -676,14 +675,14 @@ db.fees.belongsTo(db.courses, {
   foreignKey: "course_id",
   as: "cousrsefees",
 });
-db.courses.hasMany(db.syllabus, { as: "coursesyllabus" ,foreignKey:"course_id"});
+db.courses.hasMany(db.syllabus, { as: "coursesyllabus", foreignKey: "course_id" });
 db.syllabus.belongsTo(db.courses, {
   foreignKey: "course_id",
   as: "coursesyllabus",
 });
 
 
-db.syllabus.hasMany(db.syllabus_details, { as: "syllabussdetails",foreignKey:"syllabus_id"});
+db.syllabus.hasMany(db.syllabus_details, { as: "syllabussdetails", foreignKey: "syllabus_id" });
 db.syllabus_details.belongsTo(db.syllabus, {
   foreignKey: "syllabus_id",
   as: "syllabussdetails",
@@ -697,7 +696,7 @@ db.gallery.belongsTo(db.courses, {
 
 
 
-db.courses.hasMany(db.course_companies,{as:"coursecompanies",foreignKey:"courses_id"});
+db.courses.hasMany(db.course_companies, { as: "coursecompanies", foreignKey: "courses_id" });
 db.course_companies.belongsTo(db.courses, {
   foreignKey: "courses_id",
   as: "coursecompanies",
@@ -706,7 +705,7 @@ db.course_companies.belongsTo(db.courses, {
 
 
 
-db.fees.hasMany(db.fee_details, { as: "feedetail",foreignKey:"fee_id"});
+db.fees.hasMany(db.fee_details, { as: "feedetail", foreignKey: "fee_id" });
 db.fee_details.belongsTo(db.fees, {
   foreignKey: "fee_id",
   as: "feedetail",
@@ -714,13 +713,13 @@ db.fee_details.belongsTo(db.fees, {
 
 
 //fess relationship
-db.courses.hasMany(db.course_modes, { as: "coursemodes",foreignKey:"courses_id"});
+db.courses.hasMany(db.course_modes, { as: "coursemodes", foreignKey: "courses_id" });
 db.course_modes.belongsTo(db.courses, {
   foreignKey: "courses_id",
   as: "coursemodes",
 });
 
-db.courses.hasMany(db.course_exams, { as: "courseexams",foreignKey:"courses_id"});
+db.courses.hasMany(db.course_exams, { as: "courseexams", foreignKey: "courses_id" });
 db.course_exams.belongsTo(db.courses, {
   foreignKey: "courses_id",
   as: "courseexams",
@@ -729,7 +728,7 @@ db.course_exams.belongsTo(db.courses, {
 
 //Exam RELATIONSHIP
 
-db.exam.hasMany(db.newsandevents,{ as: "examnews"});
+db.exam.hasMany(db.newsandevents, { as: "examnews" });
 db.newsandevents.belongsTo(db.exam, {
   foreignKey: "exam_id",
   as: "examnews",
