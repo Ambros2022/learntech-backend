@@ -53,6 +53,7 @@ db.accesstokens = require("../models/accesstokens.model.js")(sequelize, Sequeliz
 db.level = require("./level.model.js")(sequelize, Sequelize);
 db.College = require("../models/College.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/College_stream.model.js")(sequelize, Sequelize);
+db.college_faqs = require("../models/college_faq.model.js")(sequelize, Sequelize);
 db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
 db.general_course = require("./general_course.model.js")(sequelize, Sequelize);
 db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
@@ -308,6 +309,17 @@ db.college_stream.belongsTo(db.stream, {
   as: "colegestreams",
 });
 
+db.College.hasMany(db.college_faqs, { as: "collegefaqs",foreignKey:"college_id" });
+db.college_faqs.belongsTo(db.College, {
+  foreignKey: "college_id",
+  as: "collegefaqs",
+});
+
+// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs",foreignKey:"general_course_id" });
+// db.general_course_faqs.belongsTo(db.general_course, {
+//   foreignKey: "general_course_id",
+//   as: "generalcoursefaqs",
+// });
 /***  Relation ship stream  */
 
 db.stream.hasMany(db.stream_faq, { as: "streamfaqs",foreignKey:"stream_id" });
@@ -346,7 +358,11 @@ db.abroadpage_faqs.belongsTo(db.abroadpages, {
   foreignKey: "abroad_page_id",
   as: "abroadpagefaqs",
 });
-
+// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs",foreignKey:"general_course_id" });
+// db.general_course_faqs.belongsTo(db.general_course, {
+//   foreignKey: "general_course_id",
+//   as: "generalcoursefaqs",
+// });
 
 
 

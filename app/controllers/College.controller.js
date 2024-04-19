@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require("path");
 const College = db.College;
+const college_faq = db.college_faqs;
 const _ = require("lodash");
 const streamfaq = db.stream_faq;
 const city = db.city;
@@ -97,6 +98,11 @@ exports.findAll = async (req, res) => {
           association: "citys",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "collegefaqs",
+          attributes: ["id", "questions", "answers"],
+        },
 
       ],
       subQuery: false,
@@ -127,6 +133,12 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   College.findByPk(id, {
     include: [
+      {
+        required: false,
+        association: "collegefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+
       {
         required: false,
         association: "country",
@@ -566,15 +578,15 @@ exports.updateplacements = async (req, res) => {
 exports.updatefaqs = async (req, res) => {
   try {
     if (req.body.faqs && req.body.id) {
-      await f_a_qs.destroy({
+      await college_faq.destroy({
         where: { college_id: req.body.id },
       });
       const faqss = JSON.parse(req.body.faqs);
       await _.forEach(faqss, function (value) {
-        f_a_qs.create({
+        college_faq.create({
           college_id: req.body.id,
-          questions: value.question ? value.question : null,
-          answers: value.answer ? value.answer : null,
+          questions: value.questions ? value.questions : null,
+          answers: value.answers ? value.answers : null,
         });
       });
     }
