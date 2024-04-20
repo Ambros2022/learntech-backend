@@ -226,6 +226,24 @@ exports.findAll = async (req, res) => {
       where: condition,
       limit,
       offset,
+      include: [
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id","name"],
+        },
+        {
+          required: false,
+          association: "sub_streams",
+          attributes: ["id","sub_stream_name"],
+        },
+        {
+          required: false,
+          association: "generalcoursefaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+  
+      ],
       order: [orderconfig],
     })
     .then((data) => {
