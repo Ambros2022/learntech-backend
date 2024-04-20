@@ -1,5 +1,5 @@
 const db = require("../models");
-const CollegeAndUniversity = db.CollegeAndUniversity;
+const CollegeAndUniversity = db.collegeAndUniversity;
 const school = db.school;
 const Op = db.Sequelize.Op;
 const PUBLISHED = 'Published';

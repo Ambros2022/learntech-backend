@@ -9,8 +9,7 @@ const streamcontroller = require("../controllers/stream.controller");
 const substreamcontroller = require("../controllers/substream.controller");
 const pagecontroller = require("../controllers/page.controller");
 const bannercontroller = require("../controllers/banner.controller");
-const Collegecontroller = require("../controllers/College.controller");
-const collegestreamcontroller = require("../controllers/collegestream.controller");
+const Collegecontroller = require("../controllers/college.controller.js");
 const databackupcontroller = require("../controllers/databackup.controller");
 const recognitioncontroller = require("../controllers/recognition.controller");
 const generalcoursecontroller = require("../controllers/generalcourse.controller.js");
@@ -702,58 +701,50 @@ module.exports = function (app) {
 
   /** College route start*/
 
-  app.get(
-    "/api/admin/College/get",
-    Collegecontroller.findAll
-  );
-  app.get(
-    "/api/admin/College/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    Collegecontroller.findOne
-  );
   app.post(
-    "/api/admin/College/add",
+    "/api/admin/college/add",
     globalvalidation.CollegeSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     Collegecontroller.create
   );
+
+  app.get(
+    "/api/admin/college/get",
+    Collegecontroller.findAll
+  );
+  app.get(
+    "/api/admin/college/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    Collegecontroller.findOne
+  );
+
   app.post(
-    "/api/admin/College/delete/:id",
+    "/api/admin/college/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     Collegecontroller.delete
   );
   app.post(
-    "/api/admin/College/update",
+    "/api/admin/college/update",
     globalvalidation.CollegeUpdateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     Collegecontroller.update
   );
 
+
   app.post(
-    "/api/admin/College/updateplacements",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    Collegecontroller.updateplacements
-  );
-  app.post(
-    "/api/admin/College/updatefaqs",
+    "/api/admin/college/updatefaqs",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     Collegecontroller.updatefaqs
   );
+
   app.post(
-    "/api/admin/College/updaterankings",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    Collegecontroller.updateranking
-  );
-  app.post(
-    "/api/admin/College/updategallery",
+    "/api/admin/college/updategallery",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     Collegecontroller.updategallery
   );
-  app.post(
-    "/api/admin/College/updatecutoff",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    Collegecontroller.updatecutoff
-  );
+
+
+
   /** College route end   */
 
   /**  generalcourses  Routes Start*/
@@ -842,40 +833,7 @@ module.exports = function (app) {
 
 
 
-  /* abroaduniversitiescontroller Routes start*/
-  app.get(
-    "/api/admin/collegestream/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    collegestreamcontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/collegestream/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    collegestreamcontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/collegestream/add",
-    globalvalidation.collegestreamSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    collegestreamcontroller.create
-  );
-
-  app.post(
-    "/api/admin/collegestream/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    collegestreamcontroller.delete
-  );
-
-  app.post(
-    "/api/admin/collegestream/update",
-    globalvalidation.collegestreamSchemaUpdate,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    collegestreamcontroller.update
-  );
-
- 
+  
 
 
 

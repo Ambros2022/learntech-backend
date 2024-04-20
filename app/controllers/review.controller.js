@@ -2,7 +2,7 @@ const db = require("../models");
 const review = db.review;
 const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
-const CollegeAndUniversity = db.CollegeAndUniversity;
+const CollegeAndUniversity = db.collegeAndUniversity;
 const school = db.school;
 const Op = db.Sequelize.Op;
 // Array of allowed files

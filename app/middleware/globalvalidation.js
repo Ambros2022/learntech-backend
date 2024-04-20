@@ -11,7 +11,7 @@ const stream = db.stream;
 const substream = db.sub_stream;
 const pages = db.page;
 const banner = db.banner;
-const college = db.College;
+const college = db.college;
 const collegestream = db.college_stream;
 const generalcourse = db.general_course;
 const stream_faq = db.stream_faq;
@@ -529,12 +529,21 @@ const bannerUpdateSchema = [
 
 const CollegeSchema = [
   checkField('name', 150, college, true),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("slug should be less than 150 character"),
+  checkField('slug', 150, college, true),
+  body("type")
+    .notEmpty()
+    .withMessage("type is required")
+    .isIn(["college", "university", "board"])
+    .withMessage(
+      "Invalid plan Name. Must be 'college', 'university' or 'board'"
+    ),
+  body("college_type")
+    .notEmpty()
+    .withMessage("college_type is required")
+    .isIn(['Public', 'Deemed', 'Private', 'Government', 'Autonomous'])
+    .withMessage(
+      "Invalid college_type Name. Must be 'Public','Deemed','Private','Government','Autonomous'"
+    ),
 
   ...validateIdRequired_id(countries, "country_id"),
   ...validateIdRequired_id(state, "state_id"),
@@ -546,12 +555,21 @@ const CollegeUpdateSchema = [
   ...validateIdRequired_id(college, "id"),
 
   checkField_update('name', 150, college, true),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("slug should be less than 150 character"),
+  checkField_update('slug', 150, college, true),
+  body("type")
+    .notEmpty()
+    .withMessage("type is required")
+    .isIn(["college", "university", "board"])
+    .withMessage(
+      "Invalid plan Name. Must be 'college', 'university' or 'board'"
+    ),
+  body("college_type")
+    .notEmpty()
+    .withMessage("college_type is required")
+    .isIn(['Public', 'Deemed', 'Private', 'Government', 'Autonomous'])
+    .withMessage(
+      "Invalid college_type Name. Must be 'Public','Deemed','Private','Government','Autonomous'"
+    ),
 
   ...validateIdRequired_id(countries, "country_id"),
   ...validateIdRequired_id(state, "state_id"),
@@ -562,19 +580,7 @@ const CollegeUpdateSchema = [
 
 
 
-const collegestreamSchema = [
-  ...validateIdRequired_id(stream, "stream_id"),
-  ...validateIdRequired_id(college, "college_id"),
-];
 
-const collegestreamSchemaUpdate = [
-  ...validateIdRequired_id(collegestream, "id"),
-
-  ...validateIdRequired_id(stream, "stream_id"),
-  ...validateIdRequired_id(college, "college_id"),
-
-
-];
 
 const GeneralcoursesSchema = [
   checkField('name', 150, generalcourse, true),
@@ -3241,8 +3247,6 @@ const globalvalidation = {
   SubStreamSchemaUpdate: SubStreamSchemaUpdate,
   CollegeSchema: CollegeSchema,
   CollegeUpdateSchema: CollegeUpdateSchema,
-  collegestreamSchema: collegestreamSchema,
-  collegestreamSchemaUpdate: collegestreamSchemaUpdate,
   recognitionSchema: recognitionSchema,
   recognitionUpdateSchema: recognitionUpdateSchema,
   GeneralcoursesSchema: GeneralcoursesSchema,
