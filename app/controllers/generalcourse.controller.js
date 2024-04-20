@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require("path");
-const generalcourse = db.generalcourse;
+const generalcourse = db.general_course;
+const generalcourse_faq = db.general_course_faqs;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
 // Array of allowed files
@@ -8,6 +9,18 @@ const sendsearch = require("../utility/Customsearch");
 const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
+
+// / Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 
 // // Allowed file size in mb
 const allowed_file_size = 2;
@@ -130,46 +143,46 @@ exports.update = async (req, res) => {
       is_trending: req.body.is_trending || existingRecord.is_trending,
       is_top_rank: req.body.is_top_rank || existingRecord.is_top_rank,
       status: req.body.status || existingRecord.status,
-    // logo: logos,
+      // logo: logos,
     };
 
-// Check if a new logo is provided
-if (req.files && req.files.logo) {
-  const avatar = req.files.logo;
+    // Check if a new logo is provided
+    if (req.files && req.files.logo) {
+      const avatar = req.files.logo;
 
-  // Check file type and size
-  if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-    return res.status(400).send({
-      message: "Invalid file type",
-      errors: {},
-      status: 0,
-    });
-  }
-  if (avatar.size / (1024 * 1024) > allowed_file_size) {
-    return res.status(400).send({
-      message: "File too large",
-      errors: {},
-      status: 0,
-    });
-  }
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
 
-  const logoname = "logo" + Date.now() + path.extname(avatar.name);
-  const uploadPath = "./storage/course_logo/" + logoname;
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/course_logo/" + logoname;
 
-  await avatar.mv(uploadPath);
+      await avatar.mv(uploadPath);
 
-  generalcourseupdates.logo = "course_logo/" + logoname;
+      generalcourseupdates.logo = "course_logo/" + logoname;
 
-  // If there's an old logo associated with the record, remove it
-  if (existingRecord.icon) {
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.logo) {
 
-    const oldLogoPath = "./storage/" + existingRecord.icon;
-    await removeFile(oldLogoPath);
-  }
-}
+        const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
+      }
+    }
 
-// Update database record
-await generalcourse.update(generalcourseupdates, { where: { id: req.body.id } });
+    // Update database record
+    await generalcourse.update(generalcourseupdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
@@ -203,16 +216,34 @@ exports.findAll = async (req, res) => {
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
-  let data_array = [];
+  // let data_array = [];
   // conditionStreamId ? data_array.push(conditionStreamId) : null;
-  condition ? data_array.push(condition) : null;
+  // condition ? data_array.push(condition) : null;
   // data_array.push({ is_deleted: 0 });
   const { limit, offset } = getPagination(page, size);
   generalcourse
     .findAndCountAll({
-      where: data_array,
+      where: condition,
       limit,
       offset,
+      include: [
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id","name"],
+        },
+        {
+          required: false,
+          association: "sub_streams",
+          attributes: ["id","sub_stream_name"],
+        },
+        {
+          required: false,
+          association: "generalcoursefaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+  
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -236,24 +267,34 @@ exports.findAll = async (req, res) => {
     });
 };
 
+
 exports.findOne = (req, res) => {
   const id = req.params.id;
-
-  generalcourse
-    .findOne({
-      where: {
-        [Op.or]: [
-          {
-            id: {
-              [Op.eq]: id,
-            },
-          },
-        ],
+  generalcourse.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "streams",
+        attributes: ["id","name"],
       },
-    })
+      {
+        required: false,
+        association: "sub_streams",
+        attributes: ["id","sub_stream_name"],
+      },
+      {
+        required: false,
+        association: "generalcoursefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
 
+    ],
+  })
     .then((data) => {
       if (data) {
+
+
+
         res.status(200).send({
           status: 1,
           message: "successfully retrieved",
@@ -262,105 +303,65 @@ exports.findOne = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find generalcourse with id=${id}.`,
+          message: `Cannot find general courses with id=${id}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving generalcourse with id=" + id,
+        message: "Error retrieving general courses with id=" + id,
       });
     });
 };
 
-exports.delete = async (req, res) => {
-
+exports.delete = (req, res) => {
   const id = req.params.id;
-
-
-  try {
-    const item = await generalcourse.update({ is_deleted: 1 }, {
+  generalcourse
+    .destroy({
       where: { id: id },
-    });
-
-    // console.log(item);
-    // return 
-    if (!item) {
-      res.status(400).send({
+    })
+    .then((num) => {
+      if (num == 1) {
+        res.status(200).send({
+          status: 1,
+          message: "general course  deleted successfully",
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `delete general course with id=${id}. Maybe general course was not found!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
         status: 0,
-        message: ` delete generalcourse with id=${id}. Maybe generalcourse was not found!`,
+        message: "Could not delete general course with id=" + id,
       });
-    }
-
-    return res.status(200).send({
-      status: 1,
-      message: "generalcourse  deleted successfully",
-
     });
-    // res.json(item);
-  } catch (err) {
-    res.status(500).send({
-      status: 0,
-      message: "Could not delete generalcourse with id=" + id,
-    });
-  }
-
-
 };
-// exports.delete = (req, res) => {
-//   const id = req.params.id;
-//   generalcourse
-//     .destroy({
-//       where: { id: id },
-//     })
-//     .then((num) => {
-//       if (num == 1) {
-//         res.status(200).send({
-//           status: 1,
-//           message: "generalcourse  deleted successfully",
-//         });
-//       } else {
-//         res.status(400).send({
-//           status: 0,
-//           message: ` delete generalcourse with id=${id}. Maybe generalcourse was not found!`,
-//         });
-//       }
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         status: 0,
-//         message: "Could not delete Stream with id=" + id,
-//       });
-//     });
-// };
+
 
 exports.updatefaq = async (req, res) => {
-  // return console.log(req.body);
 
   try {
     if (req.body.faqs && req.body.id) {
-      await generalcourse_faqs.destroy({
-        where: { generalcourse_id: req.body.id },
+      await generalcourse_faq.destroy({
+        where: { general_course_id: req.body.id },
       });
-      //  let data=  generalcourse_faqs.create({
-      //     generalcourse_id : 2708,
-      //     questions: "value.questions ? value.questions : null",
-      //     answers: "value.answers ? value.answers : null",
-      //   });
-
       const faqss = JSON.parse(req.body.faqs);
-      await _.forEach(faqss, async function (value) {
-        await generalcourse_faqs.create({
-          generalcourse_id: req.body.id,
+      await _.forEach(faqss, function (value) {
+        generalcourse_faq.create({
+          general_course_id: req.body.id,
           questions: value.questions ? value.questions : null,
           answers: value.answers ? value.answers : null,
         });
       });
     }
+
     res.status(200).send({
       status: 1,
-
       message: "Data Save Successfully",
     });
   } catch (error) {

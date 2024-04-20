@@ -137,7 +137,7 @@ exports.create = async (req, res) => {
       const amndata = JSON.parse(req.body.amenities);
       _.forEach(amndata, async function (value) {
 
-        await  schoolamenities.create({
+        await schoolamenities.create({
           school_id: schoolDetails.id,
           amenitie_id: value.id,
         });
@@ -147,7 +147,7 @@ exports.create = async (req, res) => {
     if (req.body.levels && schoolDetails.id) {
       const amndata = JSON.parse(req.body.levels);
       _.forEach(amndata, async function (value) {
-        await  schoollevels.create({
+        await schoollevels.create({
           school_id: schoolDetails.id,
           level_id: value.id,
         });
@@ -451,8 +451,8 @@ exports.findOne = (req, res) => {
 
         {
           required: false,
-          association: "schfaqs",
-          attributes: ["id", "questions", "answers"],
+          association: "schgallery",
+          attributes: ["id", "image"],
         },
 
       ],
@@ -545,142 +545,128 @@ exports.updatefaqs = async (req, res) => {
   }
 };
 
+
+
+
 exports.updategallery = async (req, res) => {
   try {
-    let oldimageids = [];
-    if (req.body.oldimage) {
-      let dataArray = JSON.parse(req.body.oldimage);
-      if (dataArray && dataArray.length > 0) {
-        oldimageids = dataArray.map((item) => item.id);
+    // Check if old images are provided
+    if (req.body.oldimages) {
+      const oldImages = JSON.parse(req.body.oldimages);
+
+      if (Array.isArray(oldImages) && oldImages.length > 0) {
+        let finaloldimage = [];
+
+        await Promise.all(oldImages.map(async (obj) => {
+          const parts = obj.dataURL.split('/');
+          const desiredPart = parts[parts.length - 2] + '/' + parts.pop();
+          finaloldimage.push(desiredPart);
+        }));
+
+        let oldRecordsToDelete = await schoolgallery.findAll({
+          where: {
+            school_id: req.body.id,
+            image: {
+              [Op.notIn]: finaloldimage
+            }
+          }
+        });
+
+
+
+        if (oldRecordsToDelete.length > 0) {
+          let deletedRecords = await schoolgallery.destroy({
+            where: {
+              school_id: req.body.id,
+              image: {
+                [Op.notIn]: finaloldimage
+              }
+            },
+          });
+          oldRecordsToDelete.map(async (value) => {
+
+            const oldLogoPath = "./storage/" + value.image;
+            await removeFile(oldLogoPath);
+
+
+          });
+        }
+
+
+      } else {
+
+        let oldRecordsToDelete = await schoolgallery.findAll({
+          where: {
+            school_id: req.body.id,
+
+          }
+        });
+
+
+
+        if (oldRecordsToDelete.length > 0) {
+          let deletedRecords = await schoolgallery.destroy({
+            where: {
+              school_id: req.body.id,
+            },
+          });
+          oldRecordsToDelete.map(async (value) => {
+            const oldLogoPath = "./storage/" + value.image;
+            await removeFile(oldLogoPath);
+
+
+          });
+        }
+
       }
-    }
 
-    let images = [];
+      // Check if new images are uploaded
+      if (req.files) {
+        const images = Object.values(req.files);
 
-    if (!req.files) {
-      await schoolgallery.destroy({
-        where: {
-          school_id: req.body.id,
-          id: {
-            [Op.notIn]: oldimageids,
-          },
-        },
-      });
+        // Process uploaded images
+        await Promise.all(images.map(async (imageData) => {
+          const imgname = "image" + Date.now() + Math.random() + path.extname(imageData.name);
+          const destination = "./storage/school_galleries/" + imgname;
+
+          try {
+            // Move the uploaded image to the server
+            await imageData.mv(destination);
+
+            // Save the image path to the database
+            await schoolgallery.create({
+              school_id: req.body.id,
+              image: "school_galleries/" + imgname,
+            });
+          } catch (error) {
+            // Handle error during file operations
+            console.error("Error processing image:", error);
+            throw error; // Re-throw the error to trigger the catch block
+          }
+        }));
+      }
+
+      // Send success response
       return res.status(200).send({
         status: 1,
-        message: "olf files removed successfully",
+        message: "Data saved successfully",
       });
     }
-    if (!req.body.id) {
-      return res.status(400).send({
-        message: "Invalid request, please provide gallery ID and image",
-        status: 0,
-      });
-    }
-
-    const avatar = req.files.image;
-
-    if (Array.isArray(avatar)) {
-      for (const element of avatar) {
-        if (!array_of_allowed_file_types.includes(element.mimetype)) {
-          return res.status(400).send({
-            message: "Invalid file type",
-            status: 0,
-          });
-        }
-
-        if (element.size / (1024 * 1024) > allowed_file_size) {
-          return res.status(400).send({
-            message: "File too large",
-            status: 0,
-          });
-        }
-
-        const imgname =
-          "image" + Date.now() + Math.random() + path.extname(element.name);
-        // console.log("imgname",imgname);
-
-        let isUploaded;
-        try {
-          await element.mv("./storage/schoolgallery/" + imgname);
-          isUploaded = true;
-        } catch (error) {
-          isUploaded = false;
-          console.error("File upload error: ", error);
-        }
-        if (isUploaded) {
-          images.push("schoolgallery/" + imgname);
-        }
-      }
-    } else {
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid file type",
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large",
-          status: 0,
-        });
-      }
-
-      const imgname = "image" + Date.now() + path.extname(avatar.name);
-
-      let isUploaded;
-      try {
-        await avatar.mv("./storage/schoolgallery/" + imgname);
-        isUploaded = true;
-      } catch (error) {
-        isUploaded = false;
-        console.error("File upload error: ", error);
-      }
-      if (isUploaded) {
-        images.push("schoolgallery/" + imgname);
-      }
-    }
-
-    if (images.length === 0) {
-      return res.status(400).send({
-        message: "Please insert images",
-        status: 0,
-      });
-    }
-
-    // await schoolgallery.destroy({
-    //   where: { school_id: req.body.id },
-    //   id: { [Op.notIn]: [16,19] }
-    // });
-    await schoolgallery.destroy({
-      where: {
-        school_id: req.body.id,
-        id: {
-          [Op.notIn]: oldimageids,
-        },
-      },
-    });
-    for (const value of images) {
-      await schoolgallery.create({
-        school_id: req.body.id,
-        image: value,
-        // status: "featured",
-      });
-    }
-
-    return res.status(200).send({
-      status: 1,
-      message: "Data saved successfully",
-    });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating gallery:", error);
     return res.status(500).send({
       message: "Unable to process the request",
       status: 0,
     });
   }
 };
+
+
+
+
+
+
+
 
 exports.schoollevelfindAll = async (req, res) => {
   const { page, size, searchText, searchfrom, columnname, orderby } = req.query;

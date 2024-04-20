@@ -1,18 +1,12 @@
 const db = require("../models");
 const path = require("path");
-const College = db.College;
+const College = db.college;
+const Collegestream = db.college_stream;
+const Collegeameneties = db.college_amenities;
+const Collegerecoginations = db.college_recognition;
+const Collegegallery = db.college_gallery;
+const college_faq = db.college_faqs;
 const _ = require("lodash");
-const streamfaq = db.stream_faq;
-const city = db.city;
-const college_stream = db.college_stream;
-const placements = db.placements;
-const board_colleges = db.board_colleges;
-const f_a_qs = db.f_a_qs;
-const cutoff = db.cutoff;
-const cutoffdetails = db.cutoffdetails;
-const collegegallery = db.collegegallery;
-const rankings = db.rankings;
-const university_colleges = db.university_colleges;
 const Op = db.Sequelize.Op;
 const sendsearch = require("../utility/Customsearch");
 const fileTypes = require("../config/fileTypes");
@@ -97,6 +91,11 @@ exports.findAll = async (req, res) => {
           association: "citys",
           attributes: ["id", "name"],
         },
+        // {
+        //   required: false,
+        //   association: "collegefaqs",
+        //   attributes: ["id", "questions", "answers"],
+        // },
 
       ],
       subQuery: false,
@@ -127,6 +126,8 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   College.findByPk(id, {
     include: [
+
+
       {
         required: false,
         association: "country",
@@ -141,6 +142,49 @@ exports.findOne = (req, res) => {
         required: false,
         association: "citys",
         attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "collegestreams",
+        attributes: ["id", "stream_id"],
+        include: [
+          {
+            association: "clgstreams",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+      {
+        required: false,
+        association: "collegeamenities",
+        attributes: ["id", "amenitie_id"],
+        include: [
+          {
+            association: "clgamenities",
+            attributes: ["id", "amenities_name"],
+          },
+        ],
+      },
+      {
+        required: false,
+        association: "collegerecognitions",
+        attributes: ["id", "recognition_id"],
+        include: [
+          {
+            association: "clgrecognitions",
+            attributes: ["id", "recognition_approval_name"],
+          },
+        ],
+      },
+      {
+        required: false,
+        association: "collegefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+      {
+        required: false,
+        association: "clggallery",
+        attributes: ["id", "image"],
       },
 
     ],
@@ -283,7 +327,7 @@ exports.create = async (req, res) => {
       logo: logos,
       banner_image: bannerimages,
       video_url: req.body.video_url,
-      avg_rating: req.body.avg_rating,
+      // avg_rating: req.body.avg_rating,
       info: req.body.info,
       admissions: req.body.admissions,
       placements: req.body.placements,
@@ -293,21 +337,38 @@ exports.create = async (req, res) => {
     });
 
 
-    if (
-      req.body.stream &&
-      CollegeDetails.id
-    ) {
+    if (req.body.streams && CollegeDetails.id) {
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
 
-      const stream = JSON.parse(req.body.stream);
-
-      await _.forEach(stream, function (value) {
-        college_stream.create({
-          stream_id: value.stream,
+        await Collegestream.create({
+          stream_id: value.id,
           college_id: CollegeDetails.id,
         });
       });
     }
 
+    if (req.body.amenities && CollegeDetails.id) {
+      const stream = JSON.parse(req.body.amenities);
+      _.forEach(stream, async function (value) {
+
+        await Collegeameneties.create({
+          amenitie_id: value.id,
+          college_id: CollegeDetails.id,
+        });
+      });
+    }
+
+    if (req.body.recoginations && CollegeDetails.id) {
+      const stream = JSON.parse(req.body.recoginations);
+      _.forEach(stream, async function (value) {
+
+        await Collegerecoginations.create({
+          recognition_id: value.id,
+          college_id: CollegeDetails.id,
+        });
+      });
+    }
 
     res.status(200).send({
       status: 1,
@@ -363,7 +424,6 @@ exports.update = async (req, res) => {
       });
     }
 
-
     const collegeupdate = {
       country_id: req.body.country_id || existingRecord.country_id,
       state_id: req.body.state_id || existingRecord.state_id,
@@ -382,7 +442,7 @@ exports.update = async (req, res) => {
       address: req.body.address || existingRecord.address,
       map: req.body.map || existingRecord.map,
       video_url: req.body.video_url || existingRecord.video_url,
-      avg_rating: req.body.avg_rating || existingRecord.avg_rating,
+      // avg_rating: req.body.avg_rating || existingRecord.avg_rating,
       info: req.body.info || existingRecord.info,
       admissions: req.body.admissions || existingRecord.admissions,
       placements: req.body.placements || existingRecord.placements,
@@ -390,7 +450,6 @@ exports.update = async (req, res) => {
       scholarship: req.body.scholarship || existingRecord.scholarship,
       hostel: req.body.hostel || existingRecord.hostel,
     };
-
 
     // Check if a new logo is provided
     if (req.files && req.files.icon) {
@@ -413,11 +472,11 @@ exports.update = async (req, res) => {
       }
 
       const logoname = "logo" + Date.now() + path.extname(avatar.name);
-      const uploadPath = "./storage/college_logo/" + logoname;
+      const uploadPath = "./storage/college_icon/" + logoname;
 
       await avatar.mv(uploadPath);
 
-      collegeupdate.icon = "college_logo/" + logoname;
+      collegeupdate.icon = "college_icon/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.icon) {
@@ -499,6 +558,44 @@ exports.update = async (req, res) => {
     await College.update(collegeupdate, { where: { id: req.body.id } });
 
 
+    if (req.body.streams && req.body.id) {
+      await Collegestream.destroy({
+        where: { college_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
+        await Collegestream.create({
+          college_id: req.body.id,
+          stream_id: value.id,
+        });
+      });
+    }
+    if (req.body.amenities && req.body.id) {
+      await Collegeameneties.destroy({
+        where: { college_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.amenities);
+      _.forEach(stream, async function (value) {
+        await Collegeameneties.create({
+          college_id: req.body.id,
+          amenitie_id: value.id,
+        });
+      });
+    }
+    if (req.body.recoginations && req.body.id) {
+      await Collegerecoginations.destroy({
+        where: { college_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.recoginations);
+      _.forEach(stream, async function (value) {
+        await Collegerecoginations.create({
+          college_id: req.body.id,
+          recognition_id: value.id,
+        });
+      });
+    }
+
+
     res.status(200).send({
       status: 1,
       message: "Data update Successfully",
@@ -512,51 +609,20 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.updateplacements = async (req, res) => {
-  try {
-    if (req.body.placement && req.body.id) {
-      await placements.destroy({
-        where: { college_id: req.body.id },
-      });
-      const data = JSON.parse(req.body.placement);
-      await _.forEach(data, function (value) {
-        placements.create({
-          college_id: req.body.id,
-          company_id: value.company_id ? value.company_id : null,
-          year: value.year ? value.year : null,
-          highest_package: value.highest_package ? value.highest_package : null,
-          no_of_placements: value.no_of_placements
-            ? value.no_of_placements
-            : null,
-        });
-      });
-    }
 
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to update data",
-      errors: error,
-      status: 0,
-    });
-  }
-};
 
 exports.updatefaqs = async (req, res) => {
   try {
     if (req.body.faqs && req.body.id) {
-      await f_a_qs.destroy({
+      await college_faq.destroy({
         where: { college_id: req.body.id },
       });
       const faqss = JSON.parse(req.body.faqs);
       await _.forEach(faqss, function (value) {
-        f_a_qs.create({
+        college_faq.create({
           college_id: req.body.id,
-          questions: value.question ? value.question : null,
-          answers: value.answer ? value.answer : null,
+          questions: value.questions ? value.questions : null,
+          answers: value.answers ? value.answers : null,
         });
       });
     }
@@ -574,241 +640,118 @@ exports.updatefaqs = async (req, res) => {
   }
 };
 
-exports.updateranking = async (req, res) => {
-  try {
-    if (
-      req.body.rankings &&
-      req.body.id &&
-      req.body.type != "university" &&
-      req.body.type != "board"
-    ) {
-      await rankings.destroy({
-        where: { college_id: req.body.id },
-      });
-      const data = JSON.parse(req.body.rankings);
-      await _.forEach(data, function (value) {
-        rankings.create({
-          college_id: req.body.id,
-          ranking_name: value.ranking_name ? value.ranking_name : null,
-          ranking_description: value.ranking_description
-            ? value.ranking_description
-            : null,
-        });
-      });
-    }
-
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to update data",
-      errors: error,
-      status: 0,
-    });
-  }
-};
 
 exports.updategallery = async (req, res) => {
   try {
-    let images = " ";
+    // Check if old images are provided
+    if (req.body.oldimages) {
+      const oldImages = JSON.parse(req.body.oldimages);
 
-    if (req.files && req.files.image) {
-      let avatar = req.files.image;
-      if (avatar.length > 1) {
-        var totalimages = new Array();
+      if (Array.isArray(oldImages) && oldImages.length > 0) {
+        let finaloldimage = [];
 
-        await avatar.forEach((element) => {
-          if (!array_of_allowed_file_types.includes(element.mimetype)) {
-            return res.status(400).send({
-              message: "Invalid File types ",
-              errors: {},
-              status: 0,
-            });
-          }
+        await Promise.all(oldImages.map(async (obj) => {
+          const parts = obj.dataURL.split('/');
+          const desiredPart = parts[parts.length - 2] + '/' + parts.pop();
+          finaloldimage.push(desiredPart);
+        }));
 
-          if (element.size / (1024 * 1024) > allowed_file_size) {
-            return res.status(400).send({
-              message: "File too large ",
-              errors: {},
-              status: 0,
-            });
-          }
-
-          let imgname =
-            "image" + Date.now() + Math.random() + path.extname(element.name);
-
-          let IsUploadss = element.mv("./storage/collegegallery/" + imgname)
-            ? 1
-            : 0;
-
-          if (IsUploadss) {
-            let newimg = "collegegallery/" + imgname;
-            totalimages.push(newimg);
-          }
-        });
-
-        // console.log(totalimages);
-        if (totalimages == " ") {
-          return res.status(400).send({
-            message: "insert images",
-            errors: {},
-            status: 0,
-          });
-        }
-
-        if (req.body.id) {
-          await collegegallery.destroy({
-            where: { college_id: req.body.id },
-          });
-
-          await _.forEach(totalimages, function (value) {
-            collegegallery.create({
-              college_id: req.body.id,
-              image: value,
-              status: "featured",
-            });
-          });
-
-          return res.status(200).send({
-            status: 1,
-            message: "Data Save Successfully",
-          });
-        }
-      }
-
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let image = "image" + Date.now() + path.extname(avatar.name);
-      // console.log(image);
-      let IsUpload = avatar.mv("./storage/collegegallery/" + image) ? 1 : 0;
-      // console.log(avatar.mv("./storage/collegegallery/" + image));
-
-      if (IsUpload) images = "collegegallery/" + image;
-
-      if (images == " ") {
-        return res.status(400).send({
-          message: "insert logo",
-          errors: {},
-          status: 0,
-        });
-      } else {
-        if (req.body.id) {
-          await collegegallery.destroy({
-            where: { college_id: req.body.id },
-          });
-        }
-        await collegegallery.create({
-          college_id: req.body.id,
-
-          image: images,
-          status: "featured",
-        });
-
-        return res.status(200).send({
-          status: 1,
-          message: "Data Save Successfully",
-        });
-      }
-    }
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to insert data",
-      errors: error,
-      status: 0,
-    });
-  }
-};
-
-exports.updatecutoff = async (req, res) => {
-  try {
-    if (req.body.cutoff && req.body.id) {
-      await cutoff.destroy({
-        where: { college_id: req.body.id },
-      });
-      const data = JSON.parse(req.body.cutoff);
-      await _.forEach(data, function (value) {
-        cutoff
-          .create({
+        let oldRecordsToDelete = await Collegegallery.findAll({
+          where: {
             college_id: req.body.id,
-            title: value.title ? value.title : null,
-          })
-          .then(async (data) => {
-            if (value.cutoffdetails && data.id) {
-              await cutoffdetails.destroy({
-                where: { cut_offs_id: data.id },
-              });
-              const datacutoffdetails = value.cutoffdetails;
-
-              await _.forEach(datacutoffdetails, function (value) {
-                cutoffdetails.create({
-                  cut_offs_id: data.id,
-                  course_id: value.course_id ? value.course_id : null,
-                  category: value.category ? value.category : null,
-                  rank: value.rank ? value.rank : null,
-                });
-              });
+            image: {
+              [Op.notIn]: finaloldimage
             }
+          }
+        });
+
+
+
+        if (oldRecordsToDelete.length > 0) {
+          let deletedRecords = await Collegegallery.destroy({
+            where: {
+              college_id: req.body.id,
+              image: {
+                [Op.notIn]: finaloldimage
+              }
+            },
           });
+          oldRecordsToDelete.map(async (value) => {
+
+            const oldLogoPath = "./storage/" + value.image;
+            await removeFile(oldLogoPath);
+
+
+          });
+        }
+
+
+      } else {
+
+        let oldRecordsToDelete = await Collegegallery.findAll({
+          where: {
+            college_id: req.body.id,
+
+          }
+        });
+
+
+
+        if (oldRecordsToDelete.length > 0) {
+          let deletedRecords = await Collegegallery.destroy({
+            where: {
+              college_id: req.body.id,
+            },
+          });
+          oldRecordsToDelete.map(async (value) => {
+            const oldLogoPath = "./storage/" + value.image;
+            await removeFile(oldLogoPath);
+
+
+          });
+        }
+
+      }
+
+      // Check if new images are uploaded
+      if (req.files) {
+        const images = Object.values(req.files);
+
+        // Process uploaded images
+        await Promise.all(images.map(async (imageData) => {
+          const imgname = "image" + Date.now() + Math.random() + path.extname(imageData.name);
+          const destination = "./storage/college_galleries/" + imgname;
+
+          try {
+            // Move the uploaded image to the server
+            await imageData.mv(destination);
+
+            // Save the image path to the database
+            await Collegegallery.create({
+              college_id: req.body.id,
+              image: "college_galleries/" + imgname,
+            });
+          } catch (error) {
+            // Handle error during file operations
+            console.error("Error processing image:", error);
+            throw error; // Re-throw the error to trigger the catch block
+          }
+        }));
+      }
+
+      // Send success response
+      return res.status(200).send({
+        status: 1,
+        message: "Data saved successfully",
       });
     }
-
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-    });
   } catch (error) {
-    return res.status(400).send({
-      message: "Unable to update data",
-      errors: error,
+    console.error("Error updating gallery:", error);
+    return res.status(500).send({
+      message: "Unable to process the request",
       status: 0,
     });
   }
 };
 
-// exports.findOne = (req, res) => {
-//   const id = req.params.id;
-//   CollegeAndUniversity.findByPk(id)
-//     .then(data => {
-//       if (data) {
 
-//         res.status(200).send({
-//           status: 1,
-//           message: 'successfully retrieved',
-//           data: data
-
-//       });
-
-//       } else {
-//         res.status(400).send({
-//           status: 0,
-//           message:  `Cannot find data with id=${id}.`
-
-//       });
-
-//       }
-//     })
-//     .catch(err => {
-
-//       res.status(500).send({
-//         status: 0,
-//         message:"Error retrieving data with id=" + id
-
-//     });
-//     });
-// };

@@ -190,7 +190,17 @@ exports.findAll = async (req, res) => {
 
   const { limit, offset } = getPagination(page, size);
   stream
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({ where: condition, limit, offset, 
+      include: [
+       
+        {
+            required: false,
+            association: "streamfaqs",
+            attributes: ["id", "questions", "answers"],
+          },
+
+    ],
+      order: [orderconfig] })
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
@@ -240,9 +250,21 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  stream.findByPk(id)
+  stream.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "streamfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+      
+      ],
+  })
     .then((data) => {
       if (data) {
+
+
+
         res.status(200).send({
           status: 1,
           message: "successfully retrieved",
@@ -397,8 +419,8 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.updatefaq = async (req, res) => {
-  const id = req.body.id;
+
+exports.updatefaqs = async (req, res) => {
 
   try {
     if (req.body.faqs && req.body.id) {
@@ -426,4 +448,53 @@ exports.updatefaq = async (req, res) => {
       status: 0,
     });
   }
+};
+
+exports.schoollevelfindAll = async (req, res) => {
+  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  var condition = sendsearch.customseacrh(searchText, searchfrom);
+
+  let data_array = [];
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  level
+    .findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+
+      order: [orderconfig],
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.school,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message || "Some error occurred while retrieving schooltype",
+      });
+    });
 };

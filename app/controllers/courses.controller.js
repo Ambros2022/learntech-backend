@@ -17,7 +17,7 @@ const fees = db.fees;
 const fee_details = db.fee_details;
 const syllabus = db.syllabus;
 const syllabus_details = db.syllabus_details;
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -40,101 +40,21 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let images = " ";
 
-    if (req.files && req.files.brochure) {
-      let avatar = req.files.brochure;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let image = "image" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/courses/" + image) ? 1 : 0;
-
-      if (IsUpload) {
-        images = "courses/" + image;
-      }
-    }
-
-    if (images == " ") {
-      return res.status(400).send({
-        message: "insert logo",
-        errors: {},
-        status: 0,
-      });
-    } else {
+    {
       const coursesDetails = await courses.create({
         college_id: req.body.college_id,
-        medium_id: req.body.medium_id,
-        course_group: req.body.course_group ? req.body.course_group : null,
-        course_id: req.body.course_id,
-        brochure: images,
-        college_id: req.body.college_id,
-        course_details_structure: req.body.course_details_structure,
-        duration: req.body.duration,
-        career_prospects: req.body.career_prospects
-          ? req.body.career_prospects
-          : null,
-        video: req.body.video ? req.body.video : null,
-        video_full_url: req.body.video_full_url
-          ? req.body.video_full_url
-          : null,
+        general_course_id: req.body.general_course_id,
+        course_type: req.body.course_type,
+        slug: req.body.slug,
+        meta_title: req.body.meta_title,
+        meta_description: req.body.meta_description,
+        meta_keywords: req.body.meta_keywords,
+        course_details: req.body.course_details,
+        eligibility: req.body.eligibility,
+        fee_structure: req.body.fee_structure,
         status: req.body.status,
-        course_type: req.body.course_type ? req.body.course_type : null,
-        meta_title: req.body.meta_title ? req.body.meta_title : null,
-        slug: req.body.slug ? req.body.slug : null,
-        meta_description: req.body.meta_description
-          ? req.body.meta_description
-          : null,
-        meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
-        syllabus: req.body.syllabus ? req.body.syllabus : null,
       });
-
-      if (req.body.course_mode && coursesDetails.id) {
-        const course_mode = JSON.parse(req.body.course_mode);
-
-        await _.forEach(course_mode, function (value) {
-          course_modes.create({
-            courses_id: coursesDetails.id,
-            modes_id: value.course_mode,
-          });
-        });
-      }
-      if (req.body.course_exam && coursesDetails.id) {
-        const course_exam = JSON.parse(req.body.course_exam);
-
-        await _.forEach(course_exam, function (value) {
-          course_exams.create({
-            courses_id: coursesDetails.id,
-            exams_id: value.course_exam,
-          });
-        });
-      }
-      if (req.body.recruiters && coursesDetails.id) {
-        const recruiters = JSON.parse(req.body.recruiters);
-
-        await _.forEach(recruiters, function (value) {
-          course_companies.create({
-            courses_id: coursesDetails.id,
-            companies_id: value.recruiters,
-          });
-        });
-      }
 
       res.status(200).send({
         status: 1,
@@ -155,102 +75,23 @@ exports.update = (req, res) => {
   const id = req.body.id;
 
   try {
-    let images = " ";
-    let STREAD = {
+    
+    courses.update({
       college_id: req.body.college_id,
-      medium_id: req.body.medium_id,
-      course_group: req.body.course_group,
-      course_id: req.body.course_id,
-      college_id: req.body.college_id,
-      course_details_structure: req.body.course_details_structure,
-      duration: req.body.duration,
-      career_prospects: req.body.career_prospects,
-      video: req.body.video,
-      video_full_url: req.body.video_full_url ? req.body.video_full_url : null,
-      status: req.body.status,
-      course_type: req.body.course_type ? req.body.course_type : null,
-      meta_title: req.body.meta_title,
+      general_course_id: req.body.general_course_id,
+      course_type: req.body.course_type,
       slug: req.body.slug,
+      meta_title: req.body.meta_title,
       meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      syllabus: req.body.syllabus,
-    };
-
-    if (req.files && req.files.brochure) {
-      let avatar = req.files.brochure;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let image = "image" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/courses/" + image) ? 1 : 0;
-
-      if (IsUpload) {
-        images = "courses/" + image;
-      }
-      STREAD["brochure"] = images;
-    }
-
-    courses.update(STREAD, {
-      where: { id: req.body.id },
+      meta_keywords: req.body.meta_keywords,
+      course_details: req.body.course_details,
+      eligibility: req.body.eligibility,
+      fee_structure: req.body.fee_structure,
+      status: req.body.status,
+    },  {
+      where: { id: req.body.id }
     });
 
-    if (req.body.course_mode && id) {
-      course_modes.destroy({
-        where: { courses_id: id },
-      });
-      const course_mode = JSON.parse(req.body.course_mode);
-
-      _.forEach(course_mode, function (value) {
-        course_modes.create({
-          courses_id: id,
-          modes_id: value.course_mode,
-        });
-      });
-    }
-
-    if (req.body.course_exam && id) {
-      course_exams.destroy({
-        where: { courses_id: id },
-      });
-      const course_exam = JSON.parse(req.body.course_exam);
-
-      _.forEach(course_exam, function (value) {
-        course_exams.create({
-          courses_id: id,
-          exams_id: value.course_exam,
-        });
-      });
-    }
-
-    if (req.body.recruiters && id) {
-      course_companies.destroy({
-        where: { courses_id: id },
-      });
-      const recruiters = JSON.parse(req.body.recruiters);
-
-      _.forEach(recruiters, function (value) {
-        course_companies.create({
-          courses_id: id,
-          companies_id: value.recruiters,
-        });
-      });
-    }
 
     res.status(200).send({
       status: 1,
@@ -270,9 +111,8 @@ exports.findAll = async (req, res) => {
     page,
     size,
     searchtext,
-    medium_id,
-    college_id,
-    course_id,
+    // college_id,
+    // course_id,
     searchfrom,
     columnname,
     orderby,
@@ -289,14 +129,14 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var conditionmedium_id = medium_id ? { medium_id: medium_id } : null;
-  var conditioncollege_id = college_id ? { college_id: college_id } : null;
-  var conditioncourse_id = course_id ? { course_id: course_id } : null;
+  // var conditionmedium_id = medium_id ? { medium_id: medium_id } : null;
+  // var conditioncollege_id = college_id ? { college_id: college_id } : null;
+  // var conditioncourse_id = course_id ? { course_id: course_id } : null;
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
-  conditionmedium_id ? data_array.push(conditionmedium_id) : null;
-  conditioncollege_id ? data_array.push(conditioncollege_id) : null;
-  conditioncourse_id ? data_array.push(conditioncourse_id) : null;
+  // conditionmedium_id ? data_array.push(conditionmedium_id) : null;
+  // conditioncollege_id ? data_array.push(conditioncollege_id) : null;
+  // conditioncourse_id ? data_array.push(conditioncourse_id) : null;
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -305,12 +145,12 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
-      include: [
-        { association: "medium", attributes: ["id", "medium"] },
-        { association: "college", attributes: ["id", "name"] },
-        { association: "course", attributes: ["id", "course_stream_name"] },
+      // include: [
+      //   { association: "medium", attributes: ["id", "medium"] },
+      //   { association: "college", attributes: ["id", "name"] },
+      //   { association: "course", attributes: ["id", "course_stream_name"] },
         // { association: "coursecompanies1",attributes: ["id","companies_id"]},
-      ],
+      // ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -362,59 +202,7 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   courses
     .findByPk(id, {
-      include: [
-        { association: "medium", attributes: ["id", "medium"] },
-        { association: "college", attributes: ["id", "name"] },
-        {
-          association: "course",
-          attributes: [
-            "id",
-            "course_stream_name",
-            "stream_id",
-            "course_stream_slug",
-          ],
-        },
-        {
-          association: "jobanalysis",
-          attributes: [
-            "id",
-            "job_profile",
-            "average_salary",
-            "job_description",
-          ],
-        },
-        {
-          association: "eligibilities",
-          attributes: ["id", "stream", "description"],
-        },
-        { association: "salary", attributes: ["id", "salary_year", "amount"] },
-
-        { association: "gallery", attributes: ["id", "images"] },
-        { association: "coursemodes", attributes: ["id", "modes_id"] },
-        { association: "courseexams", attributes: ["id", "exams_id"] },
-
-        { association: "coursecompanies", attributes: ["id", "companies_id"] },
-        {
-          association: "coursesyllabus",
-          attributes: ["id", "title"],
-          include: [
-            {
-              association: "syllabussdetails",
-              attributes: ["subject", "description"],
-            },
-          ],
-        },
-        {
-          association: "cousrsefees",
-          attributes: ["id", "type", "title", "note", "total_amount"],
-          include: [
-            {
-              association: "feedetail",
-              attributes: ["sub_title", "amount"],
-            },
-          ],
-        },
-      ],
+    
     })
     .then((data) => {
       if (data) {

@@ -1,10 +1,8 @@
 const db = require("../models");
-const path = require('path');
 const enquiry = db.enquiry;
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
-const { Console } = require("console");
-const Op = db.Sequelize.Op;
+
 
 
 
@@ -24,54 +22,7 @@ const getPagingData = (data, page, limit) => {
     return { totalItems, enquiry, totalPages, currentPage };
 };
 
-exports.create = async (req, res) => {
-    //  const obj = JSON.parse(req.body.mac);
-    // var messages = Array.prototype.slice.call(req.body.mac);
-    //req.body['mac[]'].length
 
-
-    try {
-
-
-
-
-        const enquiryDetails = await enquiry.create({
-            name: req.body.name,
-            email: req.body.email ? req.body.email : null,
-            course_name: req.body.course_name ? req.body.course_name : null,
-            college_name: req.body.college_name ? req.body.college_name : null,
-            gender: req.body.gender ? req.body.gender : null,
-            newsletters: req.body.newsletters ? req.body.newsletter : null,
-            current_qualification: req.body.current_qualification ? req.body.current_qualification : null,
-            course_in_mind: req.body.course_in_mind ? req.body.course_in_mind : null,
-            dob: req.body.dob ? req.body.dob : null,
-            contact: req.body.contact ? req.body.contact : null,
-            current_url: req.body.current_url,
-            description: req.body.description ? req.body.description : null,
-            location: req.body.location ? req.body.location : null,
-            mobile_verified: req.body.mobile_verified,
-
-        });
-
-
-
-
-        res.status(200).send({
-            status: 1,
-            message: 'Data Save Successfully',
-            data: enquiryDetails
-        });
-    }
-    catch (error) {
-        return res.status(400).send({
-            message: 'Unable to insert data',
-            errors: error,
-            status: 0
-        });
-    }
-
-
-}
 
 exports.findAll = async (req, res) => {
 
@@ -161,54 +112,7 @@ exports.delete = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
-    const id = req.body.id;
 
-
-    try {
-
-
-
-
-
-        enquiry.update({
-            name: req.body.name,
-            email: req.body.email ? req.body.email : null,
-            course_name: req.body.course_name ? req.body.course_name : null,
-            college_name: req.body.college_name ? req.body.college_name : null,
-            gender: req.body.gender ? req.body.gender : null,
-            newsletters: req.body.newsletters ? req.body.newsletter : null,
-            current_qualification: req.body.current_qualification ? req.body.current_qualification : null,
-            course_in_mind: req.body.course_in_mind ? req.body.course_in_mind : null,
-            dob: req.body.dob ? req.body.dob : null,
-            contact: req.body.contact ? req.body.contact : null,
-            current_url: req.body.current_url,
-            description: req.body.description ? req.body.description : null,
-            location: req.body.location ? req.body.location : null,
-            mobile_verified: req.body.mobile_verified,
-        }, {
-            where: { id: req.body.id }
-        });
-
-
-
-
-
-
-        res.status(200).send({
-            status: 1,
-            message: 'Data Save Successfully'
-        });
-    }
-    catch (error) {
-        return res.status(400).send({
-            message: 'Unable to update data',
-            errors: error,
-            status: 0
-        });
-    }
-
-};
 
 exports.findOne = (req, res) => {
     const id = req.params.id;
