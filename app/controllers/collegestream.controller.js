@@ -1,7 +1,7 @@
 const db = require("../models");
 const path = require('path');
-const College = db.college_stream;
-const streamT = db.stream;
+const collegestream = db.college_stream;
+// const stream = db.stream;
 const Op = db.Sequelize.Op;
 
 const sendsearch = require("../utility/Customsearch");
@@ -18,10 +18,10 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-  const { count: totalItems, rows: stream } = data;
+  const { count: totalItems, rows: collegestream } = data;
   const currentPage = page ? +page : 1;
   const totalPages = Math.ceil(totalItems / limit);
-  return { totalItems, stream, totalPages, currentPage };
+  return { totalItems, collegestream, totalPages, currentPage };
 };
 
 
@@ -29,16 +29,16 @@ exports.create = async (req, res) => {
 
   try {
 
- const CollegeDetails = await College.create({
-    stream_id: req.body.stream_id,
-    college_id: req.body.college_id,
+    const collegestreamDetails = await collegestream.create({
+      stream_id: req.body.stream_id,
+      college_id: req.body.college_id,
     });
 
 
     res.status(200).send({
       status: 1,
       message: 'Data Save Successfully',
-      data: CollegeDetails
+      data: collegestreamDetails
     });
   }
   catch (error) {
@@ -52,11 +52,11 @@ exports.create = async (req, res) => {
 
 }
 
-exports.findAll = async (req, res ,next) => {
+exports.findAll = async (req, res, next) => {
 
 
 
-  const { page, size, searchtext, searchfrom,stream_id, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby } = req.query;
 
 
   var column = columnname ? columnname : 'id';
@@ -65,20 +65,20 @@ exports.findAll = async (req, res ,next) => {
 
 
   const myArray = column.split(".");
-  if (typeof myArray[1]!== "undefined") {
+  if (typeof myArray[1] !== "undefined") {
     var table = myArray[0];
     column = myArray[1];
-    
+
     orderconfig = [table, column, order];
   }
 
   var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
-  var condition = sendsearch.customseacrh(searchtext,searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
 
 
- 
-var data_array = [];
+
+  var data_array = [];
   conditionStreamId ? data_array.push(conditionStreamId) : null;
   condition ? data_array.push(condition) : null;
 
@@ -88,34 +88,29 @@ var data_array = [];
   College.findAndCountAll({
     where: data_array, limit, offset,
     // include: { association: 'stream', attributes: ['id', 'name']} ,
-    order:[orderconfig] 
+    order: [orderconfig]
   })
     .then(data => {
       const response = getPagingData(data, page, limit);
-  
+
       res.status(200).send({
         status: 1,
         message: "success",
         totalItems: response.totalItems,
         currentPage: response.currentPage,
         totalPages: response.totalPages,
-        data: response.stream
+        data: response.collegestream
       });
 
 
-
-
-
     });
-  
-};
-   
 
+};
 
 
 exports.delete = (req, res) => {
   const id = req.params.id;
-  stream.destroy({
+  collegestream.destroy({
     where: { id: id }
   })
     .then(num => {
@@ -123,7 +118,7 @@ exports.delete = (req, res) => {
 
         res.status(200).send({
           status: 1,
-          message: 'Sub Stream  deleted successfully',
+          message: 'college stream  deleted successfully',
 
         });
 
@@ -132,7 +127,7 @@ exports.delete = (req, res) => {
 
         res.status(400).send({
           status: 0,
-          message: ` delete Sub Stream with id=${id}. Maybe Stream was not found!`
+          message: ` delete college stream with id=${id}. Maybe college stream was not found!`
 
         });
 
@@ -143,7 +138,7 @@ exports.delete = (req, res) => {
 
       res.status(500).send({
         status: 0,
-        message: "Could not delete Stream with id=" + id
+        message: "Could not delete college stream with id=" + id
 
       });
 
@@ -153,7 +148,10 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  stream.findByPk(id, { include: { association: 'stream', attributes: ['id', 'name'] } })
+  collegestream.findByPk(id,
+
+    { include: { association: 'stream', attributes: ['id', 'name'] } })
+
     .then(data => {
       if (data) {
 
@@ -168,7 +166,7 @@ exports.findOne = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find Sub Stream with id=${id}.`
+          message: `Cannot find college stream with id=${id}.`
 
         });
 
@@ -176,11 +174,9 @@ exports.findOne = (req, res) => {
       }
     })
     .catch(err => {
-
-
       res.status(500).send({
         status: 0,
-        message: "Error retrieving Substream with id=" + id
+        message: "Error retrieving college stream with id=" + id
 
       });
     });
@@ -190,11 +186,9 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
   const id = req.body.id;
 
-
   try {
 
-
-    College.update({
+    collegestream.update({
       stream_id: req.body.stream_id,
       college_id: req.body.college_id,
     }, {

@@ -190,7 +190,17 @@ exports.findAll = async (req, res) => {
 
   const { limit, offset } = getPagination(page, size);
   stream
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({ where: condition, limit, offset, 
+      include: [
+       
+        {
+            required: false,
+            association: "streamfaqs",
+            attributes: ["id", "questions", "answers"],
+          },
+
+    ],
+      order: [orderconfig] })
     .then((data) => {
       const response = getPagingData(data, page, limit);
 

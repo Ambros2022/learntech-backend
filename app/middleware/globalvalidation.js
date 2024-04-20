@@ -15,6 +15,8 @@ const college = db.College;
 const collegestream = db.college_stream;
 const generalcourse = db.general_course;
 const stream_faq = db.stream_faq;
+const courses = db.courses;
+const abroadpages = db.abroadpages;
 
 
 
@@ -601,7 +603,7 @@ const GeneralcoursesSchemaupdate = [
 ];
 
 const stream_faqSchema = [
- ...validateIdRequired_id(stream, "stream_id"),
+  ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 const stream_faqSchemaupdate = [
@@ -611,6 +613,57 @@ const stream_faqSchemaupdate = [
 
 ];
 
+const coursesSchema = [
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(college, "college_id"),
+  ...validateIdRequired_id(generalcourse, "general_course_id"),
+];
+
+const coursesUpdateSchema = [
+  ...validateIdRequired_id(courses, "id"),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(college, "college_id"),
+  ...validateIdRequired_id(generalcourse, "general_course_id"),
+];
+
+const abroadpageSchema = [
+  checkField('name', 150, abroadpages, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(countries, "country_id"),
+
+];
+
+const abroadpageUpdateSchema = [
+  ...validateIdRequired_id(abroadpages, "id"),
+
+  checkField_update('name', 150, abroadpages, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 }),
+
+  ...validateIdRequired_id(countries, "country_id"),
+
+
+];
 
 
 
@@ -2004,50 +2057,7 @@ const upcoming_coursesUpdateSchema = [
     }),
 ];
 
-const coursesSchema = [
-  body("college_id")
-    .exists({ checkFalsy: true })
-    .withMessage("college_id is required"),
 
-  body("medium_id")
-    .exists({ checkFalsy: true })
-    .withMessage("medium_id is required"),
-
-  body("course_id")
-    .exists({ checkFalsy: true })
-    .withMessage("course_id is required"),
-
-  body("course_mode")
-    .exists({ checkFalsy: true })
-    .withMessage("course_mode is required"),
-
-  body("course_details_structure")
-    .exists({ checkFalsy: true })
-    .withMessage("course_details_structure is required"),
-];
-const coursesUpdateSchema = [
-  body("id").exists({ checkFalsy: true }).withMessage("id is required"),
-
-  body("college_id")
-    .exists({ checkFalsy: true })
-    .withMessage("college_id is required"),
-
-  body("medium_id")
-    .exists({ checkFalsy: true })
-    .withMessage("medium_id is required"),
-
-  body("course_id")
-    .exists({ checkFalsy: true })
-    .withMessage("course_id is required"),
-
-  body("course_mode")
-    .exists({ checkFalsy: true })
-    .withMessage("course_mode is required"),
-
-  body("course_details_structure")
-    .exists({ checkFalsy: true })
-    .withMessage("course_details_structureis required"),
-];
 
 const eligibilitySchema = [
   body("course_id")
@@ -3239,6 +3249,11 @@ const globalvalidation = {
   GeneralcoursesSchemaupdate: GeneralcoursesSchemaupdate,
   stream_faqSchema: stream_faqSchema,
   stream_faqSchemaupdate: stream_faqSchemaupdate,
+  coursesSchema: coursesSchema,
+  coursesUpdateSchema: coursesUpdateSchema,
+  abroadpageSchema: abroadpageSchema,
+  abroadpageUpdateSchema: abroadpageUpdateSchema,
+
 
 
 
@@ -3254,7 +3269,7 @@ const globalvalidation = {
   managementUpdateSchema: managementUpdateSchema,
   enquirySchema: enquirySchema,
   enquiryUpdateSchema: enquiryUpdateSchema,
- 
+
 
   affilitionUpdateSchema: affilitionUpdateSchema,
   affilitionSchema: affilitionSchema,
@@ -3280,8 +3295,7 @@ const globalvalidation = {
   reviewchangestatusSchema: reviewchangestatusSchema,
   upcoming_coursesUpdateSchema: upcoming_coursesUpdateSchema,
   upcoming_coursesSchema: upcoming_coursesSchema,
-  coursesUpdateSchema: coursesUpdateSchema,
-  coursesSchema: coursesSchema,
+
   eligibilityUpdateSchema: eligibilityUpdateSchema,
   eligibilitySchema: eligibilitySchema,
   salaryUpdateSchema: salaryUpdateSchema,
