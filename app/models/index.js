@@ -33,6 +33,8 @@ sequelize
     console.error('Unable to connect to the database:', err);
   });
 /*** Model Include */
+
+db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 db.admin = require("../models/admin.model.js")(sequelize, Sequelize);
 db.countries = require("../models/countries.model.js")(sequelize, Sequelize);
 db.state = require("../models/state.model.js")(sequelize, Sequelize);
@@ -69,7 +71,6 @@ db.role = require("../models/role.model.js")(sequelize, Sequelize);
 
 db.polytechnic = require("../models/polytechnic.model.js")(sequelize, Sequelize);
 
-db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
 
 db.area = require("../models/area.model.js")(sequelize, Sequelize);
 db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
@@ -81,7 +82,7 @@ db.stream_faq = require("../models/stream_faq.model.js")(sequelize, Sequelize);
 db.accreditation = require("../models/accreditation.model.js")(sequelize, Sequelize);
 
 db.management = require("../models/management.model.js")(sequelize, Sequelize);
-db.enquiry = require("../models/enquiry.model.js")(sequelize, Sequelize);
+
 db.affilition = require("../models/affilition.model.js")(sequelize, Sequelize);
 
 db.college_accreditation = require("../models/college_accreditation.model.js")(sequelize, Sequelize);

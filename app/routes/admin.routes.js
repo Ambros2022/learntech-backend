@@ -14,6 +14,7 @@ const collegestreamcontroller = require("../controllers/collegestream.controller
 const databackupcontroller = require("../controllers/databackup.controller");
 const recognitioncontroller = require("../controllers/recognition.controller");
 const generalcoursecontroller = require("../controllers/generalcourse.controller.js");
+const enquirycontroller = require("../controllers/enquiry.controller");
 
 
 
@@ -25,7 +26,7 @@ const coursescontroller = require("../controllers/courses.controller");
 
 const winston = require("../config/winston");
 const managementcontroller = require("../controllers/management.controller");
-const enquirycontroller = require("../controllers/enquiry.controller");
+
 const areacontroller = require("../controllers/area.controller");
 
 
@@ -116,6 +117,31 @@ module.exports = function (app) {
     next();
   });
 
+    /* ENQUIRY Routes start*/
+
+    app.get(
+      "/api/admin/enquiry/get",
+      [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+      enquirycontroller.findAll
+    );
+  
+    app.get(
+      "/api/admin/enquiry/get/:id",
+      [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+      enquirycontroller.findOne
+    );
+  
+
+  
+    app.post(
+      "/api/admin/enquiry/delete/:id",
+      [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+      enquirycontroller.delete
+    );
+  
+
+    
+    /** enquiry Routes End*/
 
   /*  Recognisation route End    */
 
@@ -1584,40 +1610,7 @@ module.exports = function (app) {
 
 
 
-  /* ENQUIRY Routes start*/
 
-  app.get(
-    "/api/admin/enquiry/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    enquirycontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/enquiry/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    enquirycontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/enquiry/add",
-    globalvalidation.enquirySchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    enquirycontroller.create
-  );
-
-  app.post(
-    "/api/admin/enquiry/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    enquirycontroller.delete
-  );
-
-  app.post(
-    "/api/admin/enquiry/update",
-    globalvalidation.enquiryUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    enquirycontroller.update
-  );
-  /** enquiry Routes End*/
 
   /* management Routes start*/
 
