@@ -15,6 +15,7 @@ const recognitioncontroller = require("../controllers/recognition.controller");
 const generalcoursecontroller = require("../controllers/generalcourse.controller.js");
 const enquirycontroller = require("../controllers/enquiry.controller");
 const abroadpagecontroller = require("../controllers/abroadpage.controller.js");
+const landingpagecontroller = require("../controllers/landingpage.controller.js");
 
 
 
@@ -830,6 +831,42 @@ module.exports = function (app) {
   /**  Stream Routes End*/
 
   
+
+   /**  landingpage Routes End*/
+   
+   app.get(
+    "/api/admin/landingpage/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    landingpagecontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/landingpage/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    landingpagecontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/landingpage/add",
+    globalvalidation.landingpageSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    landingpagecontroller.create
+  );
+
+  app.post(
+    "/api/admin/landingpage/update",
+    globalvalidation.landingpageUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    landingpagecontroller.update
+  );
+
+  app.post(
+    "/api/admin/landingpage/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    landingpagecontroller.delete
+  );
+
+  /**  landingpage Routes End*/
 
 
 

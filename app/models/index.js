@@ -68,6 +68,8 @@ db.college_amenities = require("../models/college_amenities.model.js")(sequelize
 db.college_recognition = require("../models/college_recognition.model.js")(sequelize, Sequelize);
 db.college_gallery = require("../models/college_galleries.model.js")(sequelize, Sequelize);
 
+db.landing_pages = require("../models/landing_page.model.js")(sequelize, Sequelize);
+
 
 
 
