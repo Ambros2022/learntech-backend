@@ -399,6 +399,24 @@ db.abroadpages.belongsTo(db.countries, {
 
 
 
+/*** courses relationship */
+
+
+db.courses.belongsTo(db.college, {
+  foreignKey: "college_id",
+  as: "college",
+});
+
+db.general_course.hasMany(db.courses, { as: "generalcourse" });
+db.courses.belongsTo(db.general_course, {
+  foreignKey: "general_course_id",
+  as: "generalcourse",
+});
+
+
+
+
+
 
 // db.stream.hasMany(db.generalcourse, { as: "ugcourse" });
 // db.generalcourse.belongsTo(db.stream, {
