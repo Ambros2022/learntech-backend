@@ -17,6 +17,7 @@ const generalcourse = db.general_course;
 const stream_faq = db.stream_faq;
 const courses = db.courses;
 const abroadpages = db.abroadpages;
+const landingpages = db.landing_pages;
 
 
 
@@ -670,6 +671,32 @@ const abroadpageUpdateSchema = [
 
 
 ];
+
+
+const landingpageSchema = [
+  checkField('name', 250, landingpages, true),
+
+  body("link")
+  .exists({ checkFalsy: true })
+  .withMessage("link is required")
+  .isLength({ max: 150 })
+  .withMessage("link should be less than 150 character"),
+];
+
+const landingpageUpdateSchema = [
+  ...validateIdRequired_id(landingpages, "id"),
+
+  checkField_update('name', 250, landingpages, true),
+
+  body("link")
+  .exists({ checkFalsy: true })
+  .withMessage("link is required")
+  .isLength({ max: 150 })
+  .withMessage("link should be less than 150 character"),
+  
+
+];
+
 
 
 
@@ -3257,6 +3284,8 @@ const globalvalidation = {
   coursesUpdateSchema: coursesUpdateSchema,
   abroadpageSchema: abroadpageSchema,
   abroadpageUpdateSchema: abroadpageUpdateSchema,
+  landingpageSchema: landingpageSchema,
+  landingpageUpdateSchema: landingpageUpdateSchema,
 
 
 
