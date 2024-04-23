@@ -1,10 +1,10 @@
 const db = require("../models");
-const newsandevents = db.newsandevents;
+const newsandevents = db.news_and_events;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
 const sendsearch = require("../utility/Customsearch");
 const path = require("path");
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
@@ -24,10 +24,10 @@ const getPagingData = (data, page, limit) => {
 };
 exports.create = async (req, res) => {
   try {
-    let logonames = "";
+    let bannerimages = "";
 
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
+    if (req.files && req.files.banner_image) {
+      let avatar = req.files.banner_image;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -47,29 +47,25 @@ exports.create = async (req, res) => {
       }
 
       let logoname = "logo" + Date.now() + path.extname(avatar.name);
-      console.log(logoname);
 
-      let IsUpload = avatar.mv("./storage/news_event_cover/" + logoname)
-        ? 1
-        : 0;
+      let IsUpload = avatar.mv("./storage/news_banner_image/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "news_event_cover/" + logoname;
+        bannerimages = "news_banner_image/" + logoname;
       }
     }
 
+
     const newsandeventsDetails = await newsandevents.create({
-      title: req.body.title,
-      news_type: req.body.news_type,
-      exam_id: req.body.exam_id ? req.body.exam_id : null,
-      top_featured_order: req.body.top_featured_order,
-      is_top_featured: req.body.is_top_featured,
+      category_id: req.body.category_id,
+      name: req.body.name,
+      slug: req.body.slug,
+      banner_image: bannerimages,
+      pdf_file: req.body.pdf_file,
       meta_title: req.body.meta_title,
       meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      slug: req.body.slug,
-      cover_image: logonames,
-      body: req.body.body,
+      meta_keywords: req.body.meta_keywords,
+      overview: req.body.overview,
       status: req.body.status,
     });
     res.status(200).send({
@@ -85,25 +81,102 @@ exports.create = async (req, res) => {
     });
   }
 };
-exports.update = (req, res) => {
-  const id = req.body.id;
+
+// exports.update = (req, res) => {
+//   const id = req.body.id;
+//   try {
+//     let images = " ";
+//     let STREAD = {
+//       title: req.body.title,
+//       news_type: req.body.news_type,
+//       top_featured_order: req.body.top_featured_order,
+//       is_top_featured: req.body.is_top_featured,
+//       meta_title: req.body.meta_title,
+//       meta_description: req.body.meta_description,
+//       meta_keyword: req.body.meta_keyword,
+//       slug: req.body.slug,
+//       body: req.body.body,
+//       status: req.body.status,
+//       exam_id: req.body.exam_id ? req.body.exam_id : null,
+//     };
+//     if (req.files && req.files.cover_image) {
+//       let avatar = req.files.cover_image;
+
+//       // Check if the uploaded file is allowed
+//       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+//         return res.status(400).send({
+//           message: "Invalid File type ",
+//           errors: {},
+//           status: 0,
+//         });
+//       }
+
+//       if (avatar.size / (1024 * 1024) > allowed_file_size) {
+//         return res.status(400).send({
+//           message: "File too large ",
+//           errors: {},
+//           status: 0,
+//         });
+//       }
+
+//       let image = "image" + Date.now() + path.extname(avatar.name);
+
+//       let IsUpload = avatar.mv("./storage/news_event_cover/" + image) ? 1 : 0;
+
+//       if (IsUpload) {
+//         images = "news_event_cover/" + image;
+//       }
+//       STREAD["cover_image"] = images;
+//     }
+
+//     newsandevents.update(STREAD, {
+//       where: { id: req.body.id },
+//     });
+
+//     res.status(200).send({
+//       status: 1,
+//       message: "Data updated Successfully",
+//     });
+//   } catch (error) {
+//     return res.status(400).send({
+//       message: "Unable to update data",
+//       errors: error,
+//       status: 0,
+//     });
+//   }
+// };
+
+exports.update = async (req, res) => {
+
   try {
-    let images = " ";
-    let STREAD = {
-      title: req.body.title,
-      news_type: req.body.news_type,
-      top_featured_order: req.body.top_featured_order,
-      is_top_featured: req.body.is_top_featured,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      slug: req.body.slug,
-      body: req.body.body,
-      status: req.body.status,
-      exam_id: req.body.exam_id ? req.body.exam_id : null,
+
+    const existingRecord = await newsandevents.findOne({
+      where: { id: req.body.id },
+    });
+
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+
+    const newsandeventsUpdates = {
+      category_id: req.body.category_id || existingRecord.category_id,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      banner_image: req.body.banner_image || existingRecord.banner_image,
+      pdf_file: req.body.pdf_file || existingRecord.pdf_file,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      overview: req.body.overview || existingRecord.overview,
+      status: req.body.status || existingRecord.status,
+      // logo: logonames,
     };
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
+    if (req.files && req.files.logo) {
+      const avatar = req.files.logo;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -122,23 +195,27 @@ exports.update = (req, res) => {
         });
       }
 
-      let image = "image" + Date.now() + path.extname(avatar.name);
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/landingpage_logo/" + logoname;
 
-      let IsUpload = avatar.mv("./storage/news_event_cover/" + image) ? 1 : 0;
+      await avatar.mv(UploadPath);
 
-      if (IsUpload) {
-        images = "news_event_cover/" + image;
+      landingpageUpdates.logo = "landingpage_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.logo) {
+        const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
       }
-      STREAD["cover_image"] = images;
     }
 
-    newsandevents.update(STREAD, {
-      where: { id: req.body.id },
-    });
+    // Update database record
+    await landingpage.update(landingpageUpdates, { where: { id: req.body.id } });
+
 
     res.status(200).send({
       status: 1,
-      message: "Data updated Successfully",
+      message: "Data Save Successfully",
     });
   } catch (error) {
     return res.status(400).send({
@@ -148,6 +225,7 @@ exports.update = (req, res) => {
     });
   }
 };
+
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, columnname, searchfrom, orderby } = req.query;
 
@@ -215,7 +293,6 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   newsandevents
     .findByPk(id, {
-      include: [{ association: "examnews", attributes: ["id", "exam_title"] }],
     })
     .then((data) => {
       if (data) {

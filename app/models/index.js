@@ -69,6 +69,8 @@ db.college_recognition = require("../models/college_recognition.model.js")(seque
 db.college_gallery = require("../models/college_galleries.model.js")(sequelize, Sequelize);
 
 db.landing_pages = require("../models/landing_page.model.js")(sequelize, Sequelize);
+db.news_categories = require("../models/news_categories.model.js")(sequelize, Sequelize);
+db.news_and_events = require("../models/news_and_events.model.js")(sequelize, Sequelize);
 
 
 

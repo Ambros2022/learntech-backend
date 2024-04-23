@@ -18,6 +18,10 @@ const stream_faq = db.stream_faq;
 const courses = db.courses;
 const abroadpages = db.abroadpages;
 const landingpages = db.landing_pages;
+const newscategories = db.news_categories;
+const newsandevents = db.news_and_events;
+
+
 
 
 
@@ -52,7 +56,7 @@ const studentform = db.studentform;
 const jobvaccancies = db.jobvaccancies;
 const redirecturl = db.redirecturl;
 const promopage = db.promopage;
-const newsandevents = db.newsandevents;
+
 
 const upcoming_courses = db.upcoming_courses;
 const eligibilities = db.eligibilities;
@@ -697,8 +701,39 @@ const landingpageUpdateSchema = [
 
 ];
 
+const newscategoriesSchema = [
+  checkField('name', 250, newscategories, true),
+
+];
+
+const newscategoriesUpdateSchema = [
+  ...validateIdRequired_id(newscategories, "id"),
+
+  checkField_update('name', 250, newscategories, true),
+];
 
 
+const newsandeventsSchema = [
+  checkField('name', 250, newsandevents, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
+
+const newsandeventsUpdateSchema = [
+  ...validateIdRequired_id(newsandevents, "id"),
+
+  checkField_update('name', 250, newsandevents, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
 
 
 
@@ -2846,112 +2881,7 @@ const PromopageSchemaUpdate = [
     }),
 ];
 
-const newsandeventsSchema = [
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_title is required"),
 
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_keyword is required"),
-
-  body("title").exists({ checkFalsy: true }).withMessage("title is required"),
-
-  body("body").exists({ checkFalsy: true }).withMessage("news is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return newsandevents
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-];
-const newsandeventsUpdateSchema = [
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_title is required"),
-
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_keyword is required"),
-
-  body("title").exists({ checkFalsy: true }).withMessage("title is required"),
-
-  body("body").exists({ checkFalsy: true }).withMessage("news is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return newsandevents
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("newsandevents Does not exist");
-          }
-        });
-    }),
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return newsandevents
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-];
 
 const examSchema = [
   body("exam_title")
@@ -3286,6 +3216,11 @@ const globalvalidation = {
   abroadpageUpdateSchema: abroadpageUpdateSchema,
   landingpageSchema: landingpageSchema,
   landingpageUpdateSchema: landingpageUpdateSchema,
+  newscategoriesSchema: newscategoriesSchema,
+  newscategoriesUpdateSchema: newscategoriesUpdateSchema,
+  newsandeventsSchema: newsandeventsSchema,
+  newsandeventsUpdateSchema: newsandeventsUpdateSchema,
+
 
 
 
@@ -3358,8 +3293,7 @@ const globalvalidation = {
   RedirecturlSchemaUpdate: RedirecturlSchemaUpdate,
   PromopageSchema: PromopageSchema,
   PromopageSchemaUpdate: PromopageSchemaUpdate,
-  newsandeventsSchema: newsandeventsSchema,
-  newsandeventsUpdateSchema: newsandeventsUpdateSchema,
+  
 
   examSchema: examSchema,
   examUpdateSchema: examUpdateSchema,

@@ -16,6 +16,8 @@ const generalcoursecontroller = require("../controllers/generalcourse.controller
 const enquirycontroller = require("../controllers/enquiry.controller");
 const abroadpagecontroller = require("../controllers/abroadpage.controller.js");
 const landingpagecontroller = require("../controllers/landingpage.controller.js");
+const newscategoriecontroller = require("../controllers/newscategorie.controller.js");
+const newsandeventscontroller = require("../controllers/newsandevents.controller.js");
 
 
 
@@ -63,7 +65,7 @@ const websiteimagecontroller = require("../controllers/websiteimage.controller")
 const websiteimagepopupcontroller = require("../controllers/websitepopupimage.controller");
 const redirecturlcontroller = require("../controllers/redirecturl.controller");
 const promopagecontroller = require("../controllers/promopage.controller");
-const newsandeventscontroller = require("../controllers/newsandevents.controller");
+// const newsandeventscontroller = require("../controllers/newsandevents.controller");
 const examcontroller = require("../controllers/exam.controller");
 const usercontroller = require("../controllers/user.controller");
 
@@ -869,7 +871,79 @@ module.exports = function (app) {
   /**  landingpage Routes End*/
 
 
+/**  news categories Routes Start*/
+   
+app.get(
+  "/api/admin/newscategories/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newscategoriecontroller.findAll
+);
 
+app.get(
+  "/api/admin/newscategories/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newscategoriecontroller.findOne
+);
+
+app.post(
+  "/api/admin/newscategories/add",
+  globalvalidation.newscategoriesSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newscategoriecontroller.create
+);
+
+app.post(
+  "/api/admin/newscategories/update",
+  globalvalidation.newscategoriesUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newscategoriecontroller.update
+);
+
+app.post(
+  "/api/admin/newscategories/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newscategoriecontroller.delete
+);
+
+/**  news categories Routes End*/
+
+
+
+/**  news and events Routes Start*/
+   
+app.get(
+  "/api/admin/newsevents/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newsandeventscontroller.findAll
+);
+
+app.get(
+  "/api/admin/newsevents/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newsandeventscontroller.findOne
+);
+
+app.post(
+  "/api/admin/newsevents/add",
+  globalvalidation.newsandeventsSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newsandeventscontroller.create
+);
+
+app.post(
+  "/api/admin/newsevents/update",
+  globalvalidation.newsandeventsUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newsandeventscontroller.update
+);
+
+app.post(
+  "/api/admin/newsevents/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  newsandeventscontroller.delete
+);
+
+/**  news and events Routes End*/
   
 
 
@@ -1008,33 +1082,33 @@ module.exports = function (app) {
 
   /** newsand event route  start*/
 
-  app.get(
-    "/api/admin/newsandevents/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    newsandeventscontroller.findAll
-  );
-  app.get(
-    "/api/admin/newsandevents/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    newsandeventscontroller.findOne
-  );
-  app.post(
-    "/api/admin/newsandevents/add",
-    globalvalidation.newsandeventsSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    newsandeventscontroller.create
-  );
-  app.post(
-    "/api/admin/newsandevents/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    newsandeventscontroller.delete
-  );
-  app.post(
-    "/api/admin/newsandevents/update",
-    globalvalidation.newsandeventsUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    newsandeventscontroller.update
-  );
+  // app.get(
+  //   "/api/admin/newsandevents/get",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   newsandeventscontroller.findAll
+  // );
+  // app.get(
+  //   "/api/admin/newsandevents/get/:id",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   newsandeventscontroller.findOne
+  // );
+  // app.post(
+  //   "/api/admin/newsandevents/add",
+  //   globalvalidation.newsandeventsSchema,
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   newsandeventscontroller.create
+  // );
+  // app.post(
+  //   "/api/admin/newsandevents/delete/:id",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   newsandeventscontroller.delete
+  // );
+  // app.post(
+  //   "/api/admin/newsandevents/update",
+  //   globalvalidation.newsandeventsUpdateSchema,
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   newsandeventscontroller.update
+  // );
   /** newsand event route end   */
 
   /**  promo Routes Start*/
