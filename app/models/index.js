@@ -71,6 +71,8 @@ db.college_gallery = require("../models/college_galleries.model.js")(sequelize, 
 db.landing_pages = require("../models/landing_page.model.js")(sequelize, Sequelize);
 db.news_categories = require("../models/news_categories.model.js")(sequelize, Sequelize);
 db.news_and_events = require("../models/news_and_events.model.js")(sequelize, Sequelize);
+db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
+db.exam = require("../models/exam.model.js")(sequelize, Sequelize);
 
 
 
@@ -85,7 +87,7 @@ db.polytechnic = require("../models/polytechnic.model.js")(sequelize, Sequelize)
 
 
 db.area = require("../models/area.model.js")(sequelize, Sequelize);
-db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
+
 
 
 
@@ -162,10 +164,14 @@ db.newsandevents = require("./newsandeventes.model.js")(sequelize, Sequelize);
 
 
 
+
+
+
+
 db.cutoff = require("../models/cutoff.model.js")(sequelize, Sequelize);
 db.cutoffdetails = require("../models/cutoff_details.model.js")(sequelize, Sequelize);
 
-db.exam = require("../models/exam.model.js")(sequelize, Sequelize);
+
 db.exam_eligibilities = require("../models/exam_eligibilities.model.js")(sequelize, Sequelize);
 db.exam_feedetails = require("../models/exam_feedetails.model.js")(sequelize, Sequelize);
 db.exam_dates = require("../models/exam_dates.model.js")(sequelize, Sequelize);
@@ -414,10 +420,10 @@ db.abroadpages.belongsTo(db.countries, {
 
 
 
-// db.general_course.belongsTo(db.stream, {
-//   foreignKey: "stream_id",
-//   as: "streams",
-// });
+db.news_and_events.belongsTo(db.news_categories, {
+  foreignKey: "category_id",
+  as: "newscategories",
+});
 
 // db.general_course.belongsTo(db.sub_stream, {
 //   foreignKey: "sub_streams_id",

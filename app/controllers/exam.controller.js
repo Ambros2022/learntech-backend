@@ -9,7 +9,7 @@ const examdates = db.exam_dates;
 const examage = db.exam_agelimits;
 const examid = db.exam_id_proof_details;
 const examfaqs = db.exam_faqs;
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -103,37 +103,36 @@ exports.create = async (req, res) => {
     } else {
 
 
-      const newsandeventsDetails = await newsandevents.create({
+      const examsDetails = await exam.create({
         stream_id: req.body.stream_id,
         exam_title: req.body.exam_title,
         slug: req.body.slug,
-      // upcoming_date: bannerimages,
-      upcoming_date: req.body.upcoming_date,
-      exam_short_name: req.body.exam_short_name,
-      cover_image: req.body.cover_image,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      meta_keywords: req.body.meta_keywords,
-      overview: req.body.overview,
-      exam_dates: req.body.exam_dates,
-      eligibility_criteria: req.body.eligibility_criteria,
-      syllabus: req.body.syllabus,
-      cutoff: req.body.cutoff,
-      admit_card: req.body.admit_card,
-      exam_centers: req.body.exam_centers,
-      results: req.body.results,
-      prepretion_tips: req.body.prepretion_tips,
-      counseling: req.body.counseling,
-      accept_colleges: req.body.accept_colleges,
-      promo_banner: req.body.promo_banner,
-      promo_banner_status: req.body.promo_banner_status,
-      status: req.body.status,
-    });
+        upcoming_date: req.body.upcoming_date,
+        exam_short_name: req.body.exam_short_name,
+          meta_title: req.body.meta_title,
+        meta_description: req.body.meta_description,
+        meta_keywords: req.body.meta_keywords,
+        overview: req.body.overview,
+        exam_dates: req.body.exam_dates,
+        eligibility_criteria: req.body.eligibility_criteria,
+        syllabus: req.body.syllabus,
+        cutoff: req.body.cutoff,
+        admit_card: req.body.admit_card,
+        exam_centers: req.body.exam_centers,
+        results: req.body.results,
+        prepretion_tips: req.body.prepretion_tips,
+        counseling: req.body.counseling,
+        accept_colleges: req.body.accept_colleges,
+       promo_banner_status: req.body.promo_banner_status,
+        status: req.body.status,
+        cover_image: images,
+        promo_banner: promo_banners,
+      });
 
       res.status(200).send({
         status: 1,
         message: "Data Save Successfully",
-        data: examDetails,
+        data: examsDetails,
       });
     }
   } catch (error) {
@@ -145,153 +144,99 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.update = (req, res) => {
-  const id = req.body.id;
-// console.log(typeof req.body.listing_order);
+exports.update = async (req, res) => {
   try {
-    let images = " ";
-    let promo_banner_names = "";
-
-    let listingvalue =
-    req.body.listing_order == 0 || req.body.listing_order == "null" ? null : req.body.listing_order;
-    let examshortname = req.body.exam_short_name == "null" ? null : req.body.exam_short_name;
-    
-    // console.log("examshortname");
-    console.log(req.body);
-    let STREAD = {
-      exam_title: req.body.exam_title,
-      slug: req.body.slug,
-      exam_short_name: examshortname,
-      keywords: req.body.keywords,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      meta_description: req.body.meta_description
-        ? req.body.meta_description
-        : null,
-      stream_id: req.body.stream_id ? req.body.stream_id : null,
-      upcoming_date: req.body.upcoming_date && req.body.upcoming_date != "null"? req.body.upcoming_date : null,
-      meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
-
-      centers: req.body.centers,
-      exam_pattern: req.body.exam_pattern,
-      important_dates: req.body.important_dates,
-      tips: req.body.tips ,
-      card: req.body.card ,
-      colleges: req.body.colleges ,
-      results: req.body.results,
-
-      exam_description: req.body.exam_description,
-      eligibility_criteria: req.body.eligibility_criteria,
-      home_view_status: req.body.home_view_status,
-      listing_order: listingvalue,
-      status: req.body.status,
-      promo_banner_status: req.body.promo_banner_status,
-    };
-
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/exam_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "exam_promo_banner/" + logoname;
-        STREAD["promo_banner"] = promo_banner_names;
-      }
-    }
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let image = "image" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/exam_cover/" + image) ? 1 : 0;
-
-      if (IsUpload) {
-        images = "exam_cover/" + image;
-      }
-      STREAD["cover_image"] = images;
-    }
-
-    exam.update(STREAD, {
+    // Check if the record exists in the database
+    const existingRecord = await exam.findOne({
       where: { id: req.body.id },
     });
 
-    // if (req.body.course_mode && id) {
-    //   course_modes.destroy({
-    //     where: { courses_id: id },
-    //   });
-    //   const course_mode = JSON.parse(req.body.course_mode);
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
 
-    //   _.forEach(course_mode, function (value) {
-    //     course_modes.create({
-    //       courses_id: id,
-    //       modes_id: value.course_mode,
-    //     });
-    //   });
-    // }
+    let examsUpdates = {
+      stream_id: req.body.stream_id || existingRecord.stream_id,
+      exam_title: req.body.exam_title || existingRecord.exam_title,
+      slug: req.body.slug || existingRecord.slug,
+      upcoming_date: req.body.upcoming_date || existingRecord.upcoming_date,
+      exam_short_name: req.body.exam_short_name || existingRecord.exam_short_name,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      overview: req.body.overview || existingRecord.overview,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      overview: req.body.overview || existingRecord.overview,
+      exam_dates: req.body.exam_dates || existingRecord.exam_dates,
+      eligibility_criteria: req.body.eligibility_criteria || existingRecord.eligibility_criteria,
+      syllabus: req.body.syllabus || existingRecord.syllabus,
+      cutoff: req.body.cutoff || existingRecord.cutoff,
+      admit_card: req.body.admit_card || existingRecord.admit_card,
+      exam_centers: req.body.exam_centers || existingRecord.exam_centers,
+      results: req.body.results || existingRecord.results,
+      prepretion_tips: req.body.prepretion_tips || existingRecord.prepretion_tips,
+      counseling: req.body.counseling || existingRecord.counseling,
+      accept_colleges: req.body.accept_colleges || existingRecord.accept_colleges,
+      promo_banner: req.body.promo_banner || existingRecord.promo_banner,
+      promo_banner_status: req.body.promo_banner_status || existingRecord.promo_banner_status,
+      status: req.body.status || existingRecord.status,
+    };
 
-    // if (req.body.recruiters && id) {
-    //   course_companies.destroy({
-    //     where: { courses_id: id },
-    //   });
-    //   const recruiters = JSON.parse(req.body.recruiters);
+    // Check if a new logo is provided
+    if (req.files && req.files.banner_image) {
+      const avatar = req.files.banner_image;
 
-    //   _.forEach(recruiters, function (value) {
-    //     course_companies.create({
-    //       courses_id: id,
-    //       companies_id: value.recruiters,
-    //     });
-    //   });
-    // }
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/exam_banner_image/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      examsUpdates.banner_image = "exam_banner_image/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner_image) {
+        // console.log("existingRecord.icon",existingRecord.amenities_logo);
+        const oldLogoPath = "./storage/" + existingRecord.banner_image;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Update database record
+    await blog.update(examsUpdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
-      message: "Data Save Successfully",
+      message: "Data saved successfully",
     });
   } catch (error) {
     return res.status(400).send({
       message: "Unable to update data",
-      errors: error,
+      errors: error.message,
       status: 0,
     });
   }
 };
+
 
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -370,41 +315,41 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   exam
     .findByPk(id, {
-      include: [
-        {
-          association: "stream",
-          attributes: ["id", "stream_name", "stream_slug"],
-        },
-        {
-          association: "examnews",
-          attributes: ["id", "title", "slug"],
-        },
+      // include: [
+      //   {
+      //     association: "stream",
+      //     attributes: ["id", "stream_name", "stream_slug"],
+      //   },
+      //   {
+      //     association: "examnews",
+      //     attributes: ["id", "title", "slug"],
+      //   },
 
-        {
-          association: "eligibilities",
-          attributes: ["id", "title", "description"],
-        },
-        {
-          association: "feedetails",
-          attributes: ["id", "category", "amount"],
-        },
-        {
-          association: "examdates",
-          attributes: ["id", "event", "start_date", "end_date"],
-        },
-        {
-          association: "examagelimit",
-          attributes: ["id", "content", "description"],
-        },
-        {
-          association: "examidproof",
-          attributes: ["id", "content"],
-        },
-        {
-          association: "examfaqs",
-          attributes: ["id", "questions", "answers"],
-        },
-      ],
+      //   {
+      //     association: "eligibilities",
+      //     attributes: ["id", "title", "description"],
+      //   },
+      //   {
+      //     association: "feedetails",
+      //     attributes: ["id", "category", "amount"],
+      //   },
+      //   {
+      //     association: "examdates",
+      //     attributes: ["id", "event", "start_date", "end_date"],
+      //   },
+      //   {
+      //     association: "examagelimit",
+      //     attributes: ["id", "content", "description"],
+      //   },
+      //   {
+      //     association: "examidproof",
+      //     attributes: ["id", "content"],
+      //   },
+      //   {
+      //     association: "examfaqs",
+      //     attributes: ["id", "questions", "answers"],
+      //   },
+      // ],
     })
     .then((data) => {
       if (data) {

@@ -20,6 +20,8 @@ const abroadpages = db.abroadpages;
 const landingpages = db.landing_pages;
 const newscategories = db.news_categories;
 const newsandevents = db.news_and_events;
+const blog = db.blog;
+const exam = db.exam;
 
 
 
@@ -34,7 +36,7 @@ const management = db.management;
 
 const author = db.author;
 const categories = db.categories;
-const blog = db.blog;
+
 const review = db.review;
 const Op = db.Sequelize.Op;
 const affilition = db.affilition;
@@ -66,7 +68,7 @@ const gallery = db.gallery;
 const job = db.job;
 const abouts = db.abouts;
 const services = db.services;
-const exam = db.exam;
+
 const scholarships = db.scholarships;
 const abroadcountries = db.abroadcountries;
 const abroad_universities = db.abroad_universities;
@@ -493,8 +495,6 @@ const SubStreamSchemaUpdate = [
   ...validateIdRequired_id(stream, "stream_id"),
 ];
 
-
-
 const PageSchema = [
   checkField('url', 250, pages, true),
 ];
@@ -582,10 +582,6 @@ const CollegeUpdateSchema = [
 
 
 ];
-
-
-
-
 
 const GeneralcoursesSchema = [
   checkField('name', 150, generalcourse, true),
@@ -757,6 +753,32 @@ const blogUpdateSchema = [
     .withMessage("Slug should be less than 150 character"),
 ];
 
+const examSchema = [
+  checkField('exam_title', 250, exam, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+    ...validateIdRequired_id(stream, "stream_id"),
+];
+
+const examUpdateSchema = [
+  ...validateIdRequired_id(exam, "id"),
+
+  checkField_update('exam_title', 250, blog, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+    ...validateIdRequired_id(stream, "stream_id"),
+];
+
+
+
 
 
 
@@ -790,6 +812,7 @@ const areaSchema = [
         });
     }),
 ];
+
 const abroaduniversitiesSchema = [
   body("university_name")
     .exists({ checkFalsy: true })
@@ -865,8 +888,6 @@ const abroaduniversitiesUpdateSchema = [
     }),
 ];
 
-
-
 const areaUpdateSchema = [
   body("area_name")
     .exists({ checkFalsy: true })
@@ -921,8 +942,6 @@ const areaUpdateSchema = [
         });
     }),
 ];
-
-
 
 const managementUpdateSchema = [
   body("management_name")
@@ -1078,7 +1097,6 @@ const enquirySchema = [
   //   .exists({ checkFalsy: true })
   //   .withMessage("course_in_mind is required"),
 ];
-
 
 const authorSchema = [
   body("author_name")
@@ -2686,181 +2704,7 @@ const PromopageSchemaUpdate = [
 
 
 
-const examSchema = [
-  body("exam_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam title is required"),
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return exam
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
 
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_title is required"),
-
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_keyword is required"),
-
-  body("exam_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam_description is required"),
-  body("eligibility_criteria")
-    .exists({ checkFalsy: true })
-    .withMessage("Eligibility_criteria is required"),
-  body("status").exists({ checkFalsy: true }).withMessage("Status is required"),
-
-  body("listing_order").custom((value, { req }) => {
-    if (value == null || value == "" || value == "null") {
-      return true;
-    }
-    return exam
-      .findOne({
-        where: {
-          listing_order: value,
-        },
-      })
-      .then((exam) => {
-        if (exam) {
-          return Promise.reject("listing_order already in use");
-        } else {
-          // Indicates the success of this synchronous custom validator
-          return true;
-        }
-      });
-  }),
-
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
-
-const examUpdateSchema = [
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return exam
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((exam) => {
-          if (exam) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("exam Does not exist");
-          }
-        });
-    }),
-  body("exam_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam title is required"),
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return exam
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((exam) => {
-          if (exam) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_title is required"),
-
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_keyword is required"),
-
-  body("exam_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam_description is required"),
-  body("eligibility_criteria")
-    .exists({ checkFalsy: true })
-    .withMessage("Eligibility_criteria is required"),
-  body("status").exists({ checkFalsy: true }).withMessage("Status is required"),
-
-  body("listing_order").custom((value, { req }) => {
-    if (value == null || value == "" || value == "null") {
-      return true;
-    }
-    return exam
-      .findOne({
-        where: {
-          listing_order: {
-            [Op.eq]: value,
-          },
-          id: {
-            [Op.not]: [req.body.id],
-          },
-        },
-      })
-      .then((stream) => {
-        if (stream) {
-          return Promise.reject("listing_order already in use");
-        } else {
-          // Indicates the success of this synchronous custom validator
-          return true;
-        }
-      });
-  }),
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
 
 const adminpasswordSchema = [
   body("password").isLength({

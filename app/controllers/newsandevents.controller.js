@@ -39,6 +39,7 @@ const getPagingData = (data, page, limit) => {
 exports.create = async (req, res) => {
   try {
     let bannerimages = "";
+    let pdffiles = "";
 
     if (req.files && req.files.banner_image) {
       let avatar = req.files.banner_image;
@@ -69,13 +70,42 @@ exports.create = async (req, res) => {
       }
     }
 
+    if (req.files && req.files.pdf_file) {
+      let avatar = req.files.pdf_file;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/news_pdf_file/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        pdffiles = "news_pdf_file/" + logoname;
+      }
+    }
+
 
     const newsandeventsDetails = await newsandevents.create({
       category_id: req.body.category_id,
       name: req.body.name,
       slug: req.body.slug,
       banner_image: bannerimages,
-      pdf_file: req.body.pdf_file,
+      pdf_file: pdffiles,
       meta_title: req.body.meta_title,
       meta_description: req.body.meta_description,
       meta_keywords: req.body.meta_keywords,
@@ -116,17 +146,15 @@ exports.update = async (req, res) => {
       category_id: req.body.category_id || existingRecord.category_id,
       name: req.body.name || existingRecord.name,
       slug: req.body.slug || existingRecord.slug,
-      banner_image: req.body.banner_image || existingRecord.banner_image,
-      pdf_file: req.body.pdf_file || existingRecord.pdf_file,
       meta_title: req.body.meta_title || existingRecord.meta_title,
       meta_description: req.body.meta_description || existingRecord.meta_description,
       meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
       overview: req.body.overview || existingRecord.overview,
       status: req.body.status || existingRecord.status,
-      // logo: logonames,
+      
     };
-    if (req.files && req.files.logo) {
-      const avatar = req.files.logo;
+    if (req.files && req.files.banner_image) {
+      const avatar = req.files.banner_image;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -150,17 +178,50 @@ exports.update = async (req, res) => {
 
       await avatar.mv(UploadPath);
 
-      newsandeventsUpdates.logo = "news_banner_image/" + logoname;
+      newsandeventsUpdates.banner_image = "news_banner_image/" + logoname;
 
       // If there's an old logo associated with the record, remove it
-      if (existingRecord.logo) {
-        const oldLogoPath = "./storage/" + existingRecord.logo;
+      if (existingRecord.banner_image) {
+        const oldLogoPath = "./storage/" + existingRecord.banner_image;
+        await removeFile(oldLogoPath);
+      }
+    }
+    if (req.files && req.files.pdf_file) {
+      const avatar = req.files.pdf_file;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/news_pdf_file/" + logoname;
+
+      await avatar.mv(UploadPath);
+
+      newsandeventsUpdates.pdf_file = "news_pdf_file/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.pdf_file) {
+        const oldLogoPath = "./storage/" + existingRecord.pdf_file;
         await removeFile(oldLogoPath);
       }
     }
 
     // Update database record
-    await landingpage.update(newsandeventsUpdates, { where: { id: req.body.id } });
+    await newsandevents.update(newsandeventsUpdates, { where: { id: req.body.id } });
 
 
     res.status(200).send({
@@ -191,7 +252,17 @@ exports.findAll = async (req, res) => {
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   const { limit, offset } = getPagination(page, size);
   newsandevents
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({ where: condition, limit, offset, 
+      include: [
+        {
+          required: false,
+          association: "newscategories",
+          attributes: ["id", "name"],
+        },
+      
+
+      ],
+      order: [orderconfig] })
     .then((data) => {
       const response = getPagingData(data, page, limit);
       res.status(200).send({
@@ -243,6 +314,15 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   newsandevents
     .findByPk(id, {
+      include: [
+        {
+          required: false,
+          association: "newscategories",
+          attributes: ["id", "name"],
+        },
+      
+
+      ],
     })
     .then((data) => {
       if (data) {
