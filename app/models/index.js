@@ -403,22 +403,26 @@ db.abroadpages.belongsTo(db.countries, {
 
 
 
-/*** courses relationship */
+/***  Relation ship news and events  */
 
-
-db.courses.belongsTo(db.college, {
-  foreignKey: "college_id",
-  as: "college",
-});
-
-db.general_course.hasMany(db.courses, { as: "generalcourse" });
-db.courses.belongsTo(db.general_course, {
-  foreignKey: "general_course_id",
-  as: "generalcourse",
-});
+// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
+// db.general_course_faqs.belongsTo(db.general_course, {
+//   foreignKey: "general_course_id",
+//   as: "generalcoursefaqs",
+// });
 
 
 
+
+// db.general_course.belongsTo(db.stream, {
+//   foreignKey: "stream_id",
+//   as: "streams",
+// });
+
+// db.general_course.belongsTo(db.sub_stream, {
+//   foreignKey: "sub_streams_id",
+//   as: "sub_streams",
+// });
 
 
 
@@ -694,22 +698,22 @@ db.course_exams.belongsTo(db.exam, {
 
 /***  Relation ship blogs  */
 
-db.author.hasMany(db.blog, { as: "author" });
-db.blog.belongsTo(db.author, {
-  foreignKey: "author_id",
-  as: "author",
-});
-db.categories.hasMany(db.blog, { as: "categories" });
-db.blog.belongsTo(db.categories, {
-  foreignKey: "category_id",
-  as: "categories",
-});
+// db.author.hasMany(db.blog, { as: "author" });
+// db.blog.belongsTo(db.author, {
+//   foreignKey: "author_id",
+//   as: "author",
+// });
+// db.categories.hasMany(db.blog, { as: "categories" });
+// db.blog.belongsTo(db.categories, {
+//   foreignKey: "category_id",
+//   as: "categories",
+// });
 
 
-db.blog.belongsTo(db.groups, {
-  foreignKey: "group_id",
-  as: "groups",
-});
+// db.blog.belongsTo(db.groups, {
+//   foreignKey: "group_id",
+//   as: "groups",
+// });
 
 
 /*** stream Relation ship  */

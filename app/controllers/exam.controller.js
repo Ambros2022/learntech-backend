@@ -101,59 +101,34 @@ exports.create = async (req, res) => {
         status: 0,
       });
     } else {
-      let listingvalue =
-        req.body.listing_order == 0 || req.body.listing_order == "null" ? null : req.body.listing_order;
-        let examshortname = req.body.exam_short_name == "null" ? null : req.body.exam_short_name;
-      const examDetails = await exam.create({
+
+
+      const newsandeventsDetails = await newsandevents.create({
+        stream_id: req.body.stream_id,
         exam_title: req.body.exam_title,
         slug: req.body.slug,
-        exam_short_name: examshortname,
-        upcoming_date: req.body.upcoming_date  && req.body.upcoming_date != "null"? req.body.upcoming_date : null,
-        keywords: req.body.keywords ? req.body.keywords : null,
-        meta_title: req.body.meta_title ? req.body.meta_title : null,
-        meta_description: req.body.meta_description
-          ? req.body.meta_description
-          : null,
-        meta_keyword: req.body.meta_keyword,
-        centers: req.body.centers,
-        exam_pattern: req.body.exam_pattern,
-        important_dates: req.body.important_dates,
-        tips: req.body.tips ,
-        card: req.body.card ,
-        colleges: req.body.colleges ,
-        results: req.body.results ,
-
-        stream_id: req.body.stream_id ? req.body.stream_id : null,
-        cover_image: images,
-        exam_description: req.body.exam_description,
-        eligibility_criteria: req.body.eligibility_criteria,
-        home_view_status: req.body.home_view_status,
-        listing_order: listingvalue,
-        status: req.body.status,
-        promo_banner: promo_banner_names,
-        promo_banner_status: req.body.promo_banner_status ,
-      });
-
-      // if (req.body.course_mode && coursesDetails.id) {
-      //   const course_mode = JSON.parse(req.body.course_mode);
-
-      //   await _.forEach(course_mode, function (value) {
-      //     course_modes.create({
-      //       courses_id: coursesDetails.id,
-      //       modes_id: value.course_mode,
-      //     });
-      //   });
-      // }
-      // if (req.body.recruiters && coursesDetails.id) {
-      //   const recruiters = JSON.parse(req.body.recruiters);
-
-      //   await _.forEach(recruiters, function (value) {
-      //     course_companies.create({
-      //       courses_id: coursesDetails.id,
-      //       companies_id: value.recruiters,
-      //     });
-      //   });
-      // }
+      // upcoming_date: bannerimages,
+      upcoming_date: req.body.upcoming_date,
+      exam_short_name: req.body.exam_short_name,
+      cover_image: req.body.cover_image,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keywords: req.body.meta_keywords,
+      overview: req.body.overview,
+      exam_dates: req.body.exam_dates,
+      eligibility_criteria: req.body.eligibility_criteria,
+      syllabus: req.body.syllabus,
+      cutoff: req.body.cutoff,
+      admit_card: req.body.admit_card,
+      exam_centers: req.body.exam_centers,
+      results: req.body.results,
+      prepretion_tips: req.body.prepretion_tips,
+      counseling: req.body.counseling,
+      accept_colleges: req.body.accept_colleges,
+      promo_banner: req.body.promo_banner,
+      promo_banner_status: req.body.promo_banner_status,
+      status: req.body.status,
+    });
 
       res.status(200).send({
         status: 1,
