@@ -18,6 +18,8 @@ const abroadpagecontroller = require("../controllers/abroadpage.controller.js");
 const landingpagecontroller = require("../controllers/landingpage.controller.js");
 const newscategoriecontroller = require("../controllers/newscategorie.controller.js");
 const newsandeventscontroller = require("../controllers/newsandevents.controller.js");
+const blogcontroller = require("../controllers/blog.controller");
+const examcontroller = require("../controllers/exam.controller");
 
 
 
@@ -41,7 +43,7 @@ const aboutcontroller = require("../controllers/about.controller");
 const servicecontroller = require("../controllers/service.controller");
 const authorcontroller = require("../controllers/author.controller");
 const categoriescontroller = require("../controllers/categories.controller");
-const blogcontroller = require("../controllers/blog.controller");
+
 const polytechniccontroller = require("../controllers/polytechnic.controller");
 const reviewcontroller = require("../controllers/review.controller");
 const upcoming_coursescontroller = require("../controllers/upcoming_courses.controller");
@@ -66,7 +68,7 @@ const websiteimagepopupcontroller = require("../controllers/websitepopupimage.co
 const redirecturlcontroller = require("../controllers/redirecturl.controller");
 const promopagecontroller = require("../controllers/promopage.controller");
 // const newsandeventscontroller = require("../controllers/newsandevents.controller");
-const examcontroller = require("../controllers/exam.controller");
+
 const usercontroller = require("../controllers/user.controller");
 
 const scholarshipcontroller = require("../controllers/scholarship.controller");
@@ -944,7 +946,104 @@ app.post(
 );
 
 /**  news and events Routes End*/
+
+ /* blog Routes start*/
+
+ app.get(
+  "/api/admin/blog/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  blogcontroller.findAll
+);
+
+app.get(
+  "/api/admin/blog/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  blogcontroller.findOne
+);
+
+app.post(
+  "/api/admin/blog/add",
+  globalvalidation.blogSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  blogcontroller.create
+);
+
+app.post(
+  "/api/admin/blog/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  blogcontroller.delete
+);
+
+app.post(
+  "/api/admin/blog/update",
+  globalvalidation.blogUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  blogcontroller.update
+);
+
   
+ /** exam  route  End*/
+
+ app.get(
+  "/api/admin/exam/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  examcontroller.findAll
+);
+app.get(
+  "/api/admin/exam/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  examcontroller.findOne
+);
+app.post(
+  "/api/admin/exam/add",
+  globalvalidation.examSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  examcontroller.create
+);
+app.post(
+  "/api/admin/exam/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  examcontroller.delete
+);
+app.post(
+  "/api/admin/exam/update",
+  globalvalidation.examUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  examcontroller.update
+);
+// app.post(
+//   "/api/admin/exam/updateeligibilities",
+//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+//   examcontroller.updateeligibilities
+// );
+// app.post(
+//   "/api/admin/exam/updatefees",
+//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+//   examcontroller.updatefees
+// );
+// app.post(
+//   "/api/admin/exam/updateexamdates",
+//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+//   examcontroller.updateexamdates
+// );
+
+// app.post(
+//   "/api/admin/exam/updateexamagelimit",
+//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+//   examcontroller.updateexamagelimit
+// );
+// app.post(
+//   "/api/admin/exam/updateexamifproof",
+//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+//   examcontroller.updateexamifproof
+// );
+// app.post(
+//   "/api/admin/exam/updateexamfaqs",
+//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+//   examcontroller.updateexamfaqs
+// );
+
+/** Exam  route  End*/
 
 
 
@@ -1538,40 +1637,7 @@ app.post(
     polytechniccontroller.update
   );
 
-  /* blog Routes start*/
-
-  app.get(
-    "/api/admin/blog/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    blogcontroller.findAll
-  );
-
-  app.get(
-    "/api/admin/blog/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    blogcontroller.findOne
-  );
-
-  app.post(
-    "/api/admin/blog/add",
-    globalvalidation.blogSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    blogcontroller.create
-  );
-
-  app.post(
-    "/api/admin/blog/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    blogcontroller.delete
-  );
-
-  app.post(
-    "/api/admin/blog/update",
-    globalvalidation.blogUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    blogcontroller.update
-  );
-
+ 
   /* author Routes start*/
 
   app.get(
@@ -1919,68 +1985,7 @@ app.post(
   /**upcoming_courses  route end   */
 
 
-  /** EXAm  route  End*/
-
-  app.get(
-    "/api/admin/exam/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.findAll
-  );
-  app.get(
-    "/api/admin/exam/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.findOne
-  );
-  app.post(
-    "/api/admin/exam/add",
-    globalvalidation.examSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.create
-  );
-  app.post(
-    "/api/admin/exam/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.delete
-  );
-  app.post(
-    "/api/admin/exam/update",
-    globalvalidation.examUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.update
-  );
-  app.post(
-    "/api/admin/exam/updateeligibilities",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.updateeligibilities
-  );
-  app.post(
-    "/api/admin/exam/updatefees",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.updatefees
-  );
-  app.post(
-    "/api/admin/exam/updateexamdates",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.updateexamdates
-  );
-
-  app.post(
-    "/api/admin/exam/updateexamagelimit",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.updateexamagelimit
-  );
-  app.post(
-    "/api/admin/exam/updateexamifproof",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.updateexamifproof
-  );
-  app.post(
-    "/api/admin/exam/updateexamfaqs",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    examcontroller.updateexamfaqs
-  );
-
-  /** Exam  route  End*/
+ 
 
   /**upcoming_courses  route end   */
 

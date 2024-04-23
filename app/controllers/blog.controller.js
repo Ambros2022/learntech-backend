@@ -72,7 +72,7 @@ exports.create = async (req, res) => {
         let IsUpload = avatar.mv("./storage/blog_banner_image/" + logoname) ? 1 : 0;
 
         if (IsUpload) {
-          banner_images = "banner_image/" + logoname;
+          banner_images = "blog_banner_image/" + logoname;
         }
     }
 
@@ -152,9 +152,9 @@ exports.update = async (req, res) => {
 
       blogsUpdates.banner_image = "blog_banner_image/" + logoname;
 
-      // If there's an old logo associated with the record, remove it
+      
       if (existingRecord.banner_image) {
-        // console.log("existingRecord.icon",existingRecord.amenities_logo);
+  
         const oldLogoPath = "./storage/" + existingRecord.banner_image;
         await removeFile(oldLogoPath);
       }
