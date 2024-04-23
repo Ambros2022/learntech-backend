@@ -5,6 +5,18 @@ const college_groups = db.college_groups;
 const sendsearch = require("../utility/Customsearch");
 // const { college_groups } = require("../models");
 
+// Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
 // const streamT = db.stream;
 const Op = db.Sequelize.Op;
 // Array of allowed files
@@ -31,91 +43,48 @@ const getPagingData = (data, page, limit) => {
 };
 
 exports.create = async (req, res) => {
+
   try {
-    let logonames = "";
-    let promo_banner_names = "";
+    let banner_images = "";
 
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
+    if (req.files && req.files.banner_image) {
+        let avatar = req.files.banner_image;
 
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
+        // Check if the uploaded file is allowed
+        if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+            return res.status(400).send({
+                message: "Invalid File type ",
+                errors: {},
+                status: 0,
+            });
+        }
 
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
+        if (avatar.size / (1024 * 1024) > allowed_file_size) {
+            return res.status(400).send({
+                message: "File too large ",
+                errors: {},
+                status: 0,
+            });
+        }
 
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
+        let logoname = "logo" + Date.now() + path.extname(avatar.name);
 
-      let IsUpload = avatar.mv("./storage/blog_promo_banner/" + logoname)
-        ? 1
-        : 0;
+        let IsUpload = avatar.mv("./storage/blog_banner_image/" + logoname) ? 1 : 0;
 
-      if (IsUpload) {
-        promo_banner_names = "blog_promo_banner/" + logoname;
-      }
+        if (IsUpload) {
+          banner_images = "banner_image/" + logoname;
+        }
     }
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/blog_cover/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        logonames = "blog_cover/" + logoname;
-      }
-    }
-
-    let listingvalue =
-    req.body.listing_order == 0 || req.body.listing_order == "null" ? null : req.body.listing_order;
 
     const blogsDetails = await blog.create({
-      title: req.body.title,
-      category_id: req.body.category_id,
-      author_id: req.body.author_id,
-      group_id: req.body.group_id,
+      name: req.body.name,
       slug: req.body.slug,
-      body: req.body.body,
-      status: req.body.status ? req.body.status : null,
-      keywords: req.body.keywords ? req.body.keywords : null,
-      meta_description: req.body.meta_description
-        ? req.body.meta_description
-        : null,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
-      home_view_status: req.body.home_view_status ? req.body.home_view_status : null,
-      listing_order: listingvalue,
-      cover_image: logonames,
-      promo_banner: promo_banner_names,
-      promo_banner_status: req.body.promo_banner_status ,
+      banner_image: banner_images,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keywords: req.body.meta_keywords,
+      overview: req.body.overview,
+      status: req.body.status,
     });
 
     res.status(200).send({
@@ -132,111 +101,76 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   try {
-    let logonames = "";
-    let promo_banner_names = "";
-
-    let listingvalue =
-    req.body.listing_order == 0 || req.body.listing_order == "null" ? null : req.body.listing_order;
-    let STREAD = {
-      title: req.body.title,
-      category_id: req.body.category_id,
-      author_id: req.body.author_id,
-      group_id: req.body.group_id,
-      slug: req.body.slug,
-      body: req.body.body,
-      status: req.body.status ? req.body.status : null,
-      keywords: req.body.keywords ,
-      meta_description: req.body.meta_description
-        ? req.body.meta_description
-        : null,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
-      home_view_status: req.body.home_view_status ? req.body.home_view_status : null,
-      listing_order:listingvalue,
-      promo_banner_status: req.body.promo_banner_status ,
-    };
-
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/blog_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "blog_promo_banner/" + logoname;
-        STREAD["promo_banner"] = promo_banner_names;
-      }
- 
-     
-
-
-      
-    }
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/blog_cover/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        logonames = "blog_cover/" + logoname;
-      }
-
-      STREAD["cover_image"] = logonames;
-    }
-
-    blog.update(STREAD, {
+    // Check if the record exists in the database
+    const existingRecord = await blog.findOne({
       where: { id: req.body.id },
     });
 
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+    let blogsUpdates = {
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      overview: req.body.overview || existingRecord.overview,
+      status: req.body.status || existingRecord.status,
+    };
+
+    // Check if a new logo is provided
+    if (req.files && req.files.banner_image) {
+      const avatar = req.files.banner_image;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/blog_banner_image/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      blogsUpdates.banner_image = "blog_banner_image/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner_image) {
+        // console.log("existingRecord.icon",existingRecord.amenities_logo);
+        const oldLogoPath = "./storage/" + existingRecord.banner_image;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Update database record
+    await blog.update(blogsUpdates, { where: { id: req.body.id } });
+
     res.status(200).send({
       status: 1,
-      message: "Data Save Successfully",
+      message: "Data saved successfully",
     });
   } catch (error) {
     return res.status(400).send({
       message: "Unable to update data",
-      errors: error,
+      errors: error.message,
       status: 0,
     });
   }
@@ -270,10 +204,10 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
-      include: [
-        { association: "author", attributes: ["id", "author_name"] },
-        { association: "categories", attributes: ["id", "category_name"] },
-      ],
+      // include: [
+      //   { association: "author", attributes: ["id", "author_name"] },
+      //   { association: "categories", attributes: ["id", "category_name"] },
+      // ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -315,70 +249,20 @@ exports.findOne = (req, res) => {
           },
         ],
       },
-      include: [
-        { association: "author", attributes: ["id", "author_name"] },
-        { association: "categories", attributes: ["id", "category_name"] },
-        {
-          association: "groups",
-          attributes: ["id", "group", "slug"],
-          required: false,
-        },
-      ],
+      // include: [
+      //   { association: "author", attributes: ["id", "author_name"] },
+      //   { association: "categories", attributes: ["id", "category_name"] },
+      //   {
+      //     association: "groups",
+      //     attributes: ["id", "group", "slug"],
+      //     required: false,
+      //   },
+      // ],
       subQuery: false,
     })
 
     .then((data) => {
       if (data) {
-        //     if (data.group_id) {
-
-        //         // college_groups
-        //         // .findAndCountAll({
-
-        //         //   where: data_array,
-        //         // //   limit,
-        //         // //   offset,
-        //         // //   include: [
-        //         // //     { association: "author", attributes: ["id", "author_name"] },
-        //         // //     { association: "categories", attributes: ["id", "category_name"] },
-        //         // //   ],
-        //         // //   order: [orderconfig],
-        //         // })
-        //   let x=      college_groups.findAll({
-        //             where: {
-        //                 id: 11
-        //             },
-        //             subQuery: false,
-
-        //           })
-        //           console.log(x);
-        //     //     .then((datas) => {
-        //     //         console.log (datas);
-        //     //     //   const response = getPagingData(data, page, limit);
-
-        //     // //    return   res.status(200).send({
-        //     // //         status: 1,
-        //     // //         message: "success",
-        //     // //         data: datas,
-        //     // //         // totalItems: response.totalItems,
-        //     // //         // currentPage: response.currentPage,
-        //     // //         // totalPages: response.totalPages,
-        //     // //         // data: response.blog,
-        //     // //       });
-        //     //     })
-        //     //     .catch((err) => {
-        //     //     //   res.status(500).send({
-        //     //     //     status: 0,
-        //     //     //     message: err.message || "Some error occurred while retrieving groups.",
-        //     //     //   });
-        //     //     });
-
-        //       return res.status(200).send({
-        //         status: 1,
-
-        //         data: data,
-        //       });
-
-        //     }
 
         res.status(200).send({
           status: 1,

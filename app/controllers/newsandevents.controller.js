@@ -5,6 +5,19 @@ const Op = db.Sequelize.Op;
 const sendsearch = require("../utility/Customsearch");
 const path = require("path");
 const fileTypes = require("../config/fileTypes");
+// / Function to remove a file
+const fs = require("fs").promises;
+
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
@@ -22,6 +35,7 @@ const getPagingData = (data, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return { totalItems, newsandevents, totalPages, currentPage };
 };
+
 exports.create = async (req, res) => {
   try {
     let bannerimages = "";
@@ -82,70 +96,6 @@ exports.create = async (req, res) => {
   }
 };
 
-// exports.update = (req, res) => {
-//   const id = req.body.id;
-//   try {
-//     let images = " ";
-//     let STREAD = {
-//       title: req.body.title,
-//       news_type: req.body.news_type,
-//       top_featured_order: req.body.top_featured_order,
-//       is_top_featured: req.body.is_top_featured,
-//       meta_title: req.body.meta_title,
-//       meta_description: req.body.meta_description,
-//       meta_keyword: req.body.meta_keyword,
-//       slug: req.body.slug,
-//       body: req.body.body,
-//       status: req.body.status,
-//       exam_id: req.body.exam_id ? req.body.exam_id : null,
-//     };
-//     if (req.files && req.files.cover_image) {
-//       let avatar = req.files.cover_image;
-
-//       // Check if the uploaded file is allowed
-//       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-//         return res.status(400).send({
-//           message: "Invalid File type ",
-//           errors: {},
-//           status: 0,
-//         });
-//       }
-
-//       if (avatar.size / (1024 * 1024) > allowed_file_size) {
-//         return res.status(400).send({
-//           message: "File too large ",
-//           errors: {},
-//           status: 0,
-//         });
-//       }
-
-//       let image = "image" + Date.now() + path.extname(avatar.name);
-
-//       let IsUpload = avatar.mv("./storage/news_event_cover/" + image) ? 1 : 0;
-
-//       if (IsUpload) {
-//         images = "news_event_cover/" + image;
-//       }
-//       STREAD["cover_image"] = images;
-//     }
-
-//     newsandevents.update(STREAD, {
-//       where: { id: req.body.id },
-//     });
-
-//     res.status(200).send({
-//       status: 1,
-//       message: "Data updated Successfully",
-//     });
-//   } catch (error) {
-//     return res.status(400).send({
-//       message: "Unable to update data",
-//       errors: error,
-//       status: 0,
-//     });
-//   }
-// };
-
 exports.update = async (req, res) => {
 
   try {
@@ -196,11 +146,11 @@ exports.update = async (req, res) => {
       }
 
       const logoname = "logo" + Date.now() + path.extname(avatar.name);
-      const UploadPath = "./storage/landingpage_logo/" + logoname;
+      const UploadPath = "./storage/news_banner_image/" + logoname;
 
       await avatar.mv(UploadPath);
 
-      landingpageUpdates.logo = "landingpage_logo/" + logoname;
+      newsandeventsUpdates.logo = "news_banner_image/" + logoname;
 
       // If there's an old logo associated with the record, remove it
       if (existingRecord.logo) {
@@ -210,7 +160,7 @@ exports.update = async (req, res) => {
     }
 
     // Update database record
-    await landingpage.update(landingpageUpdates, { where: { id: req.body.id } });
+    await landingpage.update(newsandeventsUpdates, { where: { id: req.body.id } });
 
 
     res.status(200).send({

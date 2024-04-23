@@ -681,10 +681,10 @@ const landingpageSchema = [
   checkField('name', 250, landingpages, true),
 
   body("link")
-  .exists({ checkFalsy: true })
-  .withMessage("link is required")
-  .isLength({ max: 150 })
-  .withMessage("link should be less than 150 character"),
+    .exists({ checkFalsy: true })
+    .withMessage("link is required")
+    .isLength({ max: 150 })
+    .withMessage("link should be less than 150 character"),
 ];
 
 const landingpageUpdateSchema = [
@@ -693,11 +693,11 @@ const landingpageUpdateSchema = [
   checkField_update('name', 250, landingpages, true),
 
   body("link")
-  .exists({ checkFalsy: true })
-  .withMessage("link is required")
-  .isLength({ max: 150 })
-  .withMessage("link should be less than 150 character"),
-  
+    .exists({ checkFalsy: true })
+    .withMessage("link is required")
+    .isLength({ max: 150 })
+    .withMessage("link should be less than 150 character"),
+
 
 ];
 
@@ -735,6 +735,27 @@ const newsandeventsUpdateSchema = [
     .withMessage("Slug should be less than 150 character"),
 ];
 
+const blogSchema = [
+  checkField('name', 250, blog, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
+
+const blogUpdateSchema = [
+  ...validateIdRequired_id(blog, "id"),
+
+  checkField_update('name', 250, blog, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
 
 
 
@@ -1243,225 +1264,7 @@ const categoriesUpdateSchema = [
     }),
 ];
 
-const blogSchema = [
-  body("title")
-    .exists({ checkFalsy: true })
-    .withMessage("title Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("title  name should be less than 150 character"),
 
-  body("body")
-    .exists({ checkFalsy: true })
-    .withMessage("body name is required"),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug name is required")
-    .isLength({ max: 150 })
-    .withMessage("slug name should be less than 150 character")
-    .custom((value) => {
-      return blog
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((blog) => {
-          if (blog) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("author_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Author Id is required")
-    .custom((value) => {
-      return author
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((author) => {
-          if (author) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Author Id Not exist");
-          }
-        });
-    }),
-  body("category_id")
-    .exists({ checkFalsy: true })
-    .withMessage("category Id is required")
-    .custom((value) => {
-      return categories
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((categories) => {
-          if (categories) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("category Id Not exist");
-          }
-        });
-    }),
-  body("group_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Group  Id is required")
-    .custom((value) => {
-      return groups
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((groups) => {
-          if (groups) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Groups Id Not exist");
-          }
-        });
-    }),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
-const blogUpdateSchema = [
-  body("title")
-    .exists({ checkFalsy: true })
-    .withMessage("title Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("title  name should be less than 150 character"),
-
-  body("body")
-    .exists({ checkFalsy: true })
-    .withMessage("body name is required"),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug name is required")
-    .isLength({ max: 150 })
-    .withMessage("slug name should be less than 150 character"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return blog
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((blog) => {
-          if (blog) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("blog Does not exist");
-          }
-        });
-    }),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return blog
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((blog) => {
-          if (blog) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("author_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Author Id is required")
-    .custom((value) => {
-      return author
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((author) => {
-          if (author) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Author Id Not exist");
-          }
-        });
-    }),
-  body("category_id")
-    .exists({ checkFalsy: true })
-    .withMessage("category Id is required")
-    .custom((value) => {
-      return categories
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((categories) => {
-          if (categories) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("category Id Not exist");
-          }
-        });
-    }),
-  body("group_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Group  Id is required")
-    .custom((value) => {
-      return groups
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((groups) => {
-          if (groups) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Groups Id Not exist");
-          }
-        });
-    }),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
 
 const scholarshipSchema = [
   body("name")
@@ -3293,7 +3096,7 @@ const globalvalidation = {
   RedirecturlSchemaUpdate: RedirecturlSchemaUpdate,
   PromopageSchema: PromopageSchema,
   PromopageSchemaUpdate: PromopageSchemaUpdate,
-  
+
 
   examSchema: examSchema,
   examUpdateSchema: examUpdateSchema,

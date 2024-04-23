@@ -1,68 +1,40 @@
 module.exports = (sequelize, Sequelize) => {
   const Blog = sequelize.define("blogs", {
-    title: {
+    name: {
       type: Sequelize.STRING
     },
-    category_id: {
+    slug: {
       type: Sequelize.INTEGER
     },
-    author_id: {
+    banner_image: {
       type: Sequelize.INTEGER
     },
-    group_id: {
+    meta_title: {
       type: Sequelize.INTEGER
     },
     meta_description: {
       type: Sequelize.TEXT
     },
-    meta_title: {
+    meta_keywords: {
       type: Sequelize.STRING
     },
-    meta_keyword: {
-      type: Sequelize.STRING
-    },
-    slug: {
-      type: Sequelize.STRING
-    },
-    cover_image: {
-      type: Sequelize.STRING
-    },
-    body: {
+    overview: {
       type: Sequelize.STRING
     },
     status: {
-      type: Sequelize.TEXT
+      type: Sequelize.ENUM('Draft', 'Published')
     },
-    keywords: {
-      type: Sequelize.STRING
-    },
-    home_view_status: {
-      type: Sequelize.STRING
-    },
-    listing_order: {
-      type: Sequelize.INTEGER
-    },
-    promo_banner: {
-      type: Sequelize.STRING
-    },
-    promo_banner_status: {
-      type: Sequelize.STRING
-    },
+  }
+    ,
+    {
 
-    
-    
-    
-  }
-  ,
-  {
-    
-    timestamps: true,
-    underscored: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
-  }
-  
-  
+      timestamps: true,
+      underscored: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at"
+    }
+
+
   );
 
   return Blog;
