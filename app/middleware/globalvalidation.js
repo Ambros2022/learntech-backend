@@ -767,13 +767,14 @@ const examSchema = [
 const examUpdateSchema = [
   ...validateIdRequired_id(exam, "id"),
 
-  checkField_update('exam_title', 250, blog, true),
+  checkField_update('exam_title', 250, exam, true),
 
   body("slug")
     .exists({ checkFalsy: true })
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
+    
     ...validateIdRequired_id(stream, "stream_id"),
 ];
 
