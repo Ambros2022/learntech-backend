@@ -301,6 +301,15 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
+      include: [
+       
+        {
+          required: false,
+          association: "stream",
+          attributes: ["id", "name"],
+        },
+
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -354,41 +363,20 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   exam
     .findByPk(id, {
-      // include: [
-      //   {
-      //     association: "stream",
-      //     attributes: ["id", "stream_name", "stream_slug"],
-      //   },
-      //   {
-      //     association: "examnews",
-      //     attributes: ["id", "title", "slug"],
-      //   },
+      include: [
+       
+        {
+          required: false,
+          association: "stream",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "examfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
 
-      //   {
-      //     association: "eligibilities",
-      //     attributes: ["id", "title", "description"],
-      //   },
-      //   {
-      //     association: "feedetails",
-      //     attributes: ["id", "category", "amount"],
-      //   },
-      //   {
-      //     association: "examdates",
-      //     attributes: ["id", "event", "start_date", "end_date"],
-      //   },
-      //   {
-      //     association: "examagelimit",
-      //     attributes: ["id", "content", "description"],
-      //   },
-      //   {
-      //     association: "examidproof",
-      //     attributes: ["id", "content"],
-      //   },
-      //   {
-      //     association: "examfaqs",
-      //     attributes: ["id", "questions", "answers"],
-      //   },
-      // ],
+      ],
     })
     .then((data) => {
       if (data) {
@@ -558,14 +546,14 @@ exports.updateexamifproof = async (req, res) => {
   }
 };
 
-exports.updateexamfaqs = async (req, res) => {
+exports.updatefaq = async (req, res) => {
   try {
-    if (req.body.examfaqs && req.body.id) {
+    if (req.body.faqs && req.body.id) {
       await examfaqs.destroy({
         where: { exam_id: req.body.id },
       });
-      const eligibilty = JSON.parse(req.body.examfaqs);
-      await _.forEach(eligibilty, function (value) {
+      const faqss = JSON.parse(req.body.faqs);
+      await _.forEach(faqss, function (value) {
         examfaqs.create({
           exam_id: req.body.id,
           questions: value.questions ? value.questions : null,
@@ -586,3 +574,4 @@ exports.updateexamfaqs = async (req, res) => {
     });
   }
 };
+

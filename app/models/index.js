@@ -570,18 +570,31 @@ db.course_exams.belongsTo(db.courses, {
 
 //Exam RELATIONSHIP
 
+
+
+db.exam.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "stream",
+});
+
+db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });
+db.exam_faqs.belongsTo(db.exam, {
+  foreignKey: "exam_id",
+  as: "examfaqs",
+});
+
 // db.exam.hasMany(db.newsandevents, { as: "examnews" });
 // db.newsandevents.belongsTo(db.exam, {
 //   foreignKey: "exam_id",
 //   as: "examnews",
 // });
-
-
-
-// db.exam.belongsTo(db.stream, {
-//   foreignKey: "stream_id",
-//   as: "stream",
+// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
+// db.general_course_faqs.belongsTo(db.general_course, {
+//   foreignKey: "general_course_id",
+//   as: "generalcoursefaqs",
 // });
+
+
 // db.exam.hasMany(db.stream,{ as: "examstream",foreignKey:"stream_id"});
 // db.stream.belongsTo(db.exam, {
 //   foreignKey: "stream_id",
