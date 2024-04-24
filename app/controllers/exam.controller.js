@@ -10,6 +10,17 @@ const examage = db.exam_agelimits;
 const examid = db.exam_id_proof_details;
 const examfaqs = db.exam_faqs;
 const fileTypes = require("../config/fileTypes");
+
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -32,39 +43,9 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let images = " ";
-    let promo_banner_names = "";
+    let cover_images = " ";
+    let promo_banners = "";
 
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/exam_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "exam_promo_banner/" + logoname;
-      }
-    }
     if (req.files && req.files.cover_image) {
       let avatar = req.files.cover_image;
 
@@ -85,22 +66,45 @@ exports.create = async (req, res) => {
         });
       }
 
-      let image = "image" + Date.now() + path.extname(avatar.name);
+      let logoname = "cover_image" + Date.now() + path.extname(avatar.name);
 
-      let IsUpload = avatar.mv("./storage/exam_cover/" + image) ? 1 : 0;
+      let IsUpload = avatar.mv("./storage/exam_cover_image/" + logoname)
+        ? 1
+        : 0;
 
       if (IsUpload) {
-        images = "exam_cover/" + image;
+        cover_images = "exam_cover_image/" + logoname;
       }
     }
+    if (req.files && req.files.promo_banner) {
+      let avatar = req.files.promo_banner;
 
-    if (images == " ") {
-      return res.status(400).send({
-        message: "insert logo",
-        errors: {},
-        status: 0,
-      });
-    } else {
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let image = "promo_banner" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/exam_promo_banner/" + image) ? 1 : 0;
+
+      if (IsUpload) {
+        promo_banners = "exam_promo_banner/" + image;
+      }
+    }
+    {
 
 
       const examsDetails = await exam.create({
@@ -125,7 +129,7 @@ exports.create = async (req, res) => {
         accept_colleges: req.body.accept_colleges,
        promo_banner_status: req.body.promo_banner_status,
         status: req.body.status,
-        cover_image: images,
+        cover_image: cover_images,
         promo_banner: promo_banners,
       });
 
@@ -181,14 +185,14 @@ exports.update = async (req, res) => {
       prepretion_tips: req.body.prepretion_tips || existingRecord.prepretion_tips,
       counseling: req.body.counseling || existingRecord.counseling,
       accept_colleges: req.body.accept_colleges || existingRecord.accept_colleges,
-      promo_banner: req.body.promo_banner || existingRecord.promo_banner,
+      // promo_banner: req.body.promo_banner || existingRecord.promo_banner,
       promo_banner_status: req.body.promo_banner_status || existingRecord.promo_banner_status,
       status: req.body.status || existingRecord.status,
     };
 
     // Check if a new logo is provided
-    if (req.files && req.files.banner_image) {
-      const avatar = req.files.banner_image;
+    if (req.files && req.files.cover_image) {
+      const avatar = req.files.cover_image;
 
       // Check file type and size
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -207,22 +211,57 @@ exports.update = async (req, res) => {
       }
 
       const logoname = "logo" + Date.now() + path.extname(avatar.name);
-      const uploadPath = "./storage/exam_banner_image/" + logoname;
+      const uploadPath = "./storage/exam_cover_image/" + logoname;
 
       await avatar.mv(uploadPath);
 
-      examsUpdates.banner_image = "exam_banner_image/" + logoname;
+      examsUpdates.cover_image = "exam_cover_image/" + logoname;
 
       // If there's an old logo associated with the record, remove it
-      if (existingRecord.banner_image) {
+      if (existingRecord.cover_image) {
         // console.log("existingRecord.icon",existingRecord.amenities_logo);
-        const oldLogoPath = "./storage/" + existingRecord.banner_image;
+        const oldLogoPath = "./storage/" + existingRecord.cover_image;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Check if a new logo is provided
+    if (req.files && req.files.promo_banner) {
+      const avatar = req.files.promo_banner;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/exam_promo_banner/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      examsUpdates.promo_banner = "exam_promo_banner/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.promo_banner) {
+        // console.log("existingRecord.icon",existingRecord.amenities_logo);
+        const oldLogoPath = "./storage/" + existingRecord.promo_banner;
         await removeFile(oldLogoPath);
       }
     }
 
     // Update database record
-    await blog.update(examsUpdates, { where: { id: req.body.id } });
+    await exam.update(examsUpdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
@@ -262,6 +301,15 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
+      include: [
+       
+        {
+          required: false,
+          association: "stream",
+          attributes: ["id", "name"],
+        },
+
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -294,7 +342,7 @@ exports.delete = (req, res) => {
       if (num == 1) {
         res.status(200).send({
           status: 1,
-          message: "EXam deleted successfully",
+          message: "exam deleted successfully",
         });
       } else {
         res.status(400).send({
@@ -315,41 +363,20 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   exam
     .findByPk(id, {
-      // include: [
-      //   {
-      //     association: "stream",
-      //     attributes: ["id", "stream_name", "stream_slug"],
-      //   },
-      //   {
-      //     association: "examnews",
-      //     attributes: ["id", "title", "slug"],
-      //   },
+      include: [
+       
+        {
+          required: false,
+          association: "stream",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "examfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
 
-      //   {
-      //     association: "eligibilities",
-      //     attributes: ["id", "title", "description"],
-      //   },
-      //   {
-      //     association: "feedetails",
-      //     attributes: ["id", "category", "amount"],
-      //   },
-      //   {
-      //     association: "examdates",
-      //     attributes: ["id", "event", "start_date", "end_date"],
-      //   },
-      //   {
-      //     association: "examagelimit",
-      //     attributes: ["id", "content", "description"],
-      //   },
-      //   {
-      //     association: "examidproof",
-      //     attributes: ["id", "content"],
-      //   },
-      //   {
-      //     association: "examfaqs",
-      //     attributes: ["id", "questions", "answers"],
-      //   },
-      // ],
+      ],
     })
     .then((data) => {
       if (data) {
@@ -519,14 +546,14 @@ exports.updateexamifproof = async (req, res) => {
   }
 };
 
-exports.updateexamfaqs = async (req, res) => {
+exports.updatefaq = async (req, res) => {
   try {
-    if (req.body.examfaqs && req.body.id) {
+    if (req.body.faqs && req.body.id) {
       await examfaqs.destroy({
         where: { exam_id: req.body.id },
       });
-      const eligibilty = JSON.parse(req.body.examfaqs);
-      await _.forEach(eligibilty, function (value) {
+      const faqss = JSON.parse(req.body.faqs);
+      await _.forEach(faqss, function (value) {
         examfaqs.create({
           exam_id: req.body.id,
           questions: value.questions ? value.questions : null,
@@ -547,3 +574,4 @@ exports.updateexamfaqs = async (req, res) => {
     });
   }
 };
+

@@ -1011,6 +1011,11 @@ app.post(
   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
   examcontroller.update
 );
+app.post(
+  "/api/admin/exam/updatefaq",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  examcontroller.updatefaq
+);
 // app.post(
 //   "/api/admin/exam/updateeligibilities",
 //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
@@ -1037,11 +1042,7 @@ app.post(
 //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
 //   examcontroller.updateexamifproof
 // );
-// app.post(
-//   "/api/admin/exam/updateexamfaqs",
-//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-//   examcontroller.updateexamfaqs
-// );
+
 
 /** Exam  route  End*/
 
