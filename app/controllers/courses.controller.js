@@ -75,7 +75,7 @@ exports.update = (req, res) => {
   const id = req.body.id;
 
   try {
-    
+
     courses.update({
       college_id: req.body.college_id,
       general_course_id: req.body.general_course_id,
@@ -88,7 +88,7 @@ exports.update = (req, res) => {
       eligibility: req.body.eligibility,
       fee_structure: req.body.fee_structure,
       status: req.body.status,
-    },  {
+    }, {
       where: { id: req.body.id }
     });
 
@@ -141,18 +141,18 @@ exports.findAll = async (req, res) => {
       offset,
       include: [
         {
-            required: false,
-            association: "college",
-            attributes: ["id", "name"],
+          required: false,
+          association: "college",
+          attributes: ["id", "name"],
         },
         {
           required: false,
           association: "generalcourse",
           attributes: ["id", "name"],
-      },
-       
+        },
 
-    ],
+
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -206,18 +206,18 @@ exports.findOne = (req, res) => {
     .findByPk(id, {
       include: [
         {
-            required: false,
-            association: "college",
-            attributes: ["id", "name"],
+          required: false,
+          association: "college",
+          attributes: ["id", "name"],
         },
         {
           required: false,
           association: "generalcourse",
           attributes: ["id", "name"],
-      },
-       
+        },
 
-    ],
+
+      ],
     })
     .then((data) => {
       if (data) {
