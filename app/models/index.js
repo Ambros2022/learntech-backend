@@ -76,7 +76,8 @@ db.scholar_types = require("./scholar_type.model.js")(sequelize, Sequelize);
 db.scholarships = require("./scholarship.model.js")(sequelize, Sequelize);
 db.all_job_locations = require("./all_jobs_location.model.js")(sequelize, Sequelize);
 db.jobs_positions = require("./jobs_position.model.js")(sequelize, Sequelize);
-
+db.job_locations = require("./job_locations.model.js")(sequelize, Sequelize);
+db.jobs_enquires = require("./jobs_enquires.model.js")(sequelize, Sequelize);
 
 
 
