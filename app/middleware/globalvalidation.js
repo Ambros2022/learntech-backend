@@ -25,6 +25,8 @@ const exam = db.exam;
 const scholarlevels = db.scholar_levels;
 const scholartypes = db.scholar_types;
 const scholarships = db.scholarships;
+const alljoblocation = db.all_job_locations;
+const jobspositions = db.jobs_positions;
 
 
 
@@ -832,6 +834,26 @@ const scholarshipUpdateSchema = [
   ...validateIdRequired_id(scholartypes, "type_id"),
   ...validateIdRequired_id(countries, "country_id"),
 
+];
+
+const alljoblocationSchema = [
+  checkField('name', 250, alljoblocation, true),
+];
+
+const alljoblocationUpdateSchema = [
+  ...validateIdRequired_id(alljoblocation, "id"),
+
+  checkField_update('name', 250, alljoblocation, true),
+];
+
+const jobspositionsSchema = [
+  checkField('name', 250, alljoblocation, true),
+];
+
+const jobspositionsUpdateSchema = [
+  ...validateIdRequired_id(jobspositions, "id"),
+
+  checkField_update('name', 250, jobspositions, true),
 ];
 
 
@@ -2853,6 +2875,10 @@ const globalvalidation = {
   scholartypeUpdateSchema: scholartypeUpdateSchema,
   scholarshipSchema: scholarshipSchema,
   scholarshipUpdateSchema: scholarshipUpdateSchema,
+  alljoblocationSchema: alljoblocationSchema,
+  alljoblocationUpdateSchema: alljoblocationUpdateSchema,
+  jobspositionsSchema: jobspositionsSchema,
+  jobspositionsUpdateSchema: jobspositionsUpdateSchema,
 
 
 
