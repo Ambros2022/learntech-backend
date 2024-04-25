@@ -603,3 +603,36 @@ CREATE TABLE jobs_enquires (
   FOREIGN KEY (jobs_position_id) REFERENCES jobs_positions(id),
   FOREIGN KEY (job_location_id) REFERENCES all_job_locations(id)
 );
+
+
+CREATE TABLE reviews (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  userrating FLOAT NOT NULL,
+  user_id INT DEFAULT NULL,
+  content VARCHAR(255) NOT NULL,
+  is_approved TINYINT DEFAULT 0,
+  passing_year VARCHAR(255),
+  review_type ENUM('school', 'college') DEFAULT 'college',
+  college_id INT DEFAULT NULL,
+  course_id INT DEFAULT NULL,
+  course_type ENUM('UG', 'PG', 'Diploma', 'Doctorate', 'Default') DEFAULT 'Default',
+  school_id INT DEFAULT NULL,
+  school_board_id INT DEFAULT NULL,
+  grade VARCHAR(255) DEFAULT NULL,
+  likes INT DEFAULT 0,
+  dislikes INT DEFAULT 0,
+  is_reported TINYINT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE review_replies (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  content VARCHAR(150) NOT NULL,
+  review_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
+);
