@@ -8,6 +8,7 @@ const groups = db.groups;
 
 // / Function to remove a file
 const fs = require("fs").promises;
+
 async function removeFile(filePath) {
     try {
         await fs.unlink(filePath);
@@ -48,7 +49,7 @@ const getPagingData = (data, page, limit) => {
 exports.create = async (req, res) => {
 
     try {
-        let logonames = "";
+        let logos = "";
 
         if (req.files && req.files.logo) {
             let avatar = req.files.logo;
@@ -75,7 +76,7 @@ exports.create = async (req, res) => {
             let IsUpload = avatar.mv("./storage/landingpage_logo/" + logoname) ? 1 : 0;
 
             if (IsUpload) {
-                logonames = "landing_logo/" + logoname;
+                logos = "landingpage_logo/" + logoname;
             }
         }
 
@@ -83,7 +84,7 @@ exports.create = async (req, res) => {
             name: req.body.name,
             link: req.body.link,
             status: req.body.status,
-            logo: logonames,
+            logo: logos,
 
         });
 
@@ -218,7 +219,7 @@ exports.update = async (req, res) => {
             name: req.body.name || existingRecord.name,
             link: req.body.link || existingRecord.link,
             status: req.body.status || existingRecord.status,
-            // logo: logonames,
+          
         };
         if (req.files && req.files.logo) {
             const avatar = req.files.logo;
@@ -241,21 +242,22 @@ exports.update = async (req, res) => {
             }
 
             const logoname = "logo" + Date.now() + path.extname(avatar.name);
-            const UploadPath = "./storage/landingpage_logo/" + logoname;
-
-            await avatar.mv(UploadPath);
-
+            const uploadPath = "./storage/landingpage_logo/" + logoname;
+      
+            await avatar.mv(uploadPath);
+      
             landingpageUpdates.logo = "landingpage_logo/" + logoname;
-
+      
             // If there's an old logo associated with the record, remove it
             if (existingRecord.logo) {
-                const oldLogoPath = "./storage/" + existingRecord.logo;
-                await removeFile(oldLogoPath);
+      
+              const oldLogoPath = "./storage/" + existingRecord.logo;
+              await removeFile(oldLogoPath);
             }
-        }
-
-        // Update database record
-        await landingpage.update(landingpageUpdates, { where: { id: req.body.id } });
+          }
+      
+          // Update database record
+          await landingpage.update(landingpageUpdates, { where: { id: req.body.id } });
 
 
         res.status(200).send({

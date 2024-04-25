@@ -1,36 +1,18 @@
 module.exports = (sequelize, Sequelize) => {
-  const scholarships = sequelize.define("scholarships", {
-    level_id: {
-      type: Sequelize.STRING
-    },
-    type_id: {
-      type: Sequelize.STRING
-    },
-    country_id: {
+  const newsandevents = sequelize.define("news_and_events", {
+    category_id: {
       type: Sequelize.STRING
     },
     name: {
       type: Sequelize.STRING
     },
     slug: {
+      type: Sequelize.INTEGER
+    },
+    banner_image: {
       type: Sequelize.STRING
     },
-    gender: {
-      type: Sequelize.ENUM("male", "female", "others"),
-    },
-    amount: {
-      type: Sequelize.STRING
-    },
-    last_date: {
-      type: Sequelize.TEXT
-    },
-    total_scholarships: {
-      type: Sequelize.STRING
-    },
-    is_eligible: {
-      type: Sequelize.STRING
-    },
-    logo: {
+    pdf_file: {
       type: Sequelize.STRING
     },
     meta_title: {
@@ -46,8 +28,8 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING
     },
     status: {
-      type: Sequelize.ENUM("Draft", "Published"),
-    }
+      type: Sequelize.ENUM('Draft', 'Published'),
+    },
 
   }
     ,
@@ -62,5 +44,6 @@ module.exports = (sequelize, Sequelize) => {
 
   );
 
-  return scholarships;
+  return newsandevents;
 };
+
