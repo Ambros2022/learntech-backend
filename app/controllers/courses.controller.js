@@ -129,14 +129,8 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  // var conditionmedium_id = medium_id ? { medium_id: medium_id } : null;
-  // var conditioncollege_id = college_id ? { college_id: college_id } : null;
-  // var conditioncourse_id = course_id ? { course_id: course_id } : null;
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
-  // conditionmedium_id ? data_array.push(conditionmedium_id) : null;
-  // conditioncollege_id ? data_array.push(conditioncollege_id) : null;
-  // conditioncourse_id ? data_array.push(conditioncourse_id) : null;
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -145,12 +139,20 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
-      // include: [
-      //   { association: "medium", attributes: ["id", "medium"] },
-      //   { association: "college", attributes: ["id", "name"] },
-      //   { association: "course", attributes: ["id", "course_stream_name"] },
-        // { association: "coursecompanies1",attributes: ["id","companies_id"]},
-      // ],
+      include: [
+        {
+            required: false,
+            association: "college",
+            attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "generalcourse",
+          attributes: ["id", "name"],
+      },
+       
+
+    ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -202,7 +204,20 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   courses
     .findByPk(id, {
-    
+      include: [
+        {
+            required: false,
+            association: "college",
+            attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "generalcourse",
+          attributes: ["id", "name"],
+      },
+       
+
+    ],
     })
     .then((data) => {
       if (data) {

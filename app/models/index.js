@@ -68,6 +68,8 @@ db.college_amenities = require("../models/college_amenities.model.js")(sequelize
 db.college_recognition = require("../models/college_recognition.model.js")(sequelize, Sequelize);
 db.college_gallery = require("../models/college_galleries.model.js")(sequelize, Sequelize);
 
+db.landing_pages = require("../models/landing_page.model.js")(sequelize, Sequelize);
+
 
 
 
@@ -396,6 +398,24 @@ db.abroadpages.belongsTo(db.countries, {
   foreignKey: "country_id",
   as: "country",
 });
+
+
+
+/*** courses relationship */
+
+
+db.courses.belongsTo(db.college, {
+  foreignKey: "college_id",
+  as: "college",
+});
+
+db.general_course.hasMany(db.courses, { as: "generalcourse" });
+db.courses.belongsTo(db.general_course, {
+  foreignKey: "general_course_id",
+  as: "generalcourse",
+});
+
+
 
 
 
