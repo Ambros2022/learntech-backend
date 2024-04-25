@@ -55,7 +55,7 @@ db.accesstokens = require("../models/accesstokens.model.js")(sequelize, Sequeliz
 db.level = require("./level.model.js")(sequelize, Sequelize);
 db.recognition = require("../models/recognition.model.js")(sequelize, Sequelize);
 db.general_course = require("./general_course.model.js")(sequelize, Sequelize);
-db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
+db.general_course_faqs = require("../models/generalcourse_faq.model.js")(sequelize, Sequelize);
 db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
 db.abroadpages = require("../models/abroadpage.model.js")(sequelize, Sequelize);
 db.abroadpage_faqs = require("../models/abroadpage_faq.model.js")(sequelize, Sequelize);
@@ -132,7 +132,7 @@ db.polytechnicamenities = require("../models/polytechnicamenities.model.js")(seq
 db.polytechnicmanagment = require("../models/polytechnicmanagment.model.js")(sequelize, Sequelize);
 db.review = require("../models/review.model.js")(sequelize, Sequelize);
 db.upcoming_courses = require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
-// db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
+
 db.course_modes = require("./course_modes.model.js")(sequelize, Sequelize);
 db.course_exams = require("./course_exams.model.js")(sequelize, Sequelize);
 db.course_companies = require("./course_companies.model.js")(sequelize, Sequelize);
@@ -197,6 +197,17 @@ db.youtubevideos = require("../models/youtubevideos.model.js")(sequelize, Sequel
 
 
 
+
+/***  Relation ship courses  */
+
+db.courses.belongsTo(db.college, {
+  foreignKey: "college_id",
+  as: "college",
+});
+db.courses.belongsTo(db.general_course, {
+  foreignKey: "general_course_id",
+  as: "generalcourse",
+});
 
 /***  Relation ship school  */
 
@@ -316,7 +327,7 @@ db.college.belongsTo(db.city, {
 
 db.college.hasMany(db.college_stream, { as: "collegestreams" });
 db.college_stream.belongsTo(db.college, {
-  foreignKey:"college_id",
+  foreignKey: "college_id",
   as: "collegestreams",
 });
 
@@ -351,7 +362,7 @@ db.college_recognition.belongsTo(db.recognition, {
 
 
 
-db.college.hasMany(db.college_faqs, { as: "collegefaqs",foreignKey:"college_id" });
+db.college.hasMany(db.college_faqs, { as: "collegefaqs", foreignKey: "college_id" });
 db.college_faqs.belongsTo(db.college, {
   foreignKey: "college_id",
   as: "collegefaqs",
@@ -392,7 +403,7 @@ db.general_course.belongsTo(db.sub_stream, {
 
 /***  Relation ship abroadpage  */
 
-db.abroadpages.hasMany(db.abroadpage_faqs, { as: "abroadpagefaqs",foreignKey:"abroad_page_id" });
+db.abroadpages.hasMany(db.abroadpage_faqs, { as: "abroadpagefaqs", foreignKey: "abroad_page_id" });
 db.abroadpage_faqs.belongsTo(db.abroadpages, {
   foreignKey: "abroad_page_id",
   as: "abroadpagefaqs",
@@ -516,10 +527,10 @@ db.review.belongsTo(db.user, {
   as: "users",
 });
 
-db.review.belongsTo(db.courses, {
-  foreignKey: "item_id",
-  as: "maincourse",
-});
+// db.review.belongsTo(db.courses, {
+//   foreignKey: "item_id",
+//   as: "maincourse",
+// });
 db.review.belongsTo(db.stream, {
   foreignKey: "item_id",
   as: "reviewstream",
@@ -587,18 +598,7 @@ db.cutoffdetails.belongsTo(db.general_course, {
 
 
 
-//fess relationship
-db.courses.hasMany(db.course_modes, { as: "coursemodes", foreignKey: "courses_id" });
-db.course_modes.belongsTo(db.courses, {
-  foreignKey: "courses_id",
-  as: "coursemodes",
-});
 
-db.courses.hasMany(db.course_exams, { as: "courseexams", foreignKey: "courses_id" });
-db.course_exams.belongsTo(db.courses, {
-  foreignKey: "courses_id",
-  as: "courseexams",
-});
 
 
 
