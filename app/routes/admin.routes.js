@@ -20,6 +20,11 @@ const newscategoriecontroller = require("../controllers/newscategorie.controller
 const newsandeventscontroller = require("../controllers/newsandevents.controller.js");
 const blogcontroller = require("../controllers/blog.controller");
 const examcontroller = require("../controllers/exam.controller");
+const scholarlevelcontroller = require("../controllers/scholarlevel.controller");
+const scholartypecontroller = require("../controllers/scholartype.controller");
+const scholarshipcontroller = require("../controllers/scholarship.controller");
+
+
 
 
 
@@ -71,7 +76,7 @@ const promopagecontroller = require("../controllers/promopage.controller");
 
 const usercontroller = require("../controllers/user.controller");
 
-const scholarshipcontroller = require("../controllers/scholarship.controller");
+
 
 const abroadcountriescontroller = require("../controllers/abroadcountries.controller");
 const abroaduniversitiescontroller = require("../controllers/abroaduniversities.controller");
@@ -1045,6 +1050,103 @@ app.post(
 
 
 /** Exam  route  End*/
+
+/** scholar level route  start*/
+
+app.get(
+  "/api/admin/scholarlevel/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarlevelcontroller.findAll
+);
+app.get(
+  "/api/admin/scholarlevel/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarlevelcontroller.findOne
+);
+app.post(
+  "/api/admin/scholarlevel/add",
+  globalvalidation.scholarlevelSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarlevelcontroller.create
+);
+app.post(
+  "/api/admin/scholarlevel/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarlevelcontroller.delete
+);
+app.post(
+  "/api/admin/scholarlevel/update",
+  globalvalidation.scholarlevelUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarlevelcontroller.update
+);
+
+/**scholar level route end   */
+
+/** scholar type route  start*/
+
+app.get(
+  "/api/admin/scholartype/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholartypecontroller.findAll
+);
+app.get(
+  "/api/admin/scholartype/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholartypecontroller.findOne
+);
+app.post(
+  "/api/admin/scholartype/add",
+  globalvalidation.scholartypeSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholartypecontroller.create
+);
+app.post(
+  "/api/admin/scholartype/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholartypecontroller.delete
+);
+app.post(
+  "/api/admin/scholartype/update",
+  globalvalidation.scholartypeUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholartypecontroller.update
+);
+
+/**scholar level route end   */
+
+/** scholarship route  start*/
+
+app.get(
+  "/api/admin/scholarship/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarshipcontroller.findAll
+);
+app.get(
+  "/api/admin/scholarship/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarshipcontroller.findOne
+);
+app.post(
+  "/api/admin/scholarship/add",
+  globalvalidation.scholarshipSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarshipcontroller.create
+);
+app.post(
+  "/api/admin/scholarship/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarshipcontroller.delete
+);
+app.post(
+  "/api/admin/scholarship/update",
+  globalvalidation.scholarshipUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  scholarshipcontroller.update
+);
+
+/**scholar level route end   */
+
 
 
 
@@ -2172,38 +2274,7 @@ app.post(
   );
   /**syllabus route end   */
 
-  /** Scholarship route  start*/
-
-  app.get(
-    "/api/admin/scholarship/get",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    scholarshipcontroller.findAll
-  );
-  app.get(
-    "/api/admin/scholarship/get/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    scholarshipcontroller.findOne
-  );
-  app.post(
-    "/api/admin/scholarship/add",
-    globalvalidation.scholarshipSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    scholarshipcontroller.create
-  );
-  app.post(
-    "/api/admin/scholarship/delete/:id",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    scholarshipcontroller.delete
-  );
-  app.post(
-    "/api/admin/scholarship/update",
-    globalvalidation.scholarshipUpdateSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    scholarshipcontroller.update
-  );
-
-  /**Scholarship route end   */
-
+  
 
 
 

@@ -59,20 +59,24 @@ db.general_course_faqs= require("../models/generalcourse_faq.model.js")(sequeliz
 db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
 db.abroadpages = require("../models/abroadpage.model.js")(sequelize, Sequelize);
 db.abroadpage_faqs = require("../models/abroadpage_faq.model.js")(sequelize, Sequelize);
-
-
 db.college = require("./college.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/college_stream.model.js")(sequelize, Sequelize);
 db.college_faqs = require("../models/college_faq.model.js")(sequelize, Sequelize);
 db.college_amenities = require("../models/college_amenities.model.js")(sequelize, Sequelize);
 db.college_recognition = require("../models/college_recognition.model.js")(sequelize, Sequelize);
 db.college_gallery = require("../models/college_galleries.model.js")(sequelize, Sequelize);
-
 db.landing_pages = require("../models/landing_page.model.js")(sequelize, Sequelize);
 db.news_categories = require("../models/news_categories.model.js")(sequelize, Sequelize);
 db.news_and_events = require("../models/news_and_events.model.js")(sequelize, Sequelize);
 db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
 db.exam = require("../models/exam.model.js")(sequelize, Sequelize);
+db.exam_faqs = require("../models/exam_faq.model.js")(sequelize, Sequelize);
+db.scholar_levels = require("./scholar_level.model.js")(sequelize, Sequelize);
+db.scholar_types = require("./scholar_type.model.js")(sequelize, Sequelize);
+db.scholarships = require("./scholarship.model.js")(sequelize, Sequelize);
+
+
+
 
 
 
@@ -128,7 +132,7 @@ db.polytechnicamenities = require("../models/polytechnicamenities.model.js")(seq
 db.polytechnicmanagment = require("../models/polytechnicmanagment.model.js")(sequelize, Sequelize);
 db.review = require("../models/review.model.js")(sequelize, Sequelize);
 db.upcoming_courses = require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
-db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
+// db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
 db.course_modes = require("./course_modes.model.js")(sequelize, Sequelize);
 db.course_exams = require("./course_exams.model.js")(sequelize, Sequelize);
 db.course_companies = require("./course_companies.model.js")(sequelize, Sequelize);
@@ -177,12 +181,12 @@ db.exam_feedetails = require("../models/exam_feedetails.model.js")(sequelize, Se
 db.exam_dates = require("../models/exam_dates.model.js")(sequelize, Sequelize);
 db.exam_agelimits = require("../models/exam_agelimits.model.js")(sequelize, Sequelize);
 db.exam_id_proof_details = require("../models/exam_id_proofs.model.js")(sequelize, Sequelize);
-db.exam_faqs = require("../models/exam_faq.model.js")(sequelize, Sequelize);
+
 db.databackup = require("../models/databackup.model.js")(sequelize, Sequelize);
 
 
-db.scholarships = require("./scholarship.model.js")(sequelize, Sequelize);
-db.exams = require("./exams.model.js")(sequelize, Sequelize);
+
+// db.exams = require("./exams.model.js")(sequelize, Sequelize);
 
 
 
@@ -374,7 +378,6 @@ db.general_course_faqs.belongsTo(db.general_course, {
 
 
 
-
 db.general_course.belongsTo(db.stream, {
   foreignKey: "stream_id",
   as: "streams",
@@ -394,11 +397,7 @@ db.abroadpage_faqs.belongsTo(db.abroadpages, {
   foreignKey: "abroad_page_id",
   as: "abroadpagefaqs",
 });
-// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs",foreignKey:"general_course_id" });
-// db.general_course_faqs.belongsTo(db.general_course, {
-//   foreignKey: "general_course_id",
-//   as: "generalcoursefaqs",
-// });
+
 
 
 
@@ -411,23 +410,57 @@ db.abroadpages.belongsTo(db.countries, {
 
 /***  Relation ship news and events  */
 
-// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
-// db.general_course_faqs.belongsTo(db.general_course, {
-//   foreignKey: "general_course_id",
-//   as: "generalcoursefaqs",
-// });
-
-
-
-
 db.news_and_events.belongsTo(db.news_categories, {
   foreignKey: "category_id",
   as: "newscategories",
 });
 
+
+//Exam RELATIONSHIP
+
+
+db.exam.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "stream",
+});
+
+db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });
+db.exam_faqs.belongsTo(db.exam, {
+  foreignKey: "exam_id",
+  as: "examfaqs",
+});
+
+
+
+
+/***  Relation ship scholarship  */
+
+db.scholarships.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+
+db.scholarships.belongsTo(db.scholar_levels, {
+  foreignKey: "level_id",
+  as: "scholarlevels",
+});
+
+db.scholarships.belongsTo(db.scholar_types, {
+  foreignKey: "type_id",
+  as: "scholartypes",
+});
+
+
+
 // db.general_course.belongsTo(db.sub_stream, {
 //   foreignKey: "sub_streams_id",
 //   as: "sub_streams",
+// });
+
+//  db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
+// db.general_course_faqs.belongsTo(db.general_course, {
+//   foreignKey: "general_course_id",
+//   as: "generalcoursefaqs",
 // });
 
 
@@ -568,31 +601,14 @@ db.course_exams.belongsTo(db.courses, {
 });
 
 
-//Exam RELATIONSHIP
 
-
-
-db.exam.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "stream",
-});
-
-db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });
-db.exam_faqs.belongsTo(db.exam, {
-  foreignKey: "exam_id",
-  as: "examfaqs",
-});
 
 // db.exam.hasMany(db.newsandevents, { as: "examnews" });
 // db.newsandevents.belongsTo(db.exam, {
 //   foreignKey: "exam_id",
 //   as: "examnews",
 // });
-// db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
-// db.general_course_faqs.belongsTo(db.general_course, {
-//   foreignKey: "general_course_id",
-//   as: "generalcoursefaqs",
-// });
+
 
 
 // db.exam.hasMany(db.stream,{ as: "examstream",foreignKey:"stream_id"});

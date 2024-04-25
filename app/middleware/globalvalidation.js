@@ -22,6 +22,9 @@ const newscategories = db.news_categories;
 const newsandevents = db.news_and_events;
 const blog = db.blog;
 const exam = db.exam;
+const scholarlevels = db.scholar_levels;
+const scholartypes = db.scholar_types;
+const scholarships = db.scholarships;
 
 
 
@@ -69,7 +72,7 @@ const job = db.job;
 const abouts = db.abouts;
 const services = db.services;
 
-const scholarships = db.scholarships;
+
 const abroadcountries = db.abroadcountries;
 const abroad_universities = db.abroad_universities;
 const youtubevideos = db.youtubevideos;
@@ -761,7 +764,8 @@ const examSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
-    ...validateIdRequired_id(stream, "stream_id"),
+
+  ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 const examUpdateSchema = [
@@ -774,8 +778,60 @@ const examUpdateSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
-    
-    ...validateIdRequired_id(stream, "stream_id"),
+
+  ...validateIdRequired_id(stream, "stream_id"),
+];
+
+const scholarlevelSchema = [
+  checkField('name', 250, scholarlevels, true),
+];
+
+const scholarlevelUpdateSchema = [
+  ...validateIdRequired_id(scholarlevels, "id"),
+
+  checkField_update('name', 250, scholarlevels, true),
+];
+
+const scholartypeSchema = [
+  checkField('name', 250, scholartypes, true),
+];
+
+const scholartypeUpdateSchema = [
+  ...validateIdRequired_id(scholartypes, "id"),
+
+  checkField_update('name', 250, scholartypes, true),
+];
+
+const scholarshipSchema = [
+  checkField('name', 250, scholarships, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(scholarlevels, "level_id"),
+  ...validateIdRequired_id(scholartypes, "type_id"),
+  ...validateIdRequired_id(countries, "country_id"),
+
+];
+
+const scholarshipUpdateSchema = [
+  ...validateIdRequired_id(scholarships, "id"),
+
+  checkField_update('name', 250, scholarships, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(scholarlevels, "level_id"),
+  ...validateIdRequired_id(scholartypes, "type_id"),
+  ...validateIdRequired_id(countries, "country_id"),
+
 ];
 
 
@@ -1285,88 +1341,7 @@ const categoriesUpdateSchema = [
 
 
 
-const scholarshipSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Scholarship  name is required")
-    .isLength({ max: 150 })
-    .withMessage("Scholarship  name should be less than 150 character"),
 
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug name is required")
-    .isLength({ max: 150 })
-    .withMessage("slug name should be less than 150 character")
-    .custom((value) => {
-      return scholarships
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((scholarships) => {
-          if (scholarships) {
-            return Promise.reject("Slug already in use");
-          } else {
-            return true;
-          }
-        });
-    }),
-];
-const scholarshipUpdateSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Scholarship  name is required")
-    .isLength({ max: 150 })
-    .withMessage("Scholarship  name should be less than 150 character"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return scholarships
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((scholarships) => {
-          if (scholarships) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("scholarship Does not exist");
-          }
-        });
-    }),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return scholarships
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((scholarships) => {
-          if (scholarships) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-];
 
 
 const polytechnicSchema = [
@@ -2868,6 +2843,16 @@ const globalvalidation = {
   newscategoriesUpdateSchema: newscategoriesUpdateSchema,
   newsandeventsSchema: newsandeventsSchema,
   newsandeventsUpdateSchema: newsandeventsUpdateSchema,
+  blogSchema: blogSchema,
+  blogUpdateSchema: blogUpdateSchema,
+  examSchema: examSchema,
+  examUpdateSchema: examUpdateSchema,
+  scholarlevelSchema: scholarlevelSchema,
+  scholarlevelUpdateSchema: scholarlevelUpdateSchema,
+  scholartypeSchema: scholartypeSchema,
+  scholartypeUpdateSchema: scholartypeUpdateSchema,
+  scholarshipSchema: scholarshipSchema,
+  scholarshipUpdateSchema: scholarshipUpdateSchema,
 
 
 
@@ -2901,8 +2886,7 @@ const globalvalidation = {
   authorUpdateSchema: authorUpdateSchema,
   categoriesSchema: categoriesSchema,
   categoriesUpdateSchema: categoriesUpdateSchema,
-  blogSchema: blogSchema,
-  blogUpdateSchema: blogUpdateSchema,
+
 
   polytechnicSchema: polytechnicSchema,
   polytechnicUpdateSchema: polytechnicUpdateSchema,
@@ -2943,11 +2927,9 @@ const globalvalidation = {
   PromopageSchemaUpdate: PromopageSchemaUpdate,
 
 
-  examSchema: examSchema,
-  examUpdateSchema: examUpdateSchema,
+
   adminpasswordSchema: adminpasswordSchema,
-  scholarshipSchema: scholarshipSchema,
-  scholarshipUpdateSchema: scholarshipUpdateSchema,
+
   abroadcountriesUpdateSchema: abroadcountriesUpdateSchema,
   abroadcountriesSchema: abroadcountriesSchema,
   abroaduniversitiesUpdateSchema: abroaduniversitiesUpdateSchema,
