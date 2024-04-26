@@ -45,9 +45,9 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-    const { page, size, searchtext, searchfrom, columnname, orderby, state_id } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-    var column = columnname ? columnname : 'name';
+    var column = columnname ? columnname : 'id';
     var order = orderby ? orderby : 'ASC';
     var orderconfig = [column, order];
 
@@ -68,7 +68,20 @@ exports.findAll = async (req, res) => {
 
     joblocations.findAndCountAll({
         where: data_array, limit, offset,
+        include: [
+            {
+                required: false,
+                association: "alljoblocations",
+                attributes: ["id", "name"],
+            },
+            {
+                required: false,
+                association: "jobspositions",
+                attributes: ["id", "name"],
+            },
 
+
+        ],
 
         order: [orderconfig]
     })
@@ -156,17 +169,21 @@ exports.findOne = (req, res) => {
     const id = req.params.id;
 
     joblocations
-        .findOne({
-            where: {
-                [Op.or]: [
-                    {
-                        id: {
-                            [Op.eq]: id,
-                        },
-                    },
-                ],
-            },
+        .findByPk(id, {
+            include: [
+                {
+                    required: false,
+                    association: "alljoblocations",
+                    attributes: ["id", "name"],
+                },
+                {
+                    required: false,
+                    association: "jobspositions",
+                    attributes: ["id", "name"],
+                },
 
+
+            ],
         })
         .then(async (data) => {
             res.status(200).send({

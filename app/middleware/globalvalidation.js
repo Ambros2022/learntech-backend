@@ -27,7 +27,8 @@ const scholartypes = db.scholar_types;
 const scholarships = db.scholarships;
 const alljoblocation = db.all_job_locations;
 const jobspositions = db.jobs_positions;
-
+const joblocations = db.job_locations;
+const jobsenquires = db.jobs_enquires;
 
 
 
@@ -854,6 +855,36 @@ const jobspositionsUpdateSchema = [
   ...validateIdRequired_id(jobspositions, "id"),
 
   checkField_update('name', 250, jobspositions, true),
+];
+
+const joblocationsSchema = [
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+
+];
+
+const joblocationsUpdateSchema = [
+  ...validateIdRequired_id(joblocations, "id"),
+
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+
+];
+
+const jobsenquiresSchema = [
+  checkField('name', 250, jobsenquires, true),
+
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+];
+
+const jobsenquiresUpdateSchema = [
+  ...validateIdRequired_id(jobsenquires, "id"),
+
+  checkField_update('name', 250, jobsenquires, true),
+
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
 ];
 
 
@@ -2879,6 +2910,10 @@ const globalvalidation = {
   alljoblocationUpdateSchema: alljoblocationUpdateSchema,
   jobspositionsSchema: jobspositionsSchema,
   jobspositionsUpdateSchema: jobspositionsUpdateSchema,
+  joblocationsSchema: joblocationsSchema,
+  joblocationsUpdateSchema: joblocationsUpdateSchema,
+  jobsenquiresSchema: jobsenquiresSchema,
+  jobsenquiresUpdateSchema: jobsenquiresUpdateSchema,
 
 
 

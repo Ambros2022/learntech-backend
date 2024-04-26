@@ -15,7 +15,7 @@ module.exports = (sequelize, Sequelize) => {
     phone: {
       type: Sequelize.STRING
     },
-    DOB: {
+    d_o_b: {
       type: Sequelize.STRING
     },
     current_location: {

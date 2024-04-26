@@ -464,6 +464,30 @@ db.scholarships.belongsTo(db.scholar_types, {
 });
 
 
+/***  Relation ship  job location */
+
+db.job_locations.belongsTo(db.all_job_locations, {
+  foreignKey: "job_location_id",
+  as: "alljoblocations",
+});
+db.job_locations.belongsTo(db.jobs_positions, {
+  foreignKey: "jobs_position_id",
+  as: "jobspositions",
+});
+
+
+/***  Relation ship  jobs enquiry */
+
+db.jobs_enquires.belongsTo(db.all_job_locations, {
+  foreignKey: "job_location_id",
+  as: "alljoblocations",
+});
+db.jobs_enquires.belongsTo(db.jobs_positions, {
+  foreignKey: "jobs_position_id",
+  as: "jobspositions",
+});
+
+
 
 // db.general_course.belongsTo(db.sub_stream, {
 //   foreignKey: "sub_streams_id",

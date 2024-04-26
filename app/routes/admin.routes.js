@@ -25,6 +25,8 @@ const scholartypecontroller = require("../controllers/scholartype.controller");
 const scholarshipcontroller = require("../controllers/scholarship.controller");
 const alljobslocationcontroller = require("../controllers/alljobslocation.controller");
 const jobspositioncontroller = require("../controllers/jobsposition.controller");
+const joblocationscontroller = require("../controllers/joblocations.controller");
+const jobsenquirescontroller = require("../controllers/jobsenquires.controller");
 
 
 
@@ -1150,7 +1152,7 @@ app.post(
 /**scholar level route end   */
 
 
-/** all-job-locations route  start*/
+/** all job locations route  start*/
 
 app.get(
   "/api/admin/alljoblocation/get",
@@ -1180,10 +1182,10 @@ app.post(
   alljobslocationcontroller.update
 );
 
-/**all-job-locations route end   */
+/**all job locations route end   */
 
 
-/** jobs-positions route  start*/
+/** jobs positions route  start*/
 
 app.get(
   "/api/admin/jobsposition/get",
@@ -1211,6 +1213,71 @@ app.post(
   globalvalidation.jobspositionsUpdateSchema,
   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
   jobspositioncontroller.update
+);
+
+/**jobs positions route end   */
+
+/** job locations route  start*/
+
+app.get(
+  "/api/admin/joblocations/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  joblocationscontroller.findAll
+);
+app.get(
+  "/api/admin/joblocations/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  joblocationscontroller.findOne
+);
+app.post(
+  "/api/admin/joblocations/add",
+  globalvalidation.joblocationsSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  joblocationscontroller.create
+);
+app.post(
+  "/api/admin/joblocations/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  joblocationscontroller.delete
+);
+app.post(
+  "/api/admin/joblocations/update",
+  globalvalidation.joblocationsUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  joblocationscontroller.update
+);
+
+/**job locations route end   */
+
+
+/** jobs enquires route  start*/
+
+app.get(
+  "/api/admin/jobsenquires/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  jobsenquirescontroller.findAll
+);
+app.get(
+  "/api/admin/jobsenquires/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  jobsenquirescontroller.findOne
+);
+app.post(
+  "/api/admin/jobsenquires/add",
+  globalvalidation.jobsenquiresSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  jobsenquirescontroller.create
+);
+app.post(
+  "/api/admin/jobsenquires/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  jobsenquirescontroller.delete
+);
+app.post(
+  "/api/admin/jobsenquires/update",
+  globalvalidation.jobsenquiresUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  jobsenquirescontroller.update
 );
 
 /**all-job-locations route end   */

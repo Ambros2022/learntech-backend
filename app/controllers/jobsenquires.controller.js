@@ -29,7 +29,7 @@ exports.create = async (req, res) => {
             name: req.body.name,
             email: req.body.email,
             phone: req.body.phone,
-            DOB: req.body.DOB,
+            d_o_b: req.body.d_o_b,
             current_location: req.body.current_location,
             total_exp: req.body.total_exp,
             resume: req.body.resume,
@@ -76,7 +76,20 @@ exports.findAll = async (req, res) => {
 
     jobsenquires.findAndCountAll({
         where: data_array, limit, offset,
+        include: [
+            {
+                required: false,
+                association: "alljoblocations",
+                attributes: ["id", "name"],
+            },
+            {
+                required: false,
+                association: "jobspositions",
+                attributes: ["id", "name"],
+            },
 
+
+        ],
 
         order: [orderconfig]
     })
@@ -143,7 +156,7 @@ exports.update = (req, res) => {
                 name: req.body.name,
                 email: req.body.email,
                 phone: req.body.phone,
-                DOB: req.body.DOB,
+                d_o_b: req.body.d_o_b,
                 current_location: req.body.current_location,
                 total_exp: req.body.total_exp,
                 resume: req.body.resume,
@@ -171,17 +184,21 @@ exports.findOne = (req, res) => {
     const id = req.params.id;
 
     jobsenquires
-        .findOne({
-            where: {
-                [Op.or]: [
-                    {
-                        id: {
-                            [Op.eq]: id,
-                        },
-                    },
-                ],
-            },
+        .findByPk(id, {
+            include: [
+                {
+                    required: false,
+                    association: "alljoblocations",
+                    attributes: ["id", "name"],
+                },
+                {
+                    required: false,
+                    association: "jobspositions",
+                    attributes: ["id", "name"],
+                },
 
+
+            ],
         })
         .then(async (data) => {
             res.status(200).send({
