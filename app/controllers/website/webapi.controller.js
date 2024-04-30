@@ -18,12 +18,6 @@ const getPagingData = (data, page, limit) => {
   return { totalItems, finaldata, totalPages, currentPage };
 };
 
-const getPagingDataA = (data, page, limit) => {
-  const { count: totalItems, rows: finaldata } = data;
-  const currentPage = page ? +page : 1;
-  const totalPages = Math.ceil(totalItems.length / limit);
-  return { totalItems, finaldata, totalPages, currentPage };
-};
 
 exports.allstates = async (req, res) => {
   const { page, size, searchtext, searchfrom, country_id, columnname, orderby } = req.query;
