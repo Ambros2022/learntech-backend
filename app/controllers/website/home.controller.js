@@ -1005,7 +1005,7 @@ async function mohanbabuunivercitylandingpageCRM(mohanbabulead) {
     headers: headers,
     params: params,
   });
-  console.log(response,"respons embu") 
+  console.log(response, "respons embu")
 }
 
 async function mohanbabuunivercitydoPostRequestlanding(mohanbabulead, message) {
@@ -1140,8 +1140,8 @@ exports.landingpageenquiry = async (req, res) => {
       mx_Interested_Course: lcourse,
       Source: lsourse,
       Notes: lnotes,
-      NeetRank:lneetscore,
-      Campus:customcollege,
+      NeetRank: lneetscore,
+      Campus: customcollege,
     };
 
     let currentpageurl = req.body.current_url;
@@ -1849,18 +1849,18 @@ exports.topcollegebangalore = async (req, res) => {
 
   var conditioncollege_type = college_type
     ? {
-        college_type: {
-          [Op.or]: collegetype,
-        },
-      }
+      college_type: {
+        [Op.or]: collegetype,
+      },
+    }
     : null;
 
   var conditioncity_id = city_id
     ? {
-        city_id: {
-          [Op.or]: cityarr,
-        },
-      }
+      city_id: {
+        [Op.or]: cityarr,
+      },
+    }
     : null;
 
   var conditionarea_id = area_id ? { area_id: area_id } : null;
@@ -2166,13 +2166,13 @@ exports.findonecollege = (req, res) => {
               },
             ],
           },
-         
+
         ],
       },
 
       { association: "city", attributes: ["id", "city_name"] },
       { association: "area", attributes: ["id", "area_name"] },
- 
+
       {
         required: false,
         association: "faqs",
@@ -2211,7 +2211,7 @@ exports.findonecollege = (req, res) => {
           },
         ],
       },
-      
+
     ],
   })
     .then((data) => {
@@ -2943,39 +2943,39 @@ exports.topschoolbangalore = async (req, res) => {
 
   var conditionclassification_type = classification
     ? {
-        genders_accepted: {
-          [Op.or]: classificationtype,
-        },
-      }
+      genders_accepted: {
+        [Op.or]: classificationtype,
+      },
+    }
     : null;
 
   var conditioncity_id = city_id
     ? {
-        city_id: {
-          [Op.or]: cityarr,
-        },
-      }
+      city_id: {
+        [Op.or]: cityarr,
+      },
+    }
     : null;
   var conditionschool_level_id = school_level_id
     ? {
-        school_level_id: {
-          [Op.or]: schlevelarr,
-        },
-      }
+      school_level_id: {
+        [Op.or]: schlevelarr,
+      },
+    }
     : null;
   var conditionschool_board_id = school_board_id
     ? {
-        school_board_id: {
-          [Op.or]: schboardarr,
-        },
-      }
+      school_board_id: {
+        [Op.or]: schboardarr,
+      },
+    }
     : null;
   var conditionschool_type_id = school_type_id
     ? {
-        school_type_id: {
-          [Op.or]: schtypearr,
-        },
-      }
+      school_type_id: {
+        [Op.or]: schtypearr,
+      },
+    }
     : null;
 
   var conditionarea_id = area_id ? { area_id: area_id } : null;
@@ -3050,7 +3050,8 @@ exports.topschoolbangalore = async (req, res) => {
             },
           },
           include: [
-            { required: false,
+            {
+              required: false,
               association: "schlevelname",
               attributes: ["id", "level_name"],
             },
@@ -3066,19 +3067,20 @@ exports.topschoolbangalore = async (req, res) => {
             },
           },
           include: [
-            { required: false,
+            {
+              required: false,
               association: "schbrdname",
               attributes: ["id", "name"],
             },
           ],
         },
 
-      
+
       ],
-    
-     
+
+
       // subQuery: false,
-      
+
       order: [orderconfig],
       // group:["id"],
     })
@@ -3159,7 +3161,8 @@ exports.findoneschool = (req, res) => {
           association: "boardschools",
           attributes: ["id", "board_id"],
           include: [
-            { required: false,
+            {
+              required: false,
               association: "schbrdname",
               attributes: ["id", "name"],
             },
@@ -3548,17 +3551,17 @@ exports.allblogs = async (req, res) => {
 
   var condition_author_id = author_id
     ? {
-        author_id: {
-          [Op.or]: authorarray,
-        },
-      }
+      author_id: {
+        [Op.or]: authorarray,
+      },
+    }
     : null;
   var conditioncategory_id = category_id
     ? {
-        category_id: {
-          [Op.or]: categoriesarr,
-        },
-      }
+      category_id: {
+        [Op.or]: categoriesarr,
+      },
+    }
     : null;
 
   var conditionviewstatus = home_view_status

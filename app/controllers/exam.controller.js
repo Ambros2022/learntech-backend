@@ -113,7 +113,7 @@ exports.create = async (req, res) => {
         slug: req.body.slug,
         upcoming_date: req.body.upcoming_date,
         exam_short_name: req.body.exam_short_name,
-          meta_title: req.body.meta_title,
+        meta_title: req.body.meta_title,
         meta_description: req.body.meta_description,
         meta_keywords: req.body.meta_keywords,
         overview: req.body.overview,
@@ -127,7 +127,7 @@ exports.create = async (req, res) => {
         prepretion_tips: req.body.prepretion_tips,
         counseling: req.body.counseling,
         accept_colleges: req.body.accept_colleges,
-       promo_banner_status: req.body.promo_banner_status,
+        promo_banner_status: req.body.promo_banner_status,
         status: req.body.status,
         cover_image: cover_images,
         promo_banner: promo_banners,
@@ -302,7 +302,7 @@ exports.findAll = async (req, res) => {
       limit,
       offset,
       include: [
-       
+
         {
           required: false,
           association: "stream",
@@ -364,7 +364,7 @@ exports.findOne = (req, res) => {
   exam
     .findByPk(id, {
       include: [
-       
+
         {
           required: false,
           association: "stream",

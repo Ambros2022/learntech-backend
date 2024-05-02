@@ -151,7 +151,7 @@ exports.update = async (req, res) => {
       meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
       overview: req.body.overview || existingRecord.overview,
       status: req.body.status || existingRecord.status,
-      
+
     };
     if (req.files && req.files.banner_image) {
       const avatar = req.files.banner_image;
@@ -252,17 +252,17 @@ exports.findAll = async (req, res) => {
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   const { limit, offset } = getPagination(page, size);
   newsandevents
-    .findAndCountAll({ where: condition, limit, offset, 
+    .findAndCountAll({
+      where: condition, limit, offset,
       include: [
         {
           required: false,
           association: "newscategories",
           attributes: ["id", "name"],
         },
-      
-
       ],
-      order: [orderconfig] })
+      order: [orderconfig]
+    })
     .then((data) => {
       const response = getPagingData(data, page, limit);
       res.status(200).send({
@@ -320,7 +320,7 @@ exports.findOne = (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
-      
+
 
       ],
     })
