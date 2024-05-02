@@ -1,8 +1,8 @@
 const { authJwt, globalvalidation } = require("../middleware");
 const winston = require("../config/winston");
 const homecontroller = require("../controllers/website/home.controller");
+// const webapicontroller = require("../controllers/website/webapi.controller");
 const webapicontroller = require("../controllers/website/webapi.controller");
-
 
 const redirecturlcontroller = require("../controllers/redirecturl.controller");
 
@@ -41,6 +41,14 @@ module.exports = function (app) {
 
 
   app.get("/api/website/states/get", webapicontroller.allstates);
+
+  app.get("/api/website/exams/get", webapicontroller.allexams);
+
+  app.get("/api/website/abroadpages/get", webapicontroller.allabroadpages);
+
+  app.get("/api/website/news/get", webapicontroller.allnews);
+
+  app.get("/api/website/stream/get", webapicontroller.allstreams);
 
 
 

@@ -74,8 +74,10 @@ db.exam_faqs = require("../models/exam_faq.model.js")(sequelize, Sequelize);
 db.scholar_levels = require("./scholar_level.model.js")(sequelize, Sequelize);
 db.scholar_types = require("./scholar_type.model.js")(sequelize, Sequelize);
 db.scholarships = require("./scholarship.model.js")(sequelize, Sequelize);
-
-
+db.all_job_locations = require("./all_jobs_location.model.js")(sequelize, Sequelize);
+db.jobs_positions = require("./jobs_position.model.js")(sequelize, Sequelize);
+db.job_locations = require("./job_locations.model.js")(sequelize, Sequelize);
+db.jobs_enquires = require("./jobs_enquires.model.js")(sequelize, Sequelize);
 
 
 
@@ -379,6 +381,17 @@ db.stream_faq.belongsTo(db.stream, {
   as: "streamfaqs",
 });
 
+db.stream.hasMany(db.exam, { as: "exam" });
+db.exam.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "state",
+});
+
+// db.state.hasMany(db.city, { as: "city" });
+// db.city.belongsTo(db.state, {
+//   foreignKey: "state_id",
+//   as: "state",
+// });
 /***  Relation ship generalcourses  */
 
 db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
@@ -410,30 +423,43 @@ db.abroadpage_faqs.belongsTo(db.abroadpages, {
 });
 
 
-
-
-db.abroadpages.belongsTo(db.countries, {
-  foreignKey: "country_id",
-  as: "country",
-});
-
-
+db.countries.hasMany(db.abroadpages, { as: "abroadpages", foreignKey: "country_id" });
+ db.abroadpages.belongsTo(db.countries, {
+    foreignKey: "country_id",
+    as: "country",
+  });
 
 /***  Relation ship news and events  */
 
-db.news_and_events.belongsTo(db.news_categories, {
-  foreignKey: "category_id",
-  as: "newscategories",
-});
 
+db.news_categories.hasMany(db.news_and_events, { as: "newsandevents", foreignKey: "category_id" });
+ db.news_and_events.belongsTo(db.news_categories, {
+    foreignKey: "category_id",
+    as: "newscategories",
+  });
+
+
+  // db.stream.hasMany(db.exam, { as: "exam" });
+  // db.exam.belongsTo(db.stream, {
+  //   foreignKey: "stream_id",
+  //   as: "state",
+  // });
+
+  
+// db.news_categories.hasMany(db.news_and_events, { as: "newsandevents" });
+// db.news_and_events.belongsTo(db.news_categories, {
+//   foreignKey: "category_id",
+//   as: "newscategories",
+// });
 
 //Exam RELATIONSHIP
 
+db.stream.hasMany(db.exam, { as: "exams", foreignKey: "stream_id" });
+ db.exam.belongsTo(db.stream, {
+    foreignKey: "stream_id",
+    as: "stream",
+  });
 
-db.exam.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "stream",
-});
 
 db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });
 db.exam_faqs.belongsTo(db.exam, {
@@ -459,6 +485,30 @@ db.scholarships.belongsTo(db.scholar_levels, {
 db.scholarships.belongsTo(db.scholar_types, {
   foreignKey: "type_id",
   as: "scholartypes",
+});
+
+
+/***  Relation ship  job location */
+
+db.job_locations.belongsTo(db.all_job_locations, {
+  foreignKey: "job_location_id",
+  as: "alljoblocations",
+});
+db.job_locations.belongsTo(db.jobs_positions, {
+  foreignKey: "jobs_position_id",
+  as: "jobspositions",
+});
+
+
+/***  Relation ship  jobs enquiry */
+
+db.jobs_enquires.belongsTo(db.all_job_locations, {
+  foreignKey: "job_location_id",
+  as: "alljoblocations",
+});
+db.jobs_enquires.belongsTo(db.jobs_positions, {
+  foreignKey: "jobs_position_id",
+  as: "jobspositions",
 });
 
 

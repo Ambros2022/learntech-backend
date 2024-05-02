@@ -2,6 +2,9 @@ require("dotenv").config();
 const db = require("../../models");
 const sendsearch = require("../../utility/Customsearch");
 const state = db.state;
+const news_categories = db.news_categories;
+const stream = db.stream;
+const countries = db.countries;
 
 
 const getPagination = (page, size) => {
@@ -17,6 +20,14 @@ const getPagingData = (data, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return { totalItems, finaldata, totalPages, currentPage };
 };
+
+// exports.allstates = (req, res) => {
+//   handleGenericRequest(req, res, db.state, ["id", "name", "country_id"], [{
+//     required: false,
+//     association: "city",
+//     attributes: ["id", "name"]
+//   }]);
+// };
 
 
 exports.allstates = async (req, res) => {
@@ -76,9 +87,235 @@ exports.allstates = async (req, res) => {
         status: 0,
         message:
           err.message ||
-          "Some error occurred while retrieving abroadcountries.",
+          "Some error occurred while retrieving states.",
       });
     });
 };
 
+exports.allexams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  stream
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+
+      ],
+      include: [
+        {
+          required: false,
+          association: "exam",
+          attributes: ["id", "exam_title"],
+
+        },
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving exams.",
+      });
+    });
+};
+
+exports.allabroadpages = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  countries
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+      ],
+      include: [
+        {
+          required: false,
+          association: "abroadpages",
+          attributes: ["id", "name"],
+
+        },
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving abroad pages.",
+      });
+    });
+};
+
+exports.allnews = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  news_categories
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+      ],
+      include: [
+        {
+          required: false,
+          association: "newsandevents",
+          attributes: ["id", "banner_image", "meta_title", "meta_description"],
+
+        },
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving news and events.",
+      });
+    });
+};
+
+exports.allstreams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  stream
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+        "slug",
+      ],
+
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving streams.",
+      });
+    });
+};
