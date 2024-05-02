@@ -381,6 +381,17 @@ db.stream_faq.belongsTo(db.stream, {
   as: "streamfaqs",
 });
 
+db.stream.hasMany(db.exam, { as: "exam" });
+db.exam.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "state",
+});
+
+// db.state.hasMany(db.city, { as: "city" });
+// db.city.belongsTo(db.state, {
+//   foreignKey: "state_id",
+//   as: "state",
+// });
 /***  Relation ship generalcourses  */
 
 db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
@@ -412,30 +423,43 @@ db.abroadpage_faqs.belongsTo(db.abroadpages, {
 });
 
 
-
-
-db.abroadpages.belongsTo(db.countries, {
-  foreignKey: "country_id",
-  as: "country",
-});
-
-
+db.countries.hasMany(db.abroadpages, { as: "abroadpages", foreignKey: "country_id" });
+ db.abroadpages.belongsTo(db.countries, {
+    foreignKey: "country_id",
+    as: "country",
+  });
 
 /***  Relation ship news and events  */
 
-db.news_and_events.belongsTo(db.news_categories, {
-  foreignKey: "category_id",
-  as: "newscategories",
-});
 
+db.news_categories.hasMany(db.news_and_events, { as: "newsandevents", foreignKey: "category_id" });
+ db.news_and_events.belongsTo(db.news_categories, {
+    foreignKey: "category_id",
+    as: "newscategories",
+  });
+
+
+  // db.stream.hasMany(db.exam, { as: "exam" });
+  // db.exam.belongsTo(db.stream, {
+  //   foreignKey: "stream_id",
+  //   as: "state",
+  // });
+
+  
+// db.news_categories.hasMany(db.news_and_events, { as: "newsandevents" });
+// db.news_and_events.belongsTo(db.news_categories, {
+//   foreignKey: "category_id",
+//   as: "newscategories",
+// });
 
 //Exam RELATIONSHIP
 
+db.stream.hasMany(db.exam, { as: "exams", foreignKey: "stream_id" });
+ db.exam.belongsTo(db.stream, {
+    foreignKey: "stream_id",
+    as: "stream",
+  });
 
-db.exam.belongsTo(db.stream, {
-  foreignKey: "stream_id",
-  as: "stream",
-});
 
 db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });
 db.exam_faqs.belongsTo(db.exam, {
