@@ -27,6 +27,9 @@ const alljobslocationcontroller = require("../controllers/alljobslocation.contro
 const jobspositioncontroller = require("../controllers/jobsposition.controller");
 const joblocationscontroller = require("../controllers/joblocations.controller");
 const jobsenquirescontroller = require("../controllers/jobsenquires.controller");
+const ourteamscontroller = require("../controllers/ourteams.controller");
+const videotestimonialscontroller = require("../controllers/videotestimonials.controller");
+const schoolboardrecognitionscontroller = require("../controllers/schoolboardrecognitions.controller");
 
 
 
@@ -502,6 +505,42 @@ module.exports = function (app) {
     schoolboardcontroller.update
   );
 
+
+  //**** school board recognitions Routes start  *****/
+
+  app.get(
+    "/api/admin/schoolboardrecognition/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardrecognitionscontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/schoolboardrecognition/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardrecognitionscontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/schoolboardrecognition/add",
+    globalvalidation.schoolboardrecognitionSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardrecognitionscontroller.create
+  );
+
+  app.post(
+    "/api/admin/schoolboardrecognition/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardrecognitionscontroller.delete
+  );
+
+  app.post(
+    "/api/admin/schoolboardrecognition/update",
+    globalvalidation.schoolboardrecognitionUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardrecognitionscontroller.update
+  );
+
+  
   //**** school Routes start  *****/
 
   app.get(
@@ -1281,6 +1320,72 @@ app.post(
 );
 
 /**all-job-locations route end   */
+
+
+/** our teams route  start*/
+
+app.get(
+  "/api/admin/ourteams/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  ourteamscontroller.findAll
+);
+app.get(
+  "/api/admin/ourteams/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  ourteamscontroller.findOne
+);
+app.post(
+  "/api/admin/ourteams/add",
+  globalvalidation.ourteamsSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  ourteamscontroller.create
+);
+app.post(
+  "/api/admin/ourteams/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  ourteamscontroller.delete
+);
+app.post(
+  "/api/admin/ourteams/update",
+  globalvalidation.ourteamsUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  ourteamscontroller.update
+);
+
+/** our teams route end   */
+
+/** video testimonials route  start*/
+
+app.get(
+  "/api/admin/videotestimonials/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  videotestimonialscontroller.findAll
+);
+app.get(
+  "/api/admin/videotestimonials/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  videotestimonialscontroller.findOne
+);
+app.post(
+  "/api/admin/videotestimonials/add",
+  globalvalidation.videotestimonialsSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  videotestimonialscontroller.create
+);
+app.post(
+  "/api/admin/videotestimonials/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  videotestimonialscontroller.delete
+);
+app.post(
+  "/api/admin/videotestimonials/update",
+  globalvalidation.videotestimonialsUpdateSchema,
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  videotestimonialscontroller.update
+);
+
+/** video testimonials route end   */
+
 
 
   ////////////////////////old apis-------------------------------------------------------------------------------
