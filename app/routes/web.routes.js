@@ -50,6 +50,8 @@ module.exports = function (app) {
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 
+  app.get("/api/website/banner/get", webapicontroller.allbanners);
+
 
 
 

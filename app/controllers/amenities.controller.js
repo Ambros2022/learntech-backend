@@ -188,9 +188,6 @@ exports.findOne = (req, res) => {
     });
 };
 
-
-
-
 exports.update = async (req, res) => {
   try {
     // Check if the record exists in the database

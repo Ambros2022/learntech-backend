@@ -29,6 +29,9 @@ const alljoblocation = db.all_job_locations;
 const jobspositions = db.jobs_positions;
 const joblocations = db.job_locations;
 const jobsenquires = db.jobs_enquires;
+const ourteams = db.our_teams;
+const videotestimonials = db.video_testimonials;
+const schoolboardrecognition = db.school_board_recognitions;
 
 
 
@@ -397,6 +400,9 @@ const schoolboardSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 ];
 
 const schoolboardUpdateSchema = [
@@ -407,7 +413,9 @@ const schoolboardUpdateSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
-
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 ];
 
 
@@ -886,6 +894,45 @@ const jobsenquiresUpdateSchema = [
   ...validateIdRequired_id(alljoblocation, "job_location_id"),
   ...validateIdRequired_id(jobspositions, "jobs_position_id"),
 ];
+
+const ourteamsSchema = [
+  checkField('name', 250, ourteams, true),
+];
+
+const ourteamsUpdateSchema = [
+  ...validateIdRequired_id(ourteams, "id"),
+  checkField_update('name', 250, ourteams, true),
+
+];
+
+const videotestimonialsSchema = [
+  checkField('title', 250, videotestimonials, true),
+  checkField('name', 250, videotestimonials, true),
+];
+
+const videotestimonialsUpdateSchema = [
+  ...validateIdRequired_id(videotestimonials, "id"),
+
+  checkField_update('title', 250, videotestimonials, true),
+  checkField_update('name', 250, videotestimonials, true),
+
+];
+
+const schoolboardrecognitionSchema = [
+  // ...validateIdRequired_id(alljoblocation, "recognition_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
+
+];
+
+const schoolboardrecognitionUpdateSchema = [
+  ...validateIdRequired_id(schoolboardrecognition, "id"),
+
+  // ...validateIdRequired_id(alljoblocation, "recognition_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
+
+];
+
+
 
 
 
@@ -2914,6 +2961,12 @@ const globalvalidation = {
   joblocationsUpdateSchema: joblocationsUpdateSchema,
   jobsenquiresSchema: jobsenquiresSchema,
   jobsenquiresUpdateSchema: jobsenquiresUpdateSchema,
+  ourteamsSchema: ourteamsSchema,
+  ourteamsUpdateSchema: ourteamsUpdateSchema,
+  videotestimonialsSchema: videotestimonialsSchema,
+  videotestimonialsUpdateSchema: videotestimonialsUpdateSchema,
+  schoolboardrecognitionSchema: schoolboardrecognitionSchema,
+  schoolboardrecognitionUpdateSchema: schoolboardrecognitionUpdateSchema,
 
 
 

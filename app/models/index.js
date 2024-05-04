@@ -78,6 +78,8 @@ db.all_job_locations = require("./all_jobs_location.model.js")(sequelize, Sequel
 db.jobs_positions = require("./jobs_position.model.js")(sequelize, Sequelize);
 db.job_locations = require("./job_locations.model.js")(sequelize, Sequelize);
 db.jobs_enquires = require("./jobs_enquires.model.js")(sequelize, Sequelize);
+db.our_teams = require("./our_teams.model.js")(sequelize, Sequelize);
+db.video_testimonials = require("./video_testimonials.model.js")(sequelize, Sequelize);
 
 
 
