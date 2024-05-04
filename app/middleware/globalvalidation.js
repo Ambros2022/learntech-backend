@@ -32,6 +32,7 @@ const jobsenquires = db.jobs_enquires;
 const ourteams = db.our_teams;
 const videotestimonials = db.video_testimonials;
 const schoolboardrecognition = db.school_board_recognitions;
+const recognition = db.recognition;
 
 
 
@@ -49,7 +50,7 @@ const categories = db.categories;
 const review = db.review;
 const Op = db.Sequelize.Op;
 const affilition = db.affilition;
-const recognition = db.recognition;
+
 
 const companies = db.companies;
 
@@ -919,7 +920,7 @@ const videotestimonialsUpdateSchema = [
 ];
 
 const schoolboardrecognitionSchema = [
-  // ...validateIdRequired_id(alljoblocation, "recognition_id"),
+  ...validateIdRequired_id(recognition, "recognition_id"),
   ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
@@ -927,7 +928,7 @@ const schoolboardrecognitionSchema = [
 const schoolboardrecognitionUpdateSchema = [
   ...validateIdRequired_id(schoolboardrecognition, "id"),
 
-  // ...validateIdRequired_id(alljoblocation, "recognition_id"),
+  ...validateIdRequired_id(recognition, "recognition_id"),
   ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];

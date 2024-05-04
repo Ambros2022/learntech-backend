@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require("path");
 const schoolboards = db.schoolboards;
+const schoolboardfaqs = db.school_board_faqs;
 
 
 // Array of allowed files
@@ -133,6 +134,15 @@ exports.findAll = async (req, res) => {
       where: condition,
       limit,
       offset,
+      include: [
+
+        {
+          required: false,
+          association: "schoolboardfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+  
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -185,8 +195,18 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  schoolboards
-    .findByPk(id)
+  schoolboards.findByPk(id, {
+    include: [
+
+      {
+        required: false,
+        association: "schoolboardfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+
+    ],
+  })
+
     .then((data) => {
       if (data) {
         res.status(200).send({
@@ -289,6 +309,36 @@ exports.update = async (req, res) => {
     return res.status(400).send({
       message: "Unable to update data",
       errors: error.message,
+      status: 0,
+    });
+  }
+};
+
+exports.updatefaq = async (req, res) => {
+
+  try {
+    if (req.body.faqs && req.body.id) {
+      await schoolboardfaqs.destroy({
+        where: { school_board_id: req.body.id },
+      });
+      const faqss = JSON.parse(req.body.faqs);
+      await _.forEach(faqss, function (value) {
+        schoolboardfaqs.create({
+          school_board_id: req.body.id,
+          questions: value.questions ? value.questions : null,
+          answers: value.answers ? value.answers : null,
+        });
+      });
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: "Data Save Successfully",
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to update data",
+      errors: error,
       status: 0,
     });
   }

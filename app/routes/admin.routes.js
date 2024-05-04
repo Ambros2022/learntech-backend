@@ -505,6 +505,11 @@ module.exports = function (app) {
     schoolboardcontroller.update
   );
 
+  app.post(
+    "/api/admin/schoolboard/updatefaq",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    schoolboardcontroller.updatefaq
+  );
 
   //**** school board recognitions Routes start  *****/
 
