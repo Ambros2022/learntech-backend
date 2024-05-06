@@ -61,7 +61,7 @@ require('./app/routes/admin.routes')(app);
 require('./app/routes/web.routes')(app);
 
 // creating the http server for development
-let portnumber = process.env.APP_PORT;
+let portnumber = process.env.APP_PORT || 8000;
 
 var httpServer = http.createServer(app);
 httpServer.listen(portnumber);

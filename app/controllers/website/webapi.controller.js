@@ -6,6 +6,10 @@ const news_categories = db.news_categories;
 const news_and_events = db.news_and_events;
 const stream = db.stream;
 const countries = db.countries;
+const enquiry = db.enquiry;
+const college = db.college;
+const school = db.school;
+
 const banner = db.banner;
 const abroadpages = db.abroadpages;
 
@@ -310,106 +314,160 @@ exports.allstreams = async (req, res) => {
     });
 };
 
-exports.allbanners = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
 
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [];
+exports.searchbarhome = async (req, res) => {
+  try {
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
+    var column = columnname ? columnname : "id";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
 
-  const { limit, offset } = getPagination(page, size);
-  banner
-    .findAndCountAll({
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: "Published" }];
+    var condition = sendsearch.customseacrh(searchtext, searchfrom);
+    console.log(condition, "condition");
+    condition ? data_array.push(condition) : null;
+
+    const { limit, offset } = getPagination(page, size);
+    const collegedata = await college.findAndCountAll({
       where: data_array,
+      attributes: ["id", "name", "slug"],
+      order: [orderconfig],
+      limit,
+      offset
+    });
+    const schooldata = await school.findAndCountAll({
+      where: data_array,
+      attributes: ["id", "name", "slug"],
+      order: [orderconfig],
+      limit,
+      offset
+    });
+
+    const responseData = [];
+
+    if (collegedata.count > 0) {
+      responseData.push({
+        type: "collegedata",
+        data: collegedata.rows
+      });
+    }
+
+    if (schooldata.count > 0) {
+      responseData.push({
+        type: "schooldata",
+        data: schooldata.rows
+      });
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      data: responseData,
+    });
+
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving streams.",
+    });
+  }
+};
+
+exports.enquiry = async (req, res) => {
+  try {
+    // Validate input data
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url } = req.body;
+
+
+
+    // Create enquiry
+    const enquiryDetails = await enquiry.create({
+      name,
+      email,
+      contact_number: contact_number || null,
+      location: location || null,
+      course_in_mind: course_in_mind || null,
+      college_name: college_name || null,
+      school_name: school_name || null,
+      description: description || null,
+      current_url: current_url || null,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: "Enquiry created successfully",
+      enquiryDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      status: 0,
+      message: "An error occurred while processing your request",
+      error: error.message,
+    });
+  };
+};
+
+exports.allbanners = async (req, res) => {
+  try {
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+    var column = columnname || "id"; // Use shorthand conditional assignment
+    var order = orderby || "ASC"; // Use shorthand conditional assignment
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (myArray.length > 1) { // Check if array has more than one element
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [[table, column], order]; // Wrap table and column in an array
+    }
+
+    let data_array = [];
+    const condition = sendsearch.customseacrh(searchtext, searchfrom);
+    if (condition) {
+      data_array.push(condition);
+    }
+
+    const { limit, offset } = getPagination(page, size);
+    const data = await banner.findAndCountAll({ // Use async/await for cleaner asynchronous code
+      where: {
+        [Op.and]: data_array // Use Op.and for multiple conditions
+      },
       attributes: [
         "id",
         "title",
         "link",
       ],
-
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving banners.",
-      });
+      order: [orderconfig],
+      limit,
+      offset
     });
-};
 
-// exports.allbanners = async (req, res) => {
-//   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+    const response = getPagingData(data, page, limit);
 
-//   var column = columnname ? columnname : "id";
-//   var order = orderby ? orderby : "ASC";
-//   var orderconfig = [column, order];
-
-//   const myArray = column.split(".");
-//   if (typeof myArray[1] !== "undefined") {
-//     var table = myArray[0];
-//     column = myArray[1];
-//     orderconfig = [table, column, order];
-//   }
-//   let data_array = [];
-
-//   var condition = sendsearch.customseacrh(searchtext, searchfrom);
-//   condition ? data_array.push(condition) : null;
-
-//   const { limit, offset } = getPagination(page, size);
-//   banner
-//     .findAndCountAll({
-//       where: data_array,
-//       attributes: [
-//         "id",
-//         "title",
-//         "link",
-//       ],
-
-//       order: [orderconfig]
-//     })
-//     .then((data) => {
-//       const response = getPagingData(data, page, limit);
-
-//       res.status(200).send({
-//         status: 1,
-//         message: "success",
-//         totalItems: response.totalItems,
-//         currentPage: response.currentPage,
-//         totalPages: response.totalPages,
-//         data: response.finaldata,
-//       });
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         status: 0,
-//         message:
-//           err.message ||
-//           "Some error occurred while retrieving banners.",
-//       });
-//     });
-// };
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving banners.",
+    });
+  }
+}

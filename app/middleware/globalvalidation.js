@@ -1186,45 +1186,7 @@ const managementSchema = [
     }),
 ];
 
-const enquiryUpdateSchema = [
-  body("id").exists({ checkFalsy: true }).withMessage("id name is required"),
 
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("name is required")
-    .isLength({ max: 150 })
-    .withMessage("name should be less than 150 character"),
-
-  body("mobile_verified")
-    .exists({ checkFalsy: true })
-    .withMessage(
-      "mobile_verified either 0 for not verified, 1 for verified, 2 for block is required"
-    )
-    .isLength({ max: 150 })
-    .withMessage("mobile_verified  should be less than 150 character"),
-
-  body("current_url")
-    .exists({ checkFalsy: true })
-    .withMessage("url is required")
-    .isLength({ max: 150 })
-    .withMessage("url should be less than 150 character"),
-
-  body("email").exists({ checkFalsy: true }).withMessage("email is required"),
-
-  body("contact")
-    .exists({ checkFalsy: true })
-    .withMessage("contact is required"),
-
-  body("gender").exists({ checkFalsy: true }).withMessage("gender is required"),
-
-  body("current_qualification")
-    .exists({ checkFalsy: true })
-    .withMessage("current_qualification is required"),
-
-  body("course_in_mind")
-    .exists({ checkFalsy: true })
-    .withMessage("course_in_mind is required"),
-];
 
 const enquirySchema = [
   body("name")
@@ -1232,28 +1194,17 @@ const enquirySchema = [
     .withMessage("Name is  required")
     .isLength({ max: 150 })
     .withMessage("Name should be less than 150 character"),
-
+  body("email").exists({ checkFalsy: true }).withMessage("Email is required"),
+  body("contact_number")
+    .exists({ checkFalsy: true })
+    .withMessage("contact_numberr is required"),
   body("current_url")
     .exists({ checkFalsy: true })
     .withMessage("url is required")
     .isLength({ max: 300 })
     .withMessage("url should be less than 300 character"),
 
-  body("email").exists({ checkFalsy: true }).withMessage("Email is required"),
 
-  body("contact")
-    .exists({ checkFalsy: true })
-    .withMessage("Phone Number is required"),
-
-  // body("gender").exists({ checkFalsy: true }).withMessage("gender is required"),
-
-  // body("current_qualification")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("current_qualification is required"),
-
-  // body("course_in_mind")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("course_in_mind is required"),
 ];
 
 const authorSchema = [
@@ -2984,7 +2935,7 @@ const globalvalidation = {
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
   enquirySchema: enquirySchema,
-  enquiryUpdateSchema: enquiryUpdateSchema,
+
 
 
   affilitionUpdateSchema: affilitionUpdateSchema,
@@ -2996,7 +2947,6 @@ const globalvalidation = {
   bannerUpdateSchema: bannerUpdateSchema,
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
-  enquiryUpdateSchema: enquiryUpdateSchema,
   authorSchema: authorSchema,
   authorUpdateSchema: authorUpdateSchema,
   categoriesSchema: categoriesSchema,
