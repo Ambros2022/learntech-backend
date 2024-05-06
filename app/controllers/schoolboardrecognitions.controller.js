@@ -68,21 +68,20 @@ exports.findAll = async (req, res) => {
 
     schoolboardrecognitions.findAndCountAll({
         where: data_array, limit, offset,
-        // include: [
-        //     {
-        //         required: false,
-        //         association: "alljoblocations",
-        //         attributes: ["id", "name"],
-        //     },
-        //     {
-        //         required: false,
-        //         association: "jobspositions",
-        //         attributes: ["id", "name"],
-        //     },
+        include: [
+            {
+                required: false,
+                association: "schboardrecognitions",
+                attributes: ["id", "recognition_approval_name"],
+            },
+            {
+                required: false,
+                association: "schoolboards",
+                attributes: ["id", "name"],
+            },
 
 
-        // ],
-
+        ],
         order: [orderconfig]
     })
         .then(data => {
@@ -143,8 +142,8 @@ exports.update = (req, res) => {
     try {
         schoolboardrecognitions.update
             ({
-                job_location_id: req.body.job_location_id,
-                jobs_position_id: req.body.jobs_position_id,
+                recognition_id: req.body.recognition_id,
+                school_board_id: req.body.school_board_id,
 
             },
                 {
@@ -170,20 +169,20 @@ exports.findOne = (req, res) => {
 
     schoolboardrecognitions
         .findByPk(id, {
-            // include: [
-            //     {
-            //         required: false,
-            //         association: "alljoblocations",
-            //         attributes: ["id", "name"],
-            //     },
-            //     {
-            //         required: false,
-            //         association: "jobspositions",
-            //         attributes: ["id", "name"],
-            //     },
+            include: [
+                {
+                    required: false,
+                    association: "schboardrecognitions",
+                    attributes: ["id", "recognition_approval_name"],
+                },
+                {
+                    required: false,
+                    association: "schoolboards",
+                    attributes: ["id", "name"],
+                },
 
 
-            // ],
+            ],
         })
         .then(async (data) => {
             res.status(200).send({

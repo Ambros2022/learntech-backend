@@ -32,6 +32,7 @@ const jobsenquires = db.jobs_enquires;
 const ourteams = db.our_teams;
 const videotestimonials = db.video_testimonials;
 const schoolboardrecognition = db.school_board_recognitions;
+const recognition = db.recognition;
 
 
 
@@ -49,7 +50,7 @@ const categories = db.categories;
 const review = db.review;
 const Op = db.Sequelize.Op;
 const affilition = db.affilition;
-const recognition = db.recognition;
+
 
 const companies = db.companies;
 
@@ -919,7 +920,7 @@ const videotestimonialsUpdateSchema = [
 ];
 
 const schoolboardrecognitionSchema = [
-  // ...validateIdRequired_id(alljoblocation, "recognition_id"),
+  ...validateIdRequired_id(recognition, "recognition_id"),
   ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
@@ -927,7 +928,7 @@ const schoolboardrecognitionSchema = [
 const schoolboardrecognitionUpdateSchema = [
   ...validateIdRequired_id(schoolboardrecognition, "id"),
 
-  // ...validateIdRequired_id(alljoblocation, "recognition_id"),
+  ...validateIdRequired_id(recognition, "recognition_id"),
   ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
@@ -1185,45 +1186,7 @@ const managementSchema = [
     }),
 ];
 
-const enquiryUpdateSchema = [
-  body("id").exists({ checkFalsy: true }).withMessage("id name is required"),
 
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("name is required")
-    .isLength({ max: 150 })
-    .withMessage("name should be less than 150 character"),
-
-  body("mobile_verified")
-    .exists({ checkFalsy: true })
-    .withMessage(
-      "mobile_verified either 0 for not verified, 1 for verified, 2 for block is required"
-    )
-    .isLength({ max: 150 })
-    .withMessage("mobile_verified  should be less than 150 character"),
-
-  body("current_url")
-    .exists({ checkFalsy: true })
-    .withMessage("url is required")
-    .isLength({ max: 150 })
-    .withMessage("url should be less than 150 character"),
-
-  body("email").exists({ checkFalsy: true }).withMessage("email is required"),
-
-  body("contact")
-    .exists({ checkFalsy: true })
-    .withMessage("contact is required"),
-
-  body("gender").exists({ checkFalsy: true }).withMessage("gender is required"),
-
-  body("current_qualification")
-    .exists({ checkFalsy: true })
-    .withMessage("current_qualification is required"),
-
-  body("course_in_mind")
-    .exists({ checkFalsy: true })
-    .withMessage("course_in_mind is required"),
-];
 
 const enquirySchema = [
   body("name")
@@ -1231,28 +1194,17 @@ const enquirySchema = [
     .withMessage("Name is  required")
     .isLength({ max: 150 })
     .withMessage("Name should be less than 150 character"),
-
+  body("email").exists({ checkFalsy: true }).withMessage("Email is required"),
+  body("contact_number")
+    .exists({ checkFalsy: true })
+    .withMessage("contact_numberr is required"),
   body("current_url")
     .exists({ checkFalsy: true })
     .withMessage("url is required")
     .isLength({ max: 300 })
     .withMessage("url should be less than 300 character"),
 
-  body("email").exists({ checkFalsy: true }).withMessage("Email is required"),
 
-  body("contact")
-    .exists({ checkFalsy: true })
-    .withMessage("Phone Number is required"),
-
-  // body("gender").exists({ checkFalsy: true }).withMessage("gender is required"),
-
-  // body("current_qualification")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("current_qualification is required"),
-
-  // body("course_in_mind")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("course_in_mind is required"),
 ];
 
 const authorSchema = [
@@ -2983,7 +2935,7 @@ const globalvalidation = {
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
   enquirySchema: enquirySchema,
-  enquiryUpdateSchema: enquiryUpdateSchema,
+
 
 
   affilitionUpdateSchema: affilitionUpdateSchema,
@@ -2995,7 +2947,6 @@ const globalvalidation = {
   bannerUpdateSchema: bannerUpdateSchema,
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
-  enquiryUpdateSchema: enquiryUpdateSchema,
   authorSchema: authorSchema,
   authorUpdateSchema: authorUpdateSchema,
   categoriesSchema: categoriesSchema,
