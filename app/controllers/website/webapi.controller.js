@@ -5,6 +5,10 @@ const state = db.state;
 const news_categories = db.news_categories;
 const stream = db.stream;
 const countries = db.countries;
+const enquiry = db.enquiry;
+const college = db.college;
+const school = db.school;
+
 
 
 const getPagination = (page, size) => {
@@ -318,4 +322,107 @@ exports.allstreams = async (req, res) => {
           "Some error occurred while retrieving streams.",
       });
     });
+};
+
+
+
+exports.searchbarhome = async (req, res) => {
+  try {
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+    var column = columnname ? columnname : "id";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{status:"Published"}];
+    var condition = sendsearch.customseacrh(searchtext, searchfrom);
+    console.log(condition, "condition");
+    condition ? data_array.push(condition) : null;
+
+    const { limit, offset } = getPagination(page, size);
+    const collegedata = await college.findAndCountAll({
+      where: data_array,
+      attributes: ["id", "name", "slug"],
+      order: [orderconfig],
+      limit,
+      offset
+    });
+    const schooldata = await school.findAndCountAll({
+      where: data_array,
+      attributes: ["id", "name", "slug"],
+      order: [orderconfig],
+      limit,
+      offset
+    });
+
+    const responseData = [];
+
+    if (collegedata.count > 0) {
+      responseData.push({
+        type: "collegedata",
+        data: collegedata.rows
+      });
+    }
+
+    if (schooldata.count > 0) {
+      responseData.push({
+        type: "schooldata",
+        data: schooldata.rows
+      });
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      data: responseData,
+    });
+
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving streams.",
+    });
+  }
+};
+
+exports.enquiry = async (req, res) => {
+  try {
+    // Validate input data
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url } = req.body;
+
+
+
+    // Create enquiry
+    const enquiryDetails = await enquiry.create({
+      name,
+      email,
+      contact_number: contact_number || null,
+      location: location || null,
+      course_in_mind: course_in_mind || null,
+      college_name: college_name || null,
+      school_name: school_name || null,
+      description: description || null,
+      current_url: current_url || null,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: "Enquiry created successfully",
+      enquiryDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      status: 0,
+      message: "An error occurred while processing your request",
+      error: error.message,
+    });
+  }
 };

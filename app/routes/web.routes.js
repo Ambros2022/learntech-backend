@@ -50,6 +50,13 @@ module.exports = function (app) {
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 
+  app.get("/api/website/home/searchbar", webapicontroller.searchbarhome);
+ 
+
+  app.post(
+    "/api/website/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.enquiry
+  );
+
 
 
 
