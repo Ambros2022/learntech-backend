@@ -7,6 +7,7 @@ const news_and_events = db.news_and_events;
 const stream = db.stream;
 const countries = db.countries;
 const banner = db.banner;
+const abroadpages = db.abroadpages;
 
 
 const getPagination = (page, size) => {
@@ -165,21 +166,22 @@ exports.allabroadpages = async (req, res) => {
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
-  countries
+  abroadpages
     .findAndCountAll({
       where: data_array,
       attributes: [
         "id",
         "name",
+        "slug",
       ],
-      include: [
-        {
-          required: false,
-          association: "abroadpages",
-          attributes: ["id", "name"],
+      // include: [
+      //   {
+      //     required: false,
+      //     association: "abroadpages",
+      //     attributes: ["id", "name"],
 
-        },
-      ],
+      //   },
+      // ],
       order: [orderconfig]
     })
     .then((data) => {
@@ -359,3 +361,55 @@ exports.allbanners = async (req, res) => {
       });
     });
 };
+
+// exports.allbanners = async (req, res) => {
+//   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+//   var column = columnname ? columnname : "id";
+//   var order = orderby ? orderby : "ASC";
+//   var orderconfig = [column, order];
+
+//   const myArray = column.split(".");
+//   if (typeof myArray[1] !== "undefined") {
+//     var table = myArray[0];
+//     column = myArray[1];
+//     orderconfig = [table, column, order];
+//   }
+//   let data_array = [];
+
+//   var condition = sendsearch.customseacrh(searchtext, searchfrom);
+//   condition ? data_array.push(condition) : null;
+
+//   const { limit, offset } = getPagination(page, size);
+//   banner
+//     .findAndCountAll({
+//       where: data_array,
+//       attributes: [
+//         "id",
+//         "title",
+//         "link",
+//       ],
+
+//       order: [orderconfig]
+//     })
+//     .then((data) => {
+//       const response = getPagingData(data, page, limit);
+
+//       res.status(200).send({
+//         status: 1,
+//         message: "success",
+//         totalItems: response.totalItems,
+//         currentPage: response.currentPage,
+//         totalPages: response.totalPages,
+//         data: response.finaldata,
+//       });
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         status: 0,
+//         message:
+//           err.message ||
+//           "Some error occurred while retrieving banners.",
+//       });
+//     });
+// };
