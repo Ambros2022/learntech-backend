@@ -3,12 +3,14 @@ const db = require("../../models");
 const sendsearch = require("../../utility/Customsearch");
 const state = db.state;
 const news_categories = db.news_categories;
+const news_and_events = db.news_and_events;
 const stream = db.stream;
 const countries = db.countries;
 const enquiry = db.enquiry;
 const college = db.college;
 const school = db.school;
 
+const banner = db.banner;
 
 
 const getPagination = (page, size) => {
@@ -24,14 +26,6 @@ const getPagingData = (data, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return { totalItems, finaldata, totalPages, currentPage };
 };
-
-// exports.allstates = (req, res) => {
-//   handleGenericRequest(req, res, db.state, ["id", "name", "country_id"], [{
-//     required: false,
-//     association: "city",
-//     attributes: ["id", "name"]
-//   }]);
-// };
 
 
 exports.allstates = async (req, res) => {
@@ -233,20 +227,14 @@ exports.allnews = async (req, res) => {
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
-  news_categories
+  news_and_events
     .findAndCountAll({
       where: data_array,
       attributes: [
         "id",
-        "name",
-      ],
-      include: [
-        {
-          required: false,
-          association: "newsandevents",
-          attributes: ["id", "banner_image", "meta_title", "meta_description"],
-
-        },
+        "banner_image",
+        "meta_title",
+        "meta_description",
       ],
       order: [orderconfig]
     })
@@ -341,7 +329,7 @@ exports.searchbarhome = async (req, res) => {
       orderconfig = [table, column, order];
     }
 
-    let data_array = [{status:"Published"}];
+    let data_array = [{ status: "Published" }];
     var condition = sendsearch.customseacrh(searchtext, searchfrom);
     console.log(condition, "condition");
     condition ? data_array.push(condition) : null;
@@ -424,5 +412,60 @@ exports.enquiry = async (req, res) => {
       message: "An error occurred while processing your request",
       error: error.message,
     });
-  }
+  };
 };
+
+exports.allbanners = async (req, res) => {
+  try {
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+    var column = columnname || "id"; // Use shorthand conditional assignment
+    var order = orderby || "ASC"; // Use shorthand conditional assignment
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (myArray.length > 1) { // Check if array has more than one element
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [[table, column], order]; // Wrap table and column in an array
+    }
+
+    let data_array = [];
+    const condition = sendsearch.customseacrh(searchtext, searchfrom);
+    if (condition) {
+      data_array.push(condition);
+    }
+
+    const { limit, offset } = getPagination(page, size);
+    const data = await banner.findAndCountAll({ // Use async/await for cleaner asynchronous code
+      where: {
+        [Op.and]: data_array // Use Op.and for multiple conditions
+      },
+      attributes: [
+        "id",
+        "title",
+        "link",
+      ],
+      order: [orderconfig],
+      limit,
+      offset
+    });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving banners.",
+    });
+  }
+}

@@ -78,6 +78,10 @@ db.all_job_locations = require("./all_jobs_location.model.js")(sequelize, Sequel
 db.jobs_positions = require("./jobs_position.model.js")(sequelize, Sequelize);
 db.job_locations = require("./job_locations.model.js")(sequelize, Sequelize);
 db.jobs_enquires = require("./jobs_enquires.model.js")(sequelize, Sequelize);
+db.our_teams = require("./our_teams.model.js")(sequelize, Sequelize);
+db.video_testimonials = require("./video_testimonials.model.js")(sequelize, Sequelize);
+db.school_board_faqs = require("./school_board_faqs.model.js")(sequelize, Sequelize);
+db.school_board_recognitions = require("./school_board_recognitions.model.js")(sequelize, Sequelize);
 
 
 
@@ -211,6 +215,16 @@ db.courses.belongsTo(db.general_course, {
   as: "generalcourse",
 });
 
+/***  Relation ship school-boards */
+
+db.schoolboards.hasMany(db.school_board_faqs, { as: "schoolboardfaqs", foreignKey: "school_board_id" });
+db.school_board_faqs.belongsTo(db.schoolboards, {
+  foreignKey: "school_board_id",
+  as: "schoolboardfaqs",
+});
+
+
+
 /***  Relation ship school  */
 
 db.school.belongsTo(db.countries, {
@@ -284,6 +298,19 @@ db.fee_details.belongsTo(db.fees, {
   foreignKey: "school_id",
   as: "fee_details",
 });
+
+/***  Relation ship  school board recognitions */
+
+db.school_board_recognitions.belongsTo(db.recognition, {
+  foreignKey: "recognition_id",
+  as: "schboardrecognitions",
+});
+db.school_board_recognitions.belongsTo(db.schoolboards, {
+  foreignKey: "school_board_id",
+  as: "schoolboards",
+});
+
+
 
 /***  resettokens ship users  */
 
