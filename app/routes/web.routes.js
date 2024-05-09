@@ -58,6 +58,12 @@ module.exports = function (app) {
   );
   app.get("/api/website/banner/get", webapicontroller.allbanners);
 
+  app.get("/api/website/college/get", webapicontroller.allcolleges);
+
+  app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
+
+  app.get("/api/website/explorecollege/get", webapicontroller.exploreCollege);
+
 
 
 
