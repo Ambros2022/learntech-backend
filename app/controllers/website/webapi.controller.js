@@ -618,8 +618,8 @@ exports.newsandblogs = async (req, res) => {
     });
   }
 };
-exports.exploreCollege = async (req, res) => {
 
+exports.exploreCollege = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -634,47 +634,51 @@ exports.exploreCollege = async (req, res) => {
   }
   let data_array = [];
 
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
+  var condition = searchtext && searchfrom ? {[searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` }} : null;
+  if (condition) data_array.push(condition);
 
   const { limit, offset } = getPagination(page, size);
-  stream
-    .findAndCountAll({
+
+  try {
+    const data = await stream.findAndCountAll({
       where: data_array,
-      attributes: [
-        "id",
-        "name",
-      ],
+      attributes: ["id", "name"],
       include: [{
         required: false,
         association: "clgstreamm",
         attributes: ["college_id"],
       }],
-
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving explore colleges.",
-      });
+      order: [orderconfig],
+      limit,
+      offset
     });
-};
 
+    const response = getPagingData(data, page, limit);
+
+    
+    const finaldataWithCollegeCounts = response.finaldata.map(item => {
+      const uniqueColleges = new Set(item.clgstreamm.map(clg => clg.college_id));
+      return {
+        ...item.dataValues,
+        uniqueCollegeCount: uniqueColleges.size
+      };
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: finaldataWithCollegeCounts,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving explore colleges."
+    });
+  }
+};
 
 
 
