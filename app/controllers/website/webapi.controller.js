@@ -221,7 +221,7 @@ exports.allnews = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{ status: "Published" }];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -416,56 +416,53 @@ exports.enquiry = async (req, res) => {
 };
 
 exports.allbanners = async (req, res) => {
-  try {
-    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-    var column = columnname || "id"; // Use shorthand conditional assignment
-    var order = orderby || "ASC"; // Use shorthand conditional assignment
-    var orderconfig = [column, order];
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
 
-    const myArray = column.split(".");
-    if (myArray.length > 1) { // Check if array has more than one element
-      var table = myArray[0];
-      column = myArray[1];
-      orderconfig = [[table, column], order]; // Wrap table and column in an array
-    }
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
 
-    let data_array = [];
-    const condition = sendsearch.customseacrh(searchtext, searchfrom);
-    if (condition) {
-      data_array.push(condition);
-    }
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
 
-    const { limit, offset } = getPagination(page, size);
-    const data = await banner.findAndCountAll({ // Use async/await for cleaner asynchronous code
-      where: {
-        [Op.and]: data_array // Use Op.and for multiple conditions
-      },
+  const { limit, offset } = getPagination(page, size);
+  banner
+    .findAndCountAll({
+      where: data_array,
       attributes: [
         "id",
         "title",
         "link",
       ],
-      order: [orderconfig],
-      limit,
-      offset
-    });
 
-    const response = getPagingData(data, page, limit);
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
 
-    res.status(200).send({
-      status: 1,
-      message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: response.finaldata,
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving banners.",
+      });
     });
-  } catch (err) {
-    console.error(err); // Log the error for debugging
-    res.status(500).send({
-      status: 0,
-      message: err.message || "Some error occurred while retrieving banners.",
-    });
-  }
 }
