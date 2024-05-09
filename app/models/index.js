@@ -59,7 +59,7 @@ db.general_course_faqs = require("../models/generalcourse_faq.model.js")(sequeli
 db.courses = require("../models/courses.model.js")(sequelize, Sequelize);
 db.abroadpages = require("../models/abroadpage.model.js")(sequelize, Sequelize);
 db.abroadpage_faqs = require("../models/abroadpage_faq.model.js")(sequelize, Sequelize);
-db.college = require("./college.model.js")(sequelize, Sequelize);
+db.college = require("../models/College.model.js")(sequelize, Sequelize);
 db.college_stream = require("../models/college_stream.model.js")(sequelize, Sequelize);
 db.college_faqs = require("../models/college_faq.model.js")(sequelize, Sequelize);
 db.college_amenities = require("../models/college_amenities.model.js")(sequelize, Sequelize);
@@ -360,6 +360,7 @@ db.college_stream.belongsTo(db.college, {
   as: "collegestreams",
 });
 
+
 db.college_stream.belongsTo(db.stream, {
   foreignKey: "stream_id",
   as: "clgstreams",
@@ -400,6 +401,23 @@ db.college_faqs.belongsTo(db.college, {
 db.college.hasMany(db.college_gallery, { as: "clggallery", foreignKey: "college_id" });
 
 
+
+/***  Relation ship college stream  */
+
+db.stream.hasMany(db.college_stream, { as: "clgstreamm" });
+db.college_stream.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "state",
+});
+
+// college_stream.belongsTo(db.college, {
+//   foreignKey: 'college_id',
+//   as: 'college'
+// });
+
+
+
+
 /***  Relation ship stream  */
 
 db.stream.hasMany(db.stream_faq, { as: "streamfaqs", foreignKey: "stream_id" });
@@ -414,11 +432,7 @@ db.exam.belongsTo(db.stream, {
   as: "state",
 });
 
-// db.state.hasMany(db.city, { as: "city" });
-// db.city.belongsTo(db.state, {
-//   foreignKey: "state_id",
-//   as: "state",
-// });
+
 /***  Relation ship generalcourses  */
 
 db.general_course.hasMany(db.general_course_faqs, { as: "generalcoursefaqs", foreignKey: "general_course_id" });
@@ -465,19 +479,6 @@ db.news_categories.hasMany(db.news_and_events, { as: "newsandevents", foreignKey
     as: "newscategories",
   });
 
-
-  // db.stream.hasMany(db.exam, { as: "exam" });
-  // db.exam.belongsTo(db.stream, {
-  //   foreignKey: "stream_id",
-  //   as: "state",
-  // });
-
-  
-// db.news_categories.hasMany(db.news_and_events, { as: "newsandevents" });
-// db.news_and_events.belongsTo(db.news_categories, {
-//   foreignKey: "category_id",
-//   as: "newscategories",
-// });
 
 //Exam RELATIONSHIP
 

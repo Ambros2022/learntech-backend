@@ -15,6 +15,10 @@ const abroadpages = db.abroadpages;
 const Op = db.Sequelize.Op;
 const exam = db.exam;
 const blog = db.blog;
+const courses = db.courses;
+const college_stream = db.college_stream;
+
+
 
 
 const getPagination = (page, size) => {
@@ -614,4 +618,69 @@ exports.newsandblogs = async (req, res) => {
     });
   }
 };
+exports.exploreCollege = async (req, res) => {
+
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  stream
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+      ],
+      include: [{
+        required: false,
+        association: "clgstreamm",
+        attributes: ["college_id"],
+      }],
+
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving explore colleges.",
+      });
+    });
+};
+
+
+
+
+
+
+
+
+
 

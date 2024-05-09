@@ -17,7 +17,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING
     },
     type: {
-      type: Sequelize.ENUM("college", "university", "board"),
+      type: Sequelize.ENUM("college", "university"),
     },
     status: {
       type: Sequelize.ENUM("Draft", "Published"),
@@ -80,6 +80,9 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING
     },
     hostel: {
+      type: Sequelize.STRING
+    },
+    is_associated: {
       type: Sequelize.STRING
     },
 

@@ -62,6 +62,8 @@ module.exports = function (app) {
 
   app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
 
+  app.get("/api/website/explorecollege/get", webapicontroller.exploreCollege);
+
 
 
 
