@@ -1,7 +1,9 @@
 const db = require("../models");
 const path = require("path");
 const schoolboards = db.schoolboards;
-const schoolboardfaqs = db.school_board_faqs;
+const school_board_faqs = db.school_board_faqs;
+const _ = require("lodash");
+const Op = db.Sequelize.Op;
 
 
 // Array of allowed files
@@ -314,16 +316,16 @@ exports.update = async (req, res) => {
   }
 };
 
-exports.updatefaq = async (req, res) => {
+exports.updatefaqs = async (req, res) => {
 
   try {
     if (req.body.faqs && req.body.id) {
-      await schoolboardfaqs.destroy({
+      await school_board_faqs.destroy({
         where: { school_board_id: req.body.id },
       });
       const faqss = JSON.parse(req.body.faqs);
       await _.forEach(faqss, function (value) {
-        schoolboardfaqs.create({
+        school_board_faqs.create({
           school_board_id: req.body.id,
           questions: value.questions ? value.questions : null,
           answers: value.answers ? value.answers : null,
@@ -343,3 +345,33 @@ exports.updatefaq = async (req, res) => {
     });
   }
 };
+
+// exports.updatefaqs = async (req, res) => {
+
+//   try {
+//     if (req.body.faqs && req.body.id) {
+//       await school_faqs.destroy({
+//         where: { school_id: req.body.id },
+//       });
+//       const faqss = JSON.parse(req.body.faqs);
+//       await _.forEach(faqss, function (value) {
+//         school_faqs.create({
+//           school_id: req.body.id,
+//           questions: value.questions ? value.questions : null,
+//           answers: value.answers ? value.answers : null,
+//         });
+//       });
+//     }
+
+//     res.status(200).send({
+//       status: 1,
+//       message: "Data Save Successfully",
+//     });
+//   } catch (error) {
+//     return res.status(400).send({
+//       message: "Unable to update data",
+//       errors: error,
+//       status: 0,
+//     });
+//   }
+// };
