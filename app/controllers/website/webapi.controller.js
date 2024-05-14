@@ -634,7 +634,7 @@ exports.exploreCollege = async (req, res) => {
   }
   let data_array = [];
 
-  var condition = searchtext && searchfrom ? {[searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` }} : null;
+  var condition = searchtext && searchfrom ? { [searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` } } : null;
   if (condition) data_array.push(condition);
 
   const { limit, offset } = getPagination(page, size);
@@ -643,11 +643,18 @@ exports.exploreCollege = async (req, res) => {
     const data = await stream.findAndCountAll({
       where: data_array,
       attributes: ["id", "name"],
-      include: [{
-        required: false,
-        association: "clgstreamm",
-        attributes: ["college_id"],
-      }],
+      include: [
+        {
+          required: false,
+          association: "clgstreamm",
+          attributes: ["college_id"],
+        },
+        // {
+        //   required: false,
+        //   association: "clgstreams",
+        //   attributes: ["stream_id"],
+        // }
+      ],
       order: [orderconfig],
       limit,
       offset
@@ -655,7 +662,7 @@ exports.exploreCollege = async (req, res) => {
 
     const response = getPagingData(data, page, limit);
 
-    
+
     const finaldataWithCollegeCounts = response.finaldata.map(item => {
       const uniqueColleges = new Set(item.clgstreamm.map(clg => clg.college_id));
       return {
@@ -679,6 +686,148 @@ exports.exploreCollege = async (req, res) => {
     });
   }
 };
+
+exports.exploreexam = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = searchtext && searchfrom ? { [searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` } } : null;
+  if (condition) data_array.push(condition);
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const data = await stream.findAndCountAll({
+      where: data_array,
+      attributes: ["id", "name"],
+      include: [{
+        required: false,
+        association: "exam",
+        attributes: ["id", "exam_title"],
+        where: { status: "Published" }
+      }],
+      order: [orderconfig],
+      limit,
+      offset
+    });
+
+    const response = getPagingData(data, page, limit);
+
+
+    const finaldataWithexamCounts = response.finaldata.map(item => {
+      const uniqueexam = new Set(item.exam.map(exm => exm.id));
+      return {
+        ...item.dataValues,
+        uniqueCollegeCount: uniqueexam.size
+      };
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: finaldataWithexamCounts,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving explore exams."
+    });
+  }
+};
+
+exports.colleges = async (req, res) => {
+  const { page, size, searchtext, searchfrom, country_id, state_id, city_id, college_type, columnname, orderby, course_type } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+  let conditionarray = [];
+
+  if (college_type) {
+    conditionarray.push({ college_type: college_type });
+  }
+
+  let conditionCountryId = country_id ? { country_id: country_id } : null;
+  conditionCountryId ? data_array.push(conditionCountryId) : null;
+
+  let conditionStateId = state_id ? { state_id: state_id } : null;
+  conditionStateId ? data_array.push(conditionStateId) : null;
+
+  let conditionCityId = city_id ? { city_id: city_id } : null;
+  conditionCityId ? data_array.push(conditionCityId) : null;
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  let conditionCourseType = course_type ? { '$courses.course_type$': course_type } : null;
+  conditionCourseType ? data_array.push(conditionCourseType) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  college
+    .findAndCountAll({
+      where: {
+        [Op.and]: data_array.concat(conditionarray)
+      },
+      attributes: [
+        "id",
+        "name",
+        "city_id",
+        "state_id",
+        "established",
+      ],
+      include: [
+        {
+          required: false,
+          association: "courses",
+          attributes: ["id", "course_type"],
+        },
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving colleges.",
+      });
+    });
+};
+
 
 
 
