@@ -17,6 +17,23 @@ const generalcourse = db.general_course;
 const stream_faq = db.stream_faq;
 const courses = db.courses;
 const abroadpages = db.abroadpages;
+const landingpages = db.landing_pages;
+const newscategories = db.news_categories;
+const newsandevents = db.news_and_events;
+const blog = db.blog;
+const exam = db.exam;
+const scholarlevels = db.scholar_levels;
+const scholartypes = db.scholar_types;
+const scholarships = db.scholarships;
+const alljoblocation = db.all_job_locations;
+const jobspositions = db.jobs_positions;
+const joblocations = db.job_locations;
+const jobsenquires = db.jobs_enquires;
+const ourteams = db.our_teams;
+const videotestimonials = db.video_testimonials;
+const schoolboardrecognition = db.school_board_recognitions;
+const recognition = db.recognition;
+
 
 
 
@@ -29,11 +46,11 @@ const management = db.management;
 
 const author = db.author;
 const categories = db.categories;
-const blog = db.blog;
+
 const review = db.review;
 const Op = db.Sequelize.Op;
 const affilition = db.affilition;
-const recognition = db.recognition;
+
 
 const companies = db.companies;
 
@@ -51,7 +68,7 @@ const studentform = db.studentform;
 const jobvaccancies = db.jobvaccancies;
 const redirecturl = db.redirecturl;
 const promopage = db.promopage;
-const newsandevents = db.newsandevents;
+
 
 const upcoming_courses = db.upcoming_courses;
 const eligibilities = db.eligibilities;
@@ -61,8 +78,8 @@ const gallery = db.gallery;
 const job = db.job;
 const abouts = db.abouts;
 const services = db.services;
-const exam = db.exam;
-const scholarships = db.scholarships;
+
+
 const abroadcountries = db.abroadcountries;
 const abroad_universities = db.abroad_universities;
 const youtubevideos = db.youtubevideos;
@@ -384,6 +401,9 @@ const schoolboardSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 ];
 
 const schoolboardUpdateSchema = [
@@ -394,7 +414,9 @@ const schoolboardUpdateSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
-
+  ...validateIdRequired_id(countries, "country_id"),
+  ...validateIdRequired_id(state, "state_id"),
+  ...validateIdRequired_id(city, "city_id"),
 ];
 
 
@@ -488,8 +510,6 @@ const SubStreamSchemaUpdate = [
   ...validateIdRequired_id(stream, "stream_id"),
 ];
 
-
-
 const PageSchema = [
   checkField('url', 250, pages, true),
 ];
@@ -577,10 +597,6 @@ const CollegeUpdateSchema = [
 
 
 ];
-
-
-
-
 
 const GeneralcoursesSchema = [
   checkField('name', 150, generalcourse, true),
@@ -672,6 +688,253 @@ const abroadpageUpdateSchema = [
 ];
 
 
+const landingpageSchema = [
+  checkField('name', 250, landingpages, true),
+
+  body("link")
+    .exists({ checkFalsy: true })
+    .withMessage("link is required")
+    .isLength({ max: 150 })
+    .withMessage("link should be less than 150 character"),
+];
+
+const landingpageUpdateSchema = [
+  ...validateIdRequired_id(landingpages, "id"),
+
+  checkField_update('name', 250, landingpages, true),
+
+  body("link")
+    .exists({ checkFalsy: true })
+    .withMessage("link is required")
+    .isLength({ max: 150 })
+    .withMessage("link should be less than 150 character"),
+
+
+];
+
+const newscategoriesSchema = [
+  checkField('name', 250, newscategories, true),
+
+];
+
+const newscategoriesUpdateSchema = [
+  ...validateIdRequired_id(newscategories, "id"),
+
+  checkField_update('name', 250, newscategories, true),
+];
+
+
+const newsandeventsSchema = [
+  checkField('name', 250, newsandevents, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
+
+const newsandeventsUpdateSchema = [
+  ...validateIdRequired_id(newsandevents, "id"),
+
+  checkField_update('name', 250, newsandevents, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
+
+const blogSchema = [
+  checkField('name', 250, blog, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
+
+const blogUpdateSchema = [
+  ...validateIdRequired_id(blog, "id"),
+
+  checkField_update('name', 250, blog, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+];
+
+const examSchema = [
+  checkField('exam_title', 250, exam, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(stream, "stream_id"),
+];
+
+const examUpdateSchema = [
+  ...validateIdRequired_id(exam, "id"),
+
+  checkField_update('exam_title', 250, exam, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(stream, "stream_id"),
+];
+
+const scholarlevelSchema = [
+  checkField('name', 250, scholarlevels, true),
+];
+
+const scholarlevelUpdateSchema = [
+  ...validateIdRequired_id(scholarlevels, "id"),
+
+  checkField_update('name', 250, scholarlevels, true),
+];
+
+const scholartypeSchema = [
+  checkField('name', 250, scholartypes, true),
+];
+
+const scholartypeUpdateSchema = [
+  ...validateIdRequired_id(scholartypes, "id"),
+
+  checkField_update('name', 250, scholartypes, true),
+];
+
+const scholarshipSchema = [
+  checkField('name', 250, scholarships, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(scholarlevels, "level_id"),
+  ...validateIdRequired_id(scholartypes, "type_id"),
+  ...validateIdRequired_id(countries, "country_id"),
+
+];
+
+const scholarshipUpdateSchema = [
+  ...validateIdRequired_id(scholarships, "id"),
+
+  checkField_update('name', 250, scholarships, true),
+
+  body("slug")
+    .exists({ checkFalsy: true })
+    .withMessage("Slug is required")
+    .isLength({ max: 150 })
+    .withMessage("Slug should be less than 150 character"),
+
+  ...validateIdRequired_id(scholarlevels, "level_id"),
+  ...validateIdRequired_id(scholartypes, "type_id"),
+  ...validateIdRequired_id(countries, "country_id"),
+
+];
+
+const alljoblocationSchema = [
+  checkField('name', 250, alljoblocation, true),
+];
+
+const alljoblocationUpdateSchema = [
+  ...validateIdRequired_id(alljoblocation, "id"),
+
+  checkField_update('name', 250, alljoblocation, true),
+];
+
+const jobspositionsSchema = [
+  checkField('name', 250, alljoblocation, true),
+];
+
+const jobspositionsUpdateSchema = [
+  ...validateIdRequired_id(jobspositions, "id"),
+
+  checkField_update('name', 250, jobspositions, true),
+];
+
+const joblocationsSchema = [
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+
+];
+
+const joblocationsUpdateSchema = [
+  ...validateIdRequired_id(joblocations, "id"),
+
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+
+];
+
+const jobsenquiresSchema = [
+  checkField('name', 250, jobsenquires, true),
+
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+];
+
+const jobsenquiresUpdateSchema = [
+  ...validateIdRequired_id(jobsenquires, "id"),
+
+  checkField_update('name', 250, jobsenquires, true),
+
+  ...validateIdRequired_id(alljoblocation, "job_location_id"),
+  ...validateIdRequired_id(jobspositions, "jobs_position_id"),
+];
+
+const ourteamsSchema = [
+  checkField('name', 250, ourteams, true),
+];
+
+const ourteamsUpdateSchema = [
+  ...validateIdRequired_id(ourteams, "id"),
+  checkField_update('name', 250, ourteams, true),
+
+];
+
+const videotestimonialsSchema = [
+  checkField('title', 250, videotestimonials, true),
+  checkField('name', 250, videotestimonials, true),
+];
+
+const videotestimonialsUpdateSchema = [
+  ...validateIdRequired_id(videotestimonials, "id"),
+
+  checkField_update('title', 250, videotestimonials, true),
+  checkField_update('name', 250, videotestimonials, true),
+
+];
+
+const schoolboardrecognitionSchema = [
+  ...validateIdRequired_id(recognition, "recognition_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
+
+];
+
+const schoolboardrecognitionUpdateSchema = [
+  ...validateIdRequired_id(schoolboardrecognition, "id"),
+
+  ...validateIdRequired_id(recognition, "recognition_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
+
+];
+
+
+
 
 
 
@@ -707,6 +970,7 @@ const areaSchema = [
         });
     }),
 ];
+
 const abroaduniversitiesSchema = [
   body("university_name")
     .exists({ checkFalsy: true })
@@ -782,8 +1046,6 @@ const abroaduniversitiesUpdateSchema = [
     }),
 ];
 
-
-
 const areaUpdateSchema = [
   body("area_name")
     .exists({ checkFalsy: true })
@@ -838,8 +1100,6 @@ const areaUpdateSchema = [
         });
     }),
 ];
-
-
 
 const managementUpdateSchema = [
   body("management_name")
@@ -926,45 +1186,7 @@ const managementSchema = [
     }),
 ];
 
-const enquiryUpdateSchema = [
-  body("id").exists({ checkFalsy: true }).withMessage("id name is required"),
 
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("name is required")
-    .isLength({ max: 150 })
-    .withMessage("name should be less than 150 character"),
-
-  body("mobile_verified")
-    .exists({ checkFalsy: true })
-    .withMessage(
-      "mobile_verified either 0 for not verified, 1 for verified, 2 for block is required"
-    )
-    .isLength({ max: 150 })
-    .withMessage("mobile_verified  should be less than 150 character"),
-
-  body("current_url")
-    .exists({ checkFalsy: true })
-    .withMessage("url is required")
-    .isLength({ max: 150 })
-    .withMessage("url should be less than 150 character"),
-
-  body("email").exists({ checkFalsy: true }).withMessage("email is required"),
-
-  body("contact")
-    .exists({ checkFalsy: true })
-    .withMessage("contact is required"),
-
-  body("gender").exists({ checkFalsy: true }).withMessage("gender is required"),
-
-  body("current_qualification")
-    .exists({ checkFalsy: true })
-    .withMessage("current_qualification is required"),
-
-  body("course_in_mind")
-    .exists({ checkFalsy: true })
-    .withMessage("course_in_mind is required"),
-];
 
 const enquirySchema = [
   body("name")
@@ -972,30 +1194,18 @@ const enquirySchema = [
     .withMessage("Name is  required")
     .isLength({ max: 150 })
     .withMessage("Name should be less than 150 character"),
-
+  body("email").exists({ checkFalsy: true }).withMessage("Email is required"),
+  body("contact_number")
+    .exists({ checkFalsy: true })
+    .withMessage("contact_numberr is required"),
   body("current_url")
     .exists({ checkFalsy: true })
     .withMessage("url is required")
     .isLength({ max: 300 })
     .withMessage("url should be less than 300 character"),
 
-  body("email").exists({ checkFalsy: true }).withMessage("Email is required"),
 
-  body("contact")
-    .exists({ checkFalsy: true })
-    .withMessage("Phone Number is required"),
-
-  // body("gender").exists({ checkFalsy: true }).withMessage("gender is required"),
-
-  // body("current_qualification")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("current_qualification is required"),
-
-  // body("course_in_mind")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("course_in_mind is required"),
 ];
-
 
 const authorSchema = [
   body("author_name")
@@ -1181,308 +1391,9 @@ const categoriesUpdateSchema = [
     }),
 ];
 
-const blogSchema = [
-  body("title")
-    .exists({ checkFalsy: true })
-    .withMessage("title Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("title  name should be less than 150 character"),
 
-  body("body")
-    .exists({ checkFalsy: true })
-    .withMessage("body name is required"),
 
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug name is required")
-    .isLength({ max: 150 })
-    .withMessage("slug name should be less than 150 character")
-    .custom((value) => {
-      return blog
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((blog) => {
-          if (blog) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
 
-  body("author_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Author Id is required")
-    .custom((value) => {
-      return author
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((author) => {
-          if (author) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Author Id Not exist");
-          }
-        });
-    }),
-  body("category_id")
-    .exists({ checkFalsy: true })
-    .withMessage("category Id is required")
-    .custom((value) => {
-      return categories
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((categories) => {
-          if (categories) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("category Id Not exist");
-          }
-        });
-    }),
-  body("group_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Group  Id is required")
-    .custom((value) => {
-      return groups
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((groups) => {
-          if (groups) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Groups Id Not exist");
-          }
-        });
-    }),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
-const blogUpdateSchema = [
-  body("title")
-    .exists({ checkFalsy: true })
-    .withMessage("title Stream name is required")
-    .isLength({ max: 150 })
-    .withMessage("title  name should be less than 150 character"),
-
-  body("body")
-    .exists({ checkFalsy: true })
-    .withMessage("body name is required"),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug name is required")
-    .isLength({ max: 150 })
-    .withMessage("slug name should be less than 150 character"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return blog
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((blog) => {
-          if (blog) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("blog Does not exist");
-          }
-        });
-    }),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return blog
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((blog) => {
-          if (blog) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("author_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Author Id is required")
-    .custom((value) => {
-      return author
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((author) => {
-          if (author) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Author Id Not exist");
-          }
-        });
-    }),
-  body("category_id")
-    .exists({ checkFalsy: true })
-    .withMessage("category Id is required")
-    .custom((value) => {
-      return categories
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((categories) => {
-          if (categories) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("category Id Not exist");
-          }
-        });
-    }),
-  body("group_id")
-    .exists({ checkFalsy: true })
-    .withMessage("Group  Id is required")
-    .custom((value) => {
-      return groups
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((groups) => {
-          if (groups) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("Groups Id Not exist");
-          }
-        });
-    }),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
-
-const scholarshipSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Scholarship  name is required")
-    .isLength({ max: 150 })
-    .withMessage("Scholarship  name should be less than 150 character"),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug name is required")
-    .isLength({ max: 150 })
-    .withMessage("slug name should be less than 150 character")
-    .custom((value) => {
-      return scholarships
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((scholarships) => {
-          if (scholarships) {
-            return Promise.reject("Slug already in use");
-          } else {
-            return true;
-          }
-        });
-    }),
-];
-const scholarshipUpdateSchema = [
-  body("name")
-    .exists({ checkFalsy: true })
-    .withMessage("Scholarship  name is required")
-    .isLength({ max: 150 })
-    .withMessage("Scholarship  name should be less than 150 character"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return scholarships
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((scholarships) => {
-          if (scholarships) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("scholarship Does not exist");
-          }
-        });
-    }),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("slug is required")
-    .isLength({ max: 150 })
-    .withMessage("slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return scholarships
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((scholarships) => {
-          if (scholarships) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-];
 
 
 const polytechnicSchema = [
@@ -2819,288 +2730,9 @@ const PromopageSchemaUpdate = [
     }),
 ];
 
-const newsandeventsSchema = [
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_title is required"),
 
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_description is required"),
 
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_keyword is required"),
 
-  body("title").exists({ checkFalsy: true }).withMessage("title is required"),
-
-  body("body").exists({ checkFalsy: true }).withMessage("news is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
-
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return newsandevents
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-];
-const newsandeventsUpdateSchema = [
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_title is required"),
-
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("meta_keyword is required"),
-
-  body("title").exists({ checkFalsy: true }).withMessage("title is required"),
-
-  body("body").exists({ checkFalsy: true }).withMessage("news is required"),
-
-  body("status").exists({ checkFalsy: true }).withMessage("status is required"),
-
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return newsandevents
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("newsandevents Does not exist");
-          }
-        });
-    }),
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return newsandevents
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-];
-
-const examSchema = [
-  body("exam_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam title is required"),
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value) => {
-      return exam
-        .findOne({
-          where: {
-            slug: value,
-          },
-        })
-        .then((newsandevents) => {
-          if (newsandevents) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_title is required"),
-
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_keyword is required"),
-
-  body("exam_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam_description is required"),
-  body("eligibility_criteria")
-    .exists({ checkFalsy: true })
-    .withMessage("Eligibility_criteria is required"),
-  body("status").exists({ checkFalsy: true }).withMessage("Status is required"),
-
-  body("listing_order").custom((value, { req }) => {
-    if (value == null || value == "" || value == "null") {
-      return true;
-    }
-    return exam
-      .findOne({
-        where: {
-          listing_order: value,
-        },
-      })
-      .then((exam) => {
-        if (exam) {
-          return Promise.reject("listing_order already in use");
-        } else {
-          // Indicates the success of this synchronous custom validator
-          return true;
-        }
-      });
-  }),
-
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
-
-const examUpdateSchema = [
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return exam
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((exam) => {
-          if (exam) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("exam Does not exist");
-          }
-        });
-    }),
-  body("exam_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam title is required"),
-  body("slug")
-    .exists({ checkFalsy: true })
-    .withMessage("Slug is required")
-    .isLength({ max: 150 })
-    .withMessage("Slug should be less than 150 character")
-    .custom((value, { req }) => {
-      return exam
-        .findOne({
-          where: {
-            slug: {
-              [Op.eq]: value,
-            },
-            id: {
-              [Op.not]: [req.body.id],
-            },
-          },
-        })
-        .then((exam) => {
-          if (exam) {
-            return Promise.reject("Slug already in use");
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return true;
-          }
-        });
-    }),
-
-  body("meta_title")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_title is required"),
-
-  body("meta_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_description is required"),
-
-  body("meta_keyword")
-    .exists({ checkFalsy: true })
-    .withMessage("Meta_keyword is required"),
-
-  body("exam_description")
-    .exists({ checkFalsy: true })
-    .withMessage("Exam_description is required"),
-  body("eligibility_criteria")
-    .exists({ checkFalsy: true })
-    .withMessage("Eligibility_criteria is required"),
-  body("status").exists({ checkFalsy: true }).withMessage("Status is required"),
-
-  body("listing_order").custom((value, { req }) => {
-    if (value == null || value == "" || value == "null") {
-      return true;
-    }
-    return exam
-      .findOne({
-        where: {
-          listing_order: {
-            [Op.eq]: value,
-          },
-          id: {
-            [Op.not]: [req.body.id],
-          },
-        },
-      })
-      .then((stream) => {
-        if (stream) {
-          return Promise.reject("listing_order already in use");
-        } else {
-          // Indicates the success of this synchronous custom validator
-          return true;
-        }
-      });
-  }),
-  body("home_view_status")
-    .exists({ checkFalsy: true })
-    .withMessage("home view status is required"),
-  body("promo_banner_status")
-    .exists({ checkFalsy: true })
-    .withMessage("promo_banner_status  is required"),
-];
 
 const adminpasswordSchema = [
   body("password").isLength({
@@ -3257,6 +2889,37 @@ const globalvalidation = {
   coursesUpdateSchema: coursesUpdateSchema,
   abroadpageSchema: abroadpageSchema,
   abroadpageUpdateSchema: abroadpageUpdateSchema,
+  landingpageSchema: landingpageSchema,
+  landingpageUpdateSchema: landingpageUpdateSchema,
+  newscategoriesSchema: newscategoriesSchema,
+  newscategoriesUpdateSchema: newscategoriesUpdateSchema,
+  newsandeventsSchema: newsandeventsSchema,
+  newsandeventsUpdateSchema: newsandeventsUpdateSchema,
+  blogSchema: blogSchema,
+  blogUpdateSchema: blogUpdateSchema,
+  examSchema: examSchema,
+  examUpdateSchema: examUpdateSchema,
+  scholarlevelSchema: scholarlevelSchema,
+  scholarlevelUpdateSchema: scholarlevelUpdateSchema,
+  scholartypeSchema: scholartypeSchema,
+  scholartypeUpdateSchema: scholartypeUpdateSchema,
+  scholarshipSchema: scholarshipSchema,
+  scholarshipUpdateSchema: scholarshipUpdateSchema,
+  alljoblocationSchema: alljoblocationSchema,
+  alljoblocationUpdateSchema: alljoblocationUpdateSchema,
+  jobspositionsSchema: jobspositionsSchema,
+  jobspositionsUpdateSchema: jobspositionsUpdateSchema,
+  joblocationsSchema: joblocationsSchema,
+  joblocationsUpdateSchema: joblocationsUpdateSchema,
+  jobsenquiresSchema: jobsenquiresSchema,
+  jobsenquiresUpdateSchema: jobsenquiresUpdateSchema,
+  ourteamsSchema: ourteamsSchema,
+  ourteamsUpdateSchema: ourteamsUpdateSchema,
+  videotestimonialsSchema: videotestimonialsSchema,
+  videotestimonialsUpdateSchema: videotestimonialsUpdateSchema,
+  schoolboardrecognitionSchema: schoolboardrecognitionSchema,
+  schoolboardrecognitionUpdateSchema: schoolboardrecognitionUpdateSchema,
+
 
 
 
@@ -3272,7 +2935,7 @@ const globalvalidation = {
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
   enquirySchema: enquirySchema,
-  enquiryUpdateSchema: enquiryUpdateSchema,
+
 
 
   affilitionUpdateSchema: affilitionUpdateSchema,
@@ -3284,13 +2947,11 @@ const globalvalidation = {
   bannerUpdateSchema: bannerUpdateSchema,
   managementSchema: managementSchema,
   managementUpdateSchema: managementUpdateSchema,
-  enquiryUpdateSchema: enquiryUpdateSchema,
   authorSchema: authorSchema,
   authorUpdateSchema: authorUpdateSchema,
   categoriesSchema: categoriesSchema,
   categoriesUpdateSchema: categoriesUpdateSchema,
-  blogSchema: blogSchema,
-  blogUpdateSchema: blogUpdateSchema,
+
 
   polytechnicSchema: polytechnicSchema,
   polytechnicUpdateSchema: polytechnicUpdateSchema,
@@ -3329,14 +2990,11 @@ const globalvalidation = {
   RedirecturlSchemaUpdate: RedirecturlSchemaUpdate,
   PromopageSchema: PromopageSchema,
   PromopageSchemaUpdate: PromopageSchemaUpdate,
-  newsandeventsSchema: newsandeventsSchema,
-  newsandeventsUpdateSchema: newsandeventsUpdateSchema,
 
-  examSchema: examSchema,
-  examUpdateSchema: examUpdateSchema,
+
+
   adminpasswordSchema: adminpasswordSchema,
-  scholarshipSchema: scholarshipSchema,
-  scholarshipUpdateSchema: scholarshipUpdateSchema,
+
   abroadcountriesUpdateSchema: abroadcountriesUpdateSchema,
   abroadcountriesSchema: abroadcountriesSchema,
   abroaduniversitiesUpdateSchema: abroaduniversitiesUpdateSchema,

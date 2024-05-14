@@ -1,10 +1,23 @@
 const db = require("../models");
-const newsandevents = db.newsandevents;
+const newsandevents = db.news_and_events;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
 const sendsearch = require("../utility/Customsearch");
 const path = require("path");
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
+// / Function to remove a file
+const fs = require("fs").promises;
+
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
@@ -22,12 +35,14 @@ const getPagingData = (data, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return { totalItems, newsandevents, totalPages, currentPage };
 };
+
 exports.create = async (req, res) => {
   try {
-    let logonames = "";
+    let bannerimages = "";
+    let pdffiles = "";
 
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
+    if (req.files && req.files.banner_image) {
+      let avatar = req.files.banner_image;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -47,63 +62,16 @@ exports.create = async (req, res) => {
       }
 
       let logoname = "logo" + Date.now() + path.extname(avatar.name);
-      console.log(logoname);
 
-      let IsUpload = avatar.mv("./storage/news_event_cover/" + logoname)
-        ? 1
-        : 0;
+      let IsUpload = avatar.mv("./storage/news_banner_image/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "news_event_cover/" + logoname;
+        bannerimages = "news_banner_image/" + logoname;
       }
     }
 
-    const newsandeventsDetails = await newsandevents.create({
-      title: req.body.title,
-      news_type: req.body.news_type,
-      exam_id: req.body.exam_id ? req.body.exam_id : null,
-      top_featured_order: req.body.top_featured_order,
-      is_top_featured: req.body.is_top_featured,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      slug: req.body.slug,
-      cover_image: logonames,
-      body: req.body.body,
-      status: req.body.status,
-    });
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-      data: newsandeventsDetails,
-    });
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to insert data",
-      errors: error,
-      status: 0,
-    });
-  }
-};
-exports.update = (req, res) => {
-  const id = req.body.id;
-  try {
-    let images = " ";
-    let STREAD = {
-      title: req.body.title,
-      news_type: req.body.news_type,
-      top_featured_order: req.body.top_featured_order,
-      is_top_featured: req.body.is_top_featured,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      slug: req.body.slug,
-      body: req.body.body,
-      status: req.body.status,
-      exam_id: req.body.exam_id ? req.body.exam_id : null,
-    };
-    if (req.files && req.files.cover_image) {
-      let avatar = req.files.cover_image;
+    if (req.files && req.files.pdf_file) {
+      let avatar = req.files.pdf_file;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -122,23 +90,143 @@ exports.update = (req, res) => {
         });
       }
 
-      let image = "image" + Date.now() + path.extname(avatar.name);
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
 
-      let IsUpload = avatar.mv("./storage/news_event_cover/" + image) ? 1 : 0;
+      let IsUpload = avatar.mv("./storage/news_pdf_file/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        images = "news_event_cover/" + image;
+        pdffiles = "news_pdf_file/" + logoname;
       }
-      STREAD["cover_image"] = images;
     }
 
-    newsandevents.update(STREAD, {
+
+    const newsandeventsDetails = await newsandevents.create({
+      category_id: req.body.category_id,
+      name: req.body.name,
+      slug: req.body.slug,
+      banner_image: bannerimages,
+      pdf_file: pdffiles,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keywords: req.body.meta_keywords,
+      overview: req.body.overview,
+      status: req.body.status,
+    });
+    res.status(200).send({
+      status: 1,
+      message: "Data Save Successfully",
+      data: newsandeventsDetails,
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to insert data",
+      errors: error,
+      status: 0,
+    });
+  }
+};
+
+exports.update = async (req, res) => {
+
+  try {
+
+    const existingRecord = await newsandevents.findOne({
       where: { id: req.body.id },
     });
 
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+
+    const newsandeventsUpdates = {
+      category_id: req.body.category_id || existingRecord.category_id,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      overview: req.body.overview || existingRecord.overview,
+      status: req.body.status || existingRecord.status,
+
+    };
+    if (req.files && req.files.banner_image) {
+      const avatar = req.files.banner_image;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/news_banner_image/" + logoname;
+
+      await avatar.mv(UploadPath);
+
+      newsandeventsUpdates.banner_image = "news_banner_image/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner_image) {
+        const oldLogoPath = "./storage/" + existingRecord.banner_image;
+        await removeFile(oldLogoPath);
+      }
+    }
+    if (req.files && req.files.pdf_file) {
+      const avatar = req.files.pdf_file;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/news_pdf_file/" + logoname;
+
+      await avatar.mv(UploadPath);
+
+      newsandeventsUpdates.pdf_file = "news_pdf_file/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.pdf_file) {
+        const oldLogoPath = "./storage/" + existingRecord.pdf_file;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Update database record
+    await newsandevents.update(newsandeventsUpdates, { where: { id: req.body.id } });
+
+
     res.status(200).send({
       status: 1,
-      message: "Data updated Successfully",
+      message: "Data Save Successfully",
     });
   } catch (error) {
     return res.status(400).send({
@@ -148,6 +236,7 @@ exports.update = (req, res) => {
     });
   }
 };
+
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, columnname, searchfrom, orderby } = req.query;
 
@@ -163,7 +252,17 @@ exports.findAll = async (req, res) => {
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   const { limit, offset } = getPagination(page, size);
   newsandevents
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({
+      where: condition, limit, offset,
+      include: [
+        {
+          required: false,
+          association: "newscategories",
+          attributes: ["id", "name"],
+        },
+      ],
+      order: [orderconfig]
+    })
     .then((data) => {
       const response = getPagingData(data, page, limit);
       res.status(200).send({
@@ -215,7 +314,15 @@ exports.findOne = (req, res) => {
   const id = req.params.id;
   newsandevents
     .findByPk(id, {
-      include: [{ association: "examnews", attributes: ["id", "exam_title"] }],
+      include: [
+        {
+          required: false,
+          association: "newscategories",
+          attributes: ["id", "name"],
+        },
+
+
+      ],
     })
     .then((data) => {
       if (data) {

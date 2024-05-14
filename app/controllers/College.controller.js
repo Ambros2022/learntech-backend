@@ -334,6 +334,7 @@ exports.create = async (req, res) => {
       rankings: req.body.rankings,
       scholarship: req.body.scholarship,
       hostel: req.body.hostel,
+      is_associated: req.body.is_associated,
     });
 
 
@@ -449,6 +450,7 @@ exports.update = async (req, res) => {
       rankings: req.body.rankings || existingRecord.rankings,
       scholarship: req.body.scholarship || existingRecord.scholarship,
       hostel: req.body.hostel || existingRecord.hostel,
+      is_associated: req.body.is_associated || existingRecord.is_associated,
     };
 
     // Check if a new logo is provided

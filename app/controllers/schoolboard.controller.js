@@ -1,11 +1,26 @@
 const db = require("../models");
 const path = require("path");
 const schoolboards = db.schoolboards;
+const school_board_faqs = db.school_board_faqs;
+const _ = require("lodash");
+const Op = db.Sequelize.Op;
 
 
 // Array of allowed files
 const sendsearch = require("../utility/Customsearch");
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
+
+// Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
@@ -26,30 +41,79 @@ const getPagingData = (data, page, limit) => {
 };
 
 
-
 exports.create = async (req, res) => {
-
   try {
+    let logos = "";
+
+    if (req.files && req.files.logo) {
+      let avatar = req.files.logo;
+
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/schoolboard_logo/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        logos = "schoolboard_logo/" + logoname;
+      }
+    }
+    if (logos == "") {
+      return res.status(400).send({
+        message: "insert logo",
+        errors: {},
+        status: 0,
+      });
+    } else {
       const schoolboardsDetails = await schoolboards.create({
-          name: req.body.name,
-          slug: req.body.slug,
-      
-  });
+        country_id: req.body.country_id,
+        state_id: req.body.state_id,
+        city_id: req.body.city_id,
+        name: req.body.name,
+        slug: req.body.slug,
+        gender: req.body.gender,
+        board_type: req.body.board_type,
+        logo: logos,
+        avg_rating: req.body.avg_rating,
+        listing_order: req.body.listing_order,
+        established: req.body.established,
+        result_date: req.body.result_date,
+        info: req.body.info,
+        time_table: req.body.time_table,
+        reg_form: req.body.reg_form,
+        syllabus: req.body.syllabus,
+        results: req.body.results,
+        sample_paper: req.body.sample_paper,
+      });
 
       res.status(200).send({
-          status: 1,
-          message: 'Data Save Successfully',
-          data: schoolboardsDetails
+        status: 1,
+        message: "Data Save Successfully",
+        data: schoolboardsDetails,
       });
+    }
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to insert data",
+      errors: error,
+      status: 0,
+    });
   }
-  catch (error) {
-      return res.status(400).send({
-          message: 'Unable to insert data',
-          errors: error,
-          status: 0
-      });
-  }
-}
+};
 
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -72,6 +136,15 @@ exports.findAll = async (req, res) => {
       where: condition,
       limit,
       offset,
+      include: [
+
+        {
+          required: false,
+          association: "schoolboardfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+  
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -124,8 +197,18 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  schoolboards
-    .findByPk(id)
+  schoolboards.findByPk(id, {
+    include: [
+
+      {
+        required: false,
+        association: "schoolboardfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+
+    ],
+  })
+
     .then((data) => {
       if (data) {
         res.status(200).send({
@@ -148,60 +231,107 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.update = (req, res) => {
-  const id = req.body.id;
-
+exports.update = async (req, res) => {
   try {
-    let logonames = "";
 
-    let STREAD = {
-      name: req.body.name,
-      city_id: req.body.city_id,
-      area_id: req.body.area_id,
-      slug: req.body.slug,
-      status: req.body.status,
-      rank: req.body.rank,
-      address: req.body.address,
-      established: req.body.established,
+    const existingRecord = await schoolboards.findOne({
+      where: { id: req.body.id },
+    });
+
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+    let schoolboardsUpdates = {
+      country_id: req.body.country_id || existingRecord.country_id,
+      state_id: req.body.state_id || existingRecord.state_id,
+      city_id: req.body.city_id || existingRecord.city_id,
+      school_board_id: req.body.school_board_id || existingRecord.school_board_id,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      gender: req.body.gender || existingRecord.gender,
+      board_type: req.body.board_type || existingRecord.board_type,
+      avg_rating: req.body.avg_rating || existingRecord.avg_rating,
+      listing_order: req.body.listing_order || existingRecord.listing_order,
+      established: req.body.established || existingRecord.established,
+      result_date: req.body.result_date || existingRecord.result_date,
+      info: req.body.info || existingRecord.info,
+      time_table: req.body.time_table || existingRecord.time_table,
+      reg_form: req.body.reg_form || existingRecord.reg_form,
+      syllabus: req.body.syllabus || existingRecord.syllabus,
+      results: req.body.results || existingRecord.results,
+      sample_paper: req.body.sample_paper || existingRecord.sample_paper,
     };
 
+    // Check if a new logo is provided
     if (req.files && req.files.logo) {
-      let avatar = req.files.logo;
+      const avatar = req.files.logo;
 
-      // Check if the uploaded file is allowed
+      // Check file type and size
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
         return res.status(400).send({
-          message: "Invalid File type ",
+          message: "Invalid file type",
           errors: {},
           status: 0,
         });
       }
-
       if (avatar.size / (1024 * 1024) > allowed_file_size) {
         return res.status(400).send({
-          message: "File too large ",
+          message: "File too large",
           errors: {},
           status: 0,
         });
       }
 
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/schoolboard_logo/" + logoname;
 
-      let IsUpload = avatar.mv("./storage/schoolboards_logo/" + logoname)
-        ? 1
-        : 0;
+      await avatar.mv(uploadPath);
 
-      if (IsUpload) {
-        {
-          logonames = "schoolboards_logo/" + logoname;
-        }
-        STREAD["logo"] = logonames;
+      schoolboardsUpdates.logo = "schoolboard_logo/" + logoname;
+
+      if (existingRecord.logo) {
+        console.log("existingRecord.icon", existingRecord.logo);
+        const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
       }
     }
 
-    schoolboards.update(STREAD, {
-      where: { id: req.body.id },
+    // Update database record
+    await schoolboards.update(schoolboardsUpdates, { where: { id: req.body.id } });
+
+    res.status(200).send({
+      status: 1,
+      message: "Data saved successfully",
     });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to update data",
+      errors: error.message,
+      status: 0,
+    });
+  }
+};
+
+exports.updatefaqs = async (req, res) => {
+
+  try {
+    if (req.body.faqs && req.body.id) {
+      await school_board_faqs.destroy({
+        where: { school_board_id: req.body.id },
+      });
+      const faqss = JSON.parse(req.body.faqs);
+      await _.forEach(faqss, function (value) {
+        school_board_faqs.create({
+          school_board_id: req.body.id,
+          questions: value.questions ? value.questions : null,
+          answers: value.answers ? value.answers : null,
+        });
+      });
+    }
 
     res.status(200).send({
       status: 1,
@@ -215,3 +345,33 @@ exports.update = (req, res) => {
     });
   }
 };
+
+// exports.updatefaqs = async (req, res) => {
+
+//   try {
+//     if (req.body.faqs && req.body.id) {
+//       await school_faqs.destroy({
+//         where: { school_id: req.body.id },
+//       });
+//       const faqss = JSON.parse(req.body.faqs);
+//       await _.forEach(faqss, function (value) {
+//         school_faqs.create({
+//           school_id: req.body.id,
+//           questions: value.questions ? value.questions : null,
+//           answers: value.answers ? value.answers : null,
+//         });
+//       });
+//     }
+
+//     res.status(200).send({
+//       status: 1,
+//       message: "Data Save Successfully",
+//     });
+//   } catch (error) {
+//     return res.status(400).send({
+//       message: "Unable to update data",
+//       errors: error,
+//       status: 0,
+//     });
+//   }
+// };

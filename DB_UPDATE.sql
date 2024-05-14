@@ -603,3 +603,100 @@ CREATE TABLE jobs_enquires (
   FOREIGN KEY (jobs_position_id) REFERENCES jobs_positions(id),
   FOREIGN KEY (job_location_id) REFERENCES all_job_locations(id)
 );
+
+
+CREATE TABLE reviews (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  userrating FLOAT NOT NULL,
+  user_id INT DEFAULT NULL,
+  content VARCHAR(255) NOT NULL,
+  is_approved TINYINT DEFAULT 0,
+  passing_year VARCHAR(255),
+  review_type ENUM('school', 'college') DEFAULT 'college',
+  college_id INT DEFAULT NULL,
+  course_id INT DEFAULT NULL,
+  course_type ENUM('UG', 'PG', 'Diploma', 'Doctorate', 'Default') DEFAULT 'Default',
+  school_id INT DEFAULT NULL,
+  school_board_id INT DEFAULT NULL,
+  grade VARCHAR(255) DEFAULT NULL,
+  likes INT DEFAULT 0,
+  dislikes INT DEFAULT 0,
+  is_reported TINYINT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE review_replies (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  content VARCHAR(150) NOT NULL,
+  review_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (review_id) REFERENCES reviews(id) ON DELETE CASCADE
+);
+
+
+ALTER TABLE `school_boards`
+ADD COLUMN `country_id` INT,
+ADD COLUMN `state_id` INT,
+ADD COLUMN `city_id` INT,
+ADD COLUMN `gender` ENUM('male', 'female', 'Co-Ed') DEFAULT 'Co-Ed',
+ADD COLUMN `board_type` ENUM('state', 'national', 'international', 'default') DEFAULT 'default',
+ADD COLUMN `logo` VARCHAR(150) DEFAULT NULL,
+ADD COLUMN `avg_rating` FLOAT DEFAULT NULL,
+ADD COLUMN `listing_order` VARCHAR(50) DEFAULT '99999',
+ADD COLUMN `established` VARCHAR(150) DEFAULT NULL,
+ADD COLUMN `result_date` VARCHAR(150) DEFAULT NULL,
+ADD COLUMN `info` LONGTEXT DEFAULT NULL,
+ADD COLUMN `time_table` LONGTEXT DEFAULT NULL,
+ADD COLUMN `reg_form` LONGTEXT DEFAULT NULL,
+ADD COLUMN `syllabus` LONGTEXT DEFAULT NULL,
+ADD COLUMN `results` LONGTEXT DEFAULT NULL,
+ADD COLUMN `sample_paper` LONGTEXT DEFAULT NULL,
+ADD FOREIGN KEY (`country_id`) REFERENCES `countries`(`id`),
+ADD FOREIGN KEY (`state_id`) REFERENCES `states`(`id`),
+ADD FOREIGN KEY (`city_id`) REFERENCES `cities`(`id`);
+
+
+CREATE TABLE school_board_recognitions (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  recognition_id INT,
+  school_board_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (recognition_id) REFERENCES recognition_and_approvals(id),
+  FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
+);
+
+CREATE TABLE school_board_faqs (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  school_board_id INT,
+  questions LONGTEXT DEFAULT NULL,
+  answers LONGTEXT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
+);
+
+CREATE TABLE video_testimonials (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(150) NOT NULL,
+  name VARCHAR(150) NOT NULL,
+  designation VARCHAR(150) DEFAULT NULL,
+  video_url VARCHAR(150) DEFAULT NULL,
+  full_url VARCHAR(150) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE our_teams (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  designation VARCHAR(150) DEFAULT NULL,
+  linked_in_link VARCHAR(150) DEFAULT NULL,
+  image VARCHAR(150) DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

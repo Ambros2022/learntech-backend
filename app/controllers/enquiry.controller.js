@@ -26,13 +26,13 @@ const getPagingData = (data, page, limit) => {
 
 exports.findAll = async (req, res) => {
 
-    const { page, size, searchtext,searchfrom, columnname,orderby} = req.query;
- 
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
     var column = columnname ? columnname : 'id';
     var order = orderby ? orderby : 'ASC';
-    var orderconfig = [column,order];
-  
-  
+    var orderconfig = [column, order];
+
+
     const myArray = column.split(".");
     if (typeof myArray[1] !== "undefined") {
         var table = myArray[0];
@@ -42,7 +42,7 @@ exports.findAll = async (req, res) => {
     var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
     const { limit, offset } = getPagination(page, size);
-    enquiry.findAndCountAll({ where: condition, limit, offset,order:[orderconfig]})
+    enquiry.findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
         .then(data => {
             const response = getPagingData(data, page, limit);
 
