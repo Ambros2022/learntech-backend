@@ -215,6 +215,10 @@ db.courses.belongsTo(db.general_course, {
   as: "generalcourse",
 });
 
+db.college.hasMany(db.courses, {
+  foreignKey: "college_id",
+  as: "courses",
+});
 /***  Relation ship school-boards */
 
 db.schoolboards.hasMany(db.school_board_faqs, { as: "schoolboardfaqs", foreignKey: "school_board_id" });
