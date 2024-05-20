@@ -454,6 +454,11 @@ exports.findOne = (req, res) => {
           association: "schgallery",
           attributes: ["id", "image"],
         },
+        {
+          required: false,
+          association: "schfaqs",
+          attributes: ["id", "questions","answers"],
+        },
 
       ],
 
