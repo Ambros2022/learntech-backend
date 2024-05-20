@@ -17,6 +17,7 @@ const exam = db.exam;
 const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
+const videos = db.videos;
 
 
 
@@ -35,6 +36,57 @@ const getPagingData = (data, page, limit) => {
   return { totalItems, finaldata, totalPages, currentPage };
 };
 
+
+exports.allcountries = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  state
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+      ],
+
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving countries.",
+      });
+    });
+};
 
 exports.allstates = async (req, res) => {
   const { page, size, searchtext, searchfrom, country_id, columnname, orderby } = req.query;
@@ -183,14 +235,7 @@ exports.allabroadpages = async (req, res) => {
         "name",
         "slug",
       ],
-      // include: [
-      //   {
-      //     required: false,
-      //     association: "abroadpages",
-      //     attributes: ["id", "name"],
 
-      //   },
-      // ],
       order: [orderconfig]
     })
     .then((data) => {
@@ -228,7 +273,6 @@ exports.allnews = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-
   let data_array = [{ status: "Published" }];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -458,18 +502,27 @@ exports.allbanners = async (req, res) => {
       order: [orderconfig],
       limit,
       offset
-    });
+    })
+      .then((data) => {
+        const response = getPagingData(data, page, limit);
 
-    const response = getPagingData(data, page, limit);
-
-    res.status(200).send({
-      status: 1,
-      message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: response.finaldata,
-    });
+        res.status(200).send({
+          status: 1,
+          message: "success",
+          totalItems: response.totalItems,
+          currentPage: response.currentPage,
+          totalPages: response.totalPages,
+          data: response.finaldata,
+        });
+      })
+      .catch((err) => {
+        res.status(500).send({
+          status: 0,
+          message:
+            err.message ||
+            "Some error occurred while retrieving banners.",
+        });
+      });
   } catch (err) {
     console.error(err);
     res.status(500).send({
@@ -479,76 +532,7 @@ exports.allbanners = async (req, res) => {
   }
 }
 
-exports.allcolleges = async (req, res) => {
-  try {
-    const { page, size, searchtext, searchfrom, columnname, orderby, country_id, state_id, city_id, type, home_view_status, college_type } = req.query;
 
-    var column = columnname || "id";
-    var order = orderby || "ASC";
-    var orderconfig = [column, order];
-
-    const myArray = column.split(".");
-    if (myArray.length > 1) {
-      var table = myArray[0];
-      column = myArray[1];
-      orderconfig = [[table, column], order];
-    }
-
-    let data_array = [{ status: "Published" }];
-    let conditionarray = [];
-
-    let conditionCountryId = country_id ? { country_id: country_id } : null;
-    conditionCountryId ? data_array.push(conditionCountryId) : null;
-
-    let conditionStateId = state_id ? { state_id: state_id } : null;
-    conditionStateId ? data_array.push(conditionStateId) : null;
-
-    let conditionCityId = city_id ? { city_id: city_id } : null;
-    conditionCityId ? data_array.push(conditionCityId) : null;
-
-    if (type) {
-      conditionarray.push({ type: type });
-    }
-    if (home_view_status) {
-      conditionarray.push({ home_view_status: home_view_status });
-    }
-    if (college_type) {
-      conditionarray.push({ college_type: college_type });
-    }
-    const condition = sendsearch.customseacrh(searchtext, searchfrom);
-    if (condition) {
-      data_array.push(condition);
-    }
-
-    const { limit, offset } = getPagination(page, size);
-    const data = await college.findAndCountAll({
-      where: {
-        [Op.and]: data_array.concat(conditionarray)
-      },
-      attributes: ["id", "name", "slug", "logo", "banner_image", "address"],
-      order: [orderconfig],
-      limit,
-      offset
-    });
-
-    const response = getPagingData(data, page, limit);
-
-    res.status(200).send({
-      status: 1,
-      message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: response.finaldata,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      status: 0,
-      message: err.message || "Some error occurred while retrieving colleges.",
-    });
-  }
-}
 
 exports.newsandblogs = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -649,11 +633,6 @@ exports.exploreCollege = async (req, res) => {
           association: "clgstreamm",
           attributes: ["college_id"],
         },
-        // {
-        //   required: false,
-        //   association: "clgstreams",
-        //   attributes: ["stream_id"],
-        // }
       ],
       order: [orderconfig],
       limit,
@@ -749,8 +728,8 @@ exports.exploreexam = async (req, res) => {
   }
 };
 
-exports.colleges = async (req, res) => {
-  const { page, size, searchtext, searchfrom, country_id, state_id, city_id, college_type, columnname, orderby, course_type } = req.query;
+exports.explorecourses = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -763,77 +742,317 @@ exports.colleges = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-  let conditionarray = [];
 
-  if (college_type) {
-    conditionarray.push({ college_type: college_type });
-  }
-
-  let conditionCountryId = country_id ? { country_id: country_id } : null;
-  conditionCountryId ? data_array.push(conditionCountryId) : null;
-
-  let conditionStateId = state_id ? { state_id: state_id } : null;
-  conditionStateId ? data_array.push(conditionStateId) : null;
-
-  let conditionCityId = city_id ? { city_id: city_id } : null;
-  conditionCityId ? data_array.push(conditionCityId) : null;
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-
-  let conditionCourseType = course_type ? { '$courses.course_type$': course_type } : null;
-  conditionCourseType ? data_array.push(conditionCourseType) : null;
+  var condition = searchtext && searchfrom ? { [searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` } } : null;
+  if (condition) data_array.push(condition);
 
   const { limit, offset } = getPagination(page, size);
-  college
-    .findAndCountAll({
-      where: {
-        [Op.and]: data_array.concat(conditionarray)
-      },
-      attributes: [
-        "id",
-        "name",
-        "city_id",
-        "state_id",
-        "established",
-      ],
-      include: [
-        {
-          required: false,
-          association: "courses",
-          attributes: ["id", "course_type"],
-        },
-      ],
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
 
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving colleges.",
-      });
+  try {
+    const data = await stream.findAndCountAll({
+      where: data_array,
+      attributes: ["id", "name"],
+      include: [{
+        required: false,
+        association: "general_courses",
+        attributes: ["id", "name", "slug"],
+        where: { status: "Published" }
+      }],
+      order: [orderconfig],
+      limit,
+      offset
     });
+
+    const response = getPagingData(data, page, limit);
+
+
+    const finaldataWithcourseCounts = response.finaldata.map(item => {
+      const uniquecourse = new Set(item.general_courses.map(exm => exm.stream_id));
+      return {
+        ...item.dataValues,
+        uniqueCollegeCount: uniquecourse.size
+      };
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: finaldataWithcourseCounts,
+      // data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving explore courses."
+    });
+  }
+};
+
+exports.allcolleges = async (req, res) => {
+  const {
+    page,
+    size,
+    searchtext,
+    searchfrom,
+    country_id,
+    state_id,
+    city_id,
+    type,
+    college_type,
+    is_associated,
+    columnname,
+    orderby,
+    course_type,
+    general_course_id,
+    stream_id
+  } = req.query;
+
+  let column = columnname || "id";
+  let order = orderby || "ASC";
+  let orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (myArray[1] !== undefined) {
+    const table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  let data_array = [];
+  let conditionarray = [];
+
+  if (is_associated) {
+    conditionarray.push({ is_associated });
+  }
+
+  if (type) {
+    conditionarray.push({ type });
+  }
+
+  if (college_type) {
+    conditionarray.push({ college_type });
+  }
+
+ 
+  if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+  if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
+  if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
+
+
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) data_array.push(condition);
+
+  let include = [];
+
+  if (course_type || general_course_id) {
+    include.push({
+      association: "courses",
+      required: true,
+      attributes: ["id", "general_course_id", "course_type"],
+      where: {}
+    });
+
+    if (course_type) include[include.length - 1].where.course_type = course_type;
+    if (general_course_id) include[include.length - 1].where.general_course_id = JSON.parse(general_course_id);
+  }
+
+  if (stream_id) {
+    include.push({
+      association: "collegestreams",
+      required: true,
+      attributes: ["id", "college_id", "stream_id"],
+      where: {
+        stream_id: JSON.parse(stream_id)
+      }
+    });
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const data = await college.findAndCountAll({
+      where: {
+        [Op.and]: data_array.concat(conditionarray),
+      },
+      attributes: ["id", "name", "city_id", "state_id", "established"],
+      include,
+      order: [orderconfig],
+      limit,
+      offset,
+    });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving colleges.",
+    });
+  }
 };
 
 
 
 
 
+exports.allvideos = async (req, res) => {
+  try {
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+    var column = columnname || "id";
+    var order = orderby || "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (myArray.length > 1) {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [[table, column], order];
+    }
+
+    let data_array = [];
+    let conditionarray = [];
+
+    const condition = sendsearch.customseacrh(searchtext, searchfrom);
+    if (condition) {
+      data_array.push(condition);
+    }
+
+    const { limit, offset } = getPagination(page, size);
+    const data = await videos.findAndCountAll({
+      where: {
+        [Op.and]: data_array.concat(conditionarray)
+      },
+      attributes: ["id", "title", "description", "youtube_link"],
+      order: [orderconfig],
+      limit,
+      offset
+    })
+      .then((data) => {
+        const response = getPagingData(data, page, limit);
+
+        res.status(200).send({
+          status: 1,
+          message: "success",
+          totalItems: response.totalItems,
+          currentPage: response.currentPage,
+          totalPages: response.totalPages,
+          data: response.finaldata,
+        });
+      })
+      .catch((err) => {
+        res.status(500).send({
+          status: 0,
+          message:
+            err.message ||
+            "Some error occurred while retrieving banners.",
+        });
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving videos.",
+    });
+  }
+}
+
+exports.collegefindOne = (req, res) => {
+  const id = req.params.id;
+  college.findByPk(id, {
+    include: [
 
 
+      {
+        required: false,
+        association: "country",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "state",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "citys",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "collegestreams",
+        attributes: ["id", "stream_id"],
+        include: [
+          {
+            association: "clgstreams",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+      {
+        required: false,
+        association: "collegeamenities",
+        attributes: ["id", "amenitie_id"],
+        include: [
+          {
+            association: "clgamenities",
+            attributes: ["id", "amenities_name"],
+          },
+        ],
+      },
+      {
+        required: false,
+        association: "collegerecognitions",
+        attributes: ["id", "recognition_id"],
+        include: [
+          {
+            association: "clgrecognitions",
+            attributes: ["id", "recognition_approval_name"],
+          },
+        ],
+      },
+      {
+        required: false,
+        association: "collegefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+      {
+        required: false,
+        association: "clggallery",
+        attributes: ["id", "image"],
+      },
 
-
-
+    ],
+  })
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find colleges with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving colleges with id=" + id,
+      });
+    });
+};
