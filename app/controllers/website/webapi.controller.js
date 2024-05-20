@@ -56,7 +56,7 @@ exports.allcountries = async (req, res) => {
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
-  state
+  countries
     .findAndCountAll({
       where: data_array,
       attributes: [
