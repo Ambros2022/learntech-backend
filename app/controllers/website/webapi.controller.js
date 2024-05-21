@@ -626,7 +626,7 @@ exports.exploreCollege = async (req, res) => {
   try {
     const data = await stream.findAndCountAll({
       where: data_array,
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "logo"],
       include: [
         {
           required: false,
@@ -689,7 +689,7 @@ exports.exploreexam = async (req, res) => {
   try {
     const data = await stream.findAndCountAll({
       where: data_array,
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "logo"],
       include: [{
         required: false,
         association: "exam",
@@ -751,7 +751,7 @@ exports.explorecourses = async (req, res) => {
   try {
     const data = await stream.findAndCountAll({
       where: data_array,
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "logo"],
       include: [{
         required: false,
         association: "general_courses",
