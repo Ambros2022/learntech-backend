@@ -52,6 +52,8 @@ module.exports = function (app) {
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 
+  app.get("/api/website/courses/get", webapicontroller.allcourses);
+
   app.get("/api/website/home/searchbar", webapicontroller.searchbarhome);
 
 
@@ -73,6 +75,8 @@ module.exports = function (app) {
   app.get("/api/website/videos/get", webapicontroller.allvideos);
 
   app.get("/api/website/collegefindone/get/:id", webapicontroller.collegefindOne);
+
+  
 
 
 
