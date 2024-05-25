@@ -17,16 +17,10 @@ var corsOptions = {
   origin: [
     "http://localhost:3000",
     "http://preprod.keralastudy.com",
-    "http://bstudy.codepixelsoft.com",
-    "http://localhost:3001",
-    "http://preprod.bangalorestudy.com",
-    "https://preprod.bangalorestudy.com",
-    "https://bangalorestudy.com"
   ]
 };
 
 app.use(cors(corsOptions));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -37,16 +31,12 @@ app.use(fileUpload({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/', express.static(__dirname + '/storage'));
+app.use('/storage', express.static(__dirname + '/storage'));
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Default route
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+require('./app/routes/web.routes')(app);
 app.get("/api", (req, res) => {
- res.json({ message: "Welcome to Learntechww.comww1122" });
+ res.json({ message: "Welcome to Learntechww.com" });
 });
 
 // Start the HTTP server
@@ -56,5 +46,5 @@ var httpServer = http.createServer(app);
 httpServer.listen(portnumber);
 
 httpServer.on("listening", function () {
-  console.log("ok, server is running on portq: " + portnumber);
+  console.log("ok, server is running on port: " + portnumber);
 });
