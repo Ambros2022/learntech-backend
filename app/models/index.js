@@ -445,7 +445,10 @@ db.general_course_faqs.belongsTo(db.general_course, {
   as: "generalcoursefaqs",
 });
 
-
+db.stream.hasMany(db.general_course, {
+  foreignKey: "stream_id",
+  as: "general_courses"
+});
 
 db.general_course.belongsTo(db.stream, {
   foreignKey: "stream_id",

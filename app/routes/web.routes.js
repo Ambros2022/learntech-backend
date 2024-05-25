@@ -40,6 +40,8 @@ module.exports = function (app) {
   });
 
 
+  app.get("/api/website/country/get", webapicontroller.allcountries);
+
   app.get("/api/website/states/get", webapicontroller.allstates);
 
   app.get("/api/website/exams/get", webapicontroller.allexams);
@@ -50,6 +52,8 @@ module.exports = function (app) {
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 
+  app.get("/api/website/courses/get", webapicontroller.allcourses);
+
   app.get("/api/website/home/searchbar", webapicontroller.searchbarhome);
 
 
@@ -58,16 +62,21 @@ module.exports = function (app) {
   );
   app.get("/api/website/banner/get", webapicontroller.allbanners);
 
-  app.get("/api/website/college/get", webapicontroller.allcolleges);
-
   app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
 
   app.get("/api/website/explorecollege/get", webapicontroller.exploreCollege);
 
   app.get("/api/website/exploreexam/get", webapicontroller.exploreexam);
 
-  app.get("/api/website/colleges/get", webapicontroller.colleges);
+  app.get("/api/website/explorecourses/get", webapicontroller.explorecourses);
 
+  app.get("/api/website/colleges/get", webapicontroller.allcolleges);
+
+  app.get("/api/website/videos/get", webapicontroller.allvideos);
+
+  app.get("/api/website/collegefindone/get/:id", webapicontroller.collegefindOne);
+
+  
 
 
 

@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Learntechww.com" });
+  res.json({ message: "Welcome to Learntechww.comww" });
 });
 
 app.use('/', express.static(__dirname + '/storage'));
@@ -55,19 +55,19 @@ app.use('/storage', express.static(__dirname + '/storage'));
 
 
 
-require('./app/routes/auth.routes')(app);
-require('./app/routes/user.routes')(app);
-require('./app/routes/admin.routes')(app);
-require('./app/routes/web.routes')(app);
+// require('./app/routes/auth.routes')(app);
+// require('./app/routes/user.routes')(app);
+// require('./app/routes/admin.routes')(app);
+// require('./app/routes/web.routes')(app);
 
 // creating the http server for development
-let portnumber = process.env.APP_PORT || 8000;
+let portnumber = 5000;
 
 var httpServer = http.createServer(app);
 httpServer.listen(portnumber);
 
 httpServer.on("listening", function () {
-  console.log("ok, server is running: " + portnumber);
+  console.log("ok, server is runningqq: " + portnumber);
 });
 
 
