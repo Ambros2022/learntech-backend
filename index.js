@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // simple route
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Learntechww.comww" });
+  res.json({ message: "Welcome to Learntechww.comww11" });
 });
 
 app.use('/', express.static(__dirname + '/storage'));
