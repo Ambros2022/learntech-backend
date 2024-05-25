@@ -29,14 +29,21 @@ app.use(fileUpload({
   createParentPath: true
 }));
 
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/', express.static(__dirname + '/storage'));
 app.use('/storage', express.static(__dirname + '/storage'));
 
 require('./app/routes/web.routes')(app);
+require('./app/routes/auth.routes')(app);
+require('./app/routes/user.routes')(app);
+require('./app/routes/admin.routes')(app);
+
+
 app.get("/api", (req, res) => {
- res.json({ message: "Welcome to Learntechww.com" });
+ res.json({ message: "Welcome to Learntechww.com v1" });
 });
 
 // Start the HTTP server
