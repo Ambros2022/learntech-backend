@@ -10,7 +10,7 @@ const fs = require('fs');
 
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://www.bangalorestudy.com');
+  res.header('Access-Control-Allow-Origin', 'http://preprod.keralastudy.com/');
   // You can also set other CORS headers as needed
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 
 
 var corsOptions = {
-  origin: ["http://localhost:3000","https://www.keralastudy.com","http://bstudy.codepixelsoft.com","http://localhost:3001","http://preprod.bangalorestudy.com","https://preprod.bangalorestudy.com","https://bangalorestudy.com"]
+  origin: ["http://localhost:3000","http://preprod.keralastudy.com/","http://bstudy.codepixelsoft.com","http://localhost:3001","http://preprod.bangalorestudy.com","https://preprod.bangalorestudy.com","https://bangalorestudy.com"]
 };
 
 app.use(cors(corsOptions));
@@ -49,8 +49,8 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to Learntechww.comww11" });
 });
 
-app.use('/', express.static(__dirname + '/storage'));
-app.use('/storage', express.static(__dirname + '/storage'));
+// app.use('/', express.static(__dirname + '/storage'));
+// app.use('/storage', express.static(__dirname + '/storage'));
 
 
 
