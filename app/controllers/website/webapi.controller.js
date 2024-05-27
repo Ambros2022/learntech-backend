@@ -926,13 +926,19 @@ exports.allcolleges = async (req, res) => {
       where: {
         [Op.and]: data_array.concat(conditionarray),
       },
-      attributes: ["id", "name", "city_id", "state_id", "established"],
-      include,
+      attributes: ["id", "name", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating"],
+      include: [
+        {
+            required: false,
+            association: "state",
+            attributes: ["id", "name"],
+          },
+      ],
       order: [orderconfig],
       limit,
       offset,
     });
-
+   
     const response = getPagingData(data, page, limit);
 
     res.status(200).send({
