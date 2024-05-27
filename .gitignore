@@ -14,7 +14,7 @@ storage2/
 
 .env
 server.js
-
+index.js
 # Compiled Java class files
 *.class
 
