@@ -44,7 +44,7 @@ module.exports = function (app) {
 
   app.get("/api/website/states/get", webapicontroller.allstates);
 
-  app.get("/api/website/exams/get", webapicontroller.allexams);
+  app.get("/api/website/stream_exams/get", webapicontroller.allstream_exams);
 
   app.get("/api/website/allabroadpages/get", webapicontroller.allabroadpages);
 

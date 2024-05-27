@@ -59,7 +59,7 @@ exports.allcountries = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   countries
     .findAndCountAll({
-      where: data_array,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -112,7 +112,7 @@ exports.allstates = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   state
     .findAndCountAll({
-      where: data_array,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -151,7 +151,7 @@ exports.allstates = async (req, res) => {
     });
 };
 
-exports.allexams = async (req, res) => {
+exports.allstream_exams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -173,7 +173,7 @@ exports.allexams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -886,7 +886,7 @@ exports.allcolleges = async (req, res) => {
     conditionarray.push({ college_type });
   }
 
- 
+
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
   if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
   if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
@@ -930,16 +930,16 @@ exports.allcolleges = async (req, res) => {
       attributes: ["id", "name", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating"],
       include: [
         {
-            required: false,
-            association: "state",
-            attributes: ["id", "name"],
-          },
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
       ],
       order: [orderconfig],
       limit,
       offset,
     });
-   
+
     const response = getPagingData(data, page, limit);
 
     res.status(200).send({
@@ -1245,7 +1245,7 @@ exports.allschools = async (req, res) => {
     conditionarray.push({ school_type });
   }
 
- 
+
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
   if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
   if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
@@ -1345,7 +1345,7 @@ exports.schoolfindone = (req, res) => {
         {
           required: false,
           association: "schfaqs",
-          attributes: ["id", "questions","answers"],
+          attributes: ["id", "questions", "answers"],
         },
 
       ],
@@ -1404,9 +1404,9 @@ exports.abroadpages = async (req, res) => {
       ],
       include: [
         {
-            required: false,
-            association: "country",
-            attributes: ["id", "name"],
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
         },
       ],
       order: [orderconfig]
@@ -1437,42 +1437,42 @@ exports.abroadcollegefindone = (req, res) => {
   const id = req.params.id;
   abroadpages.findByPk(id, {
     attributes: ['id', 'country_id', 'name', 'slug', 'backgroundimage'],
-      include: [
-          {
-              required: false,
-              association: "country",
-              attributes: ["id", "name"],
-          },
-          {
-              required: false,
-              association: "abroadpagefaqs",
-              attributes: ["id", "questions", "answers"],
-            },
+    include: [
+      {
+        required: false,
+        association: "country",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "abroadpagefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
 
-      ],
+    ],
   })
-      .then((data) => {
-          if (data) {
+    .then((data) => {
+      if (data) {
 
 
-              res.status(200).send({
-                  status: 1,
-                  message: "successfully retrieved",
-                  data: data,
-              });
-          } else {
-              res.status(400).send({
-                  status: 0,
-                  message: `Cannot find abroadpages with id=${id}.`,
-              });
-          }
-      })
-      .catch((err) => {
-          res.status(500).send({
-              status: 0,
-              message: "Error retrieving abroadpages with id=" + id,
-          });
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find abroadpages with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving abroadpages with id=" + id,
       });
+    });
 };
 
 exports.allentranceexams = async (req, res) => {
@@ -1536,34 +1536,34 @@ exports.findoneexam = (req, res) => {
   const id = req.params.id;
   exam.findByPk(id, {
     attributes: ['id', 'exam_title', 'slug'],
-      include: [
-        {
-          required: false,
-          association: "examfaqs",
-          attributes: ["id", "questions", "answers"],
-        },
-      ],
+    include: [
+      {
+        required: false,
+        association: "examfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+    ],
   })
-      .then((data) => {
-          if (data) {
+    .then((data) => {
+      if (data) {
 
 
-              res.status(200).send({
-                  status: 1,
-                  message: "successfully retrieved",
-                  data: data,
-              });
-          } else {
-              res.status(400).send({
-                  status: 0,
-                  message: `Cannot find exams with id=${id}.`,
-              });
-          }
-      })
-      .catch((err) => {
-          res.status(500).send({
-              status: 0,
-              message: "Error retrieving exams with id=" + id,
-          });
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find exams with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving exams with id=" + id,
       });
+    });
 };

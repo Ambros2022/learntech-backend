@@ -18,20 +18,21 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    const { count: totalItems, rows: affilition} = data;
+    const { count: totalItems, rows: affilition } = data;
     const currentPage = page ? +page : 1;
     const totalPages = Math.ceil(totalItems / limit);
     return { totalItems, affilition, totalPages, currentPage };
 };
 
 exports.create = async (req, res) => {
-	
+
     try {
         const affilitionDetails = await affilition.create
-		({other_affiliations_name:req.body.other_affiliations_name,
-            other_affiliations_slug:req.body.other_affiliations_slug,
-            other_affiliations_description: req.body.other_affiliations_description,
-        });
+            ({
+                other_affiliations_name: req.body.other_affiliations_name,
+                other_affiliations_slug: req.body.other_affiliations_slug,
+                other_affiliations_description: req.body.other_affiliations_description,
+            });
 
         res.status(200).send({
             status: 1,
@@ -50,52 +51,53 @@ exports.create = async (req, res) => {
 
 }
 
-exports.findAll = async  (req, res) => {
+exports.findAll = async (req, res) => {
 
 
-    const { page, size, searchtext,stream_id,searchfrom,columnname,orderby } = req.query;
-  
-    var column= columnname ? columnname:'id';
-    var order= orderby?orderby:'ASC';
+    const { page, size, searchtext, stream_id, searchfrom, columnname, orderby } = req.query;
+
+    var column = columnname ? columnname : 'id';
+    var order = orderby ? orderby : 'ASC';
     var orderconfig = [column, order];
     const myArray = column.split(".");
-    if (typeof myArray[1]!== "undefined") {
-      var table= myArray[0];
-      column= myArray[1];
-      orderconfig = [table,column,order];
+    if (typeof myArray[1] !== "undefined") {
+        var table = myArray[0];
+        column = myArray[1];
+        orderconfig = [table, column, order];
     }
-    
-  
-    var conditionStreamId = stream_id ? {stream_id:stream_id}:null;
+
+
+    var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
     var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  let data_array = [];
-  conditionStreamId?data_array.push(conditionStreamId):null;
-  condition?data_array.push(condition):null;
-   
-  
-    
+    let data_array = [];
+    conditionStreamId ? data_array.push(conditionStreamId) : null;
+    condition ? data_array.push(condition) : null;
+
+
+
     const { limit, offset } = getPagination(page, size);
-    affilition.findAndCountAll({ where: data_array, limit, offset,order:[orderconfig]})
-      .then(data => {
-        const response = getPagingData(data, page, limit);
-  
-        res.status(200).send({
-          status:1,
-          message:"success",
-          totalItems:response.totalItems,
-          currentPage:response.currentPage,
-          totalPages:response.totalPages,
-          data:response.affilition});
-      })
-      .catch(err => {
-        res.status(500).send({
-          status: 0,
-          message:
-  
-            err.message || "Some error occurred while retrieving Sub streams."
+    affilition.findAndCountAll({ where: data_array, limit, offset, order: [orderconfig] })
+        .then(data => {
+            const response = getPagingData(data, page, limit);
+
+            res.status(200).send({
+                status: 1,
+                message: "success",
+                totalItems: response.totalItems,
+                currentPage: response.currentPage,
+                totalPages: response.totalPages,
+                data: response.affilition
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                status: 0,
+                message:
+
+                    err.message || "Some error occurred while retrieving Sub streams."
+            });
         });
-      });
-  };
+};
 
 
 exports.delete = (req, res) => {
@@ -139,7 +141,7 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
     const id = req.body.id;
 
-  
+
     try {
         affilition.update({
             other_affiliations_name: req.body.other_affiliations_name,
@@ -171,7 +173,7 @@ exports.update = (req, res) => {
 
 exports.findOne = (req, res) => {
     const id = req.params.id;
-   affilition.findByPk(id)
+    affilition.findByPk(id)
         .then(data => {
             if (data) {
 
