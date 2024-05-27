@@ -18,6 +18,7 @@ const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
 const videos = db.videos;
+// const abroadpages = db.abroadpages;
 
 
 
@@ -415,6 +416,8 @@ exports.allcourses = async (req, res) => {
     });
 };
 
+
+
 exports.searchbarhome = async (req, res) => {
   try {
     const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -579,9 +582,7 @@ exports.allbanners = async (req, res) => {
       message: err.message || "Some error occurred while retrieving banners.",
     });
   }
-}
-
-
+};
 
 exports.newsandblogs = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -1021,7 +1022,7 @@ exports.allvideos = async (req, res) => {
       message: err.message || "Some error occurred while retrieving videos.",
     });
   }
-}
+};
 
 exports.collegefindOne = (req, res) => {
   const id = req.params.id;
@@ -1112,3 +1113,457 @@ exports.collegefindOne = (req, res) => {
     });
 };
 
+exports.courses = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  stream
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+      ],
+      include: [{
+        required: false,
+        association: "general_courses",
+        attributes: ["id", "name", "slug"],
+        where: { status: "Published" }
+      }],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving courses.",
+      });
+    });
+};
+
+exports.coursefindone = (req, res) => {
+  const id = req.params.id;
+  courses
+    .findByPk(id, {
+      attributes: ['id', 'college_id', 'slug'],
+      include: [
+        {
+          required: false,
+          association: "college",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "generalcourse",
+          attributes: ["id", "name"],
+        },
+
+
+      ],
+    })
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find courses with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        error: err,
+        message: "Error retrievingdd courses with id=" + id,
+      });
+    });
+};
+
+exports.allschools = async (req, res) => {
+  const {
+    page,
+    size,
+    searchtext,
+    searchfrom,
+    country_id,
+    state_id,
+    city_id,
+    columnname,
+    orderby,
+    school_type,
+  } = req.query;
+
+  let column = columnname || "id";
+  let order = orderby || "ASC";
+  let orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (myArray[1] !== undefined) {
+    const table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  let data_array = [];
+  let conditionarray = [];
+
+  if (school_type) {
+    conditionarray.push({ school_type });
+  }
+
+ 
+  if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+  if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
+  if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
+
+
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) data_array.push(condition);
+
+  let include = [];
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const data = await school.findAndCountAll({
+      where: {
+        [Op.and]: data_array.concat(conditionarray),
+      },
+      attributes: ["id", "name", "city_id", "established", "icon"],
+      include,
+      order: [orderconfig],
+      limit,
+      offset,
+    });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving schools.",
+    });
+  }
+};
+
+exports.schoolfindone = (req, res) => {
+  const id = req.params.id;
+  school
+    .findByPk(id, {
+      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug'],
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schoolboard",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schoolamenities",
+          attributes: ["id", "amenitie_id"],
+          include: [
+            {
+              association: "schamenities",
+              attributes: ["id", "amenities_name"],
+            },
+          ],
+        },
+        {
+          required: false,
+          association: "schoollevels",
+          attributes: ["id"],
+          include: [
+            {
+              association: "schlevelname",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+
+        {
+          required: false,
+          association: "schgallery",
+          attributes: ["id", "image"],
+        },
+        {
+          required: false,
+          association: "schfaqs",
+          attributes: ["id", "questions","answers"],
+        },
+
+      ],
+
+    })
+    .then((data) => {
+      if (data) {
+
+        res.status(200).send({
+          status: 1,
+          message: "Successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find school with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: err.message || "Error retrieving school with id=" + id,
+      });
+    });
+};
+
+exports.abroadpages = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  abroadpages
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "country_id",
+        "name",
+        "slug",
+      ],
+      include: [
+        {
+            required: false,
+            association: "country",
+            attributes: ["id", "name"],
+        },
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving abroad pages.",
+      });
+    });
+};
+
+exports.abroadcollegefindone = (req, res) => {
+  const id = req.params.id;
+  abroadpages.findByPk(id, {
+    attributes: ['id', 'country_id', 'name', 'slug', 'backgroundimage'],
+      include: [
+          {
+              required: false,
+              association: "country",
+              attributes: ["id", "name"],
+          },
+          {
+              required: false,
+              association: "abroadpagefaqs",
+              attributes: ["id", "questions", "answers"],
+            },
+
+      ],
+  })
+      .then((data) => {
+          if (data) {
+
+
+              res.status(200).send({
+                  status: 1,
+                  message: "successfully retrieved",
+                  data: data,
+              });
+          } else {
+              res.status(400).send({
+                  status: 0,
+                  message: `Cannot find abroadpages with id=${id}.`,
+              });
+          }
+      })
+      .catch((err) => {
+          res.status(500).send({
+              status: 0,
+              message: "Error retrieving abroadpages with id=" + id,
+          });
+      });
+};
+
+exports.allentranceexams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  stream
+    .findAndCountAll({
+      where: data_array,
+      attributes: [
+        "id",
+        "name",
+      ],
+      include: [{
+        required: false,
+        association: "exam",
+        attributes: ["id", "exam_title"],
+        where: { status: "Published" }
+      }],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving exams.",
+      });
+    });
+};
+
+exports.findoneexam = (req, res) => {
+  const id = req.params.id;
+  exam.findByPk(id, {
+    attributes: ['id', 'exam_title', 'slug'],
+      include: [
+        {
+          required: false,
+          association: "examfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+      ],
+  })
+      .then((data) => {
+          if (data) {
+
+
+              res.status(200).send({
+                  status: 1,
+                  message: "successfully retrieved",
+                  data: data,
+              });
+          } else {
+              res.status(400).send({
+                  status: 0,
+                  message: `Cannot find exams with id=${id}.`,
+              });
+          }
+      })
+      .catch((err) => {
+          res.status(500).send({
+              status: 0,
+              message: "Error retrieving exams with id=" + id,
+          });
+      });
+};
