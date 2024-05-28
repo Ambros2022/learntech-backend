@@ -13,14 +13,14 @@ app.use((req, res, next) => {
   next();
 });
 
-var corsOptions = {
-  origin: [
-    "http://localhost:3000",
-    "http://preprod.keralastudy.com",
-  ]
-};
+// var corsOptions = {
+//   origin: [
+//     "http://localhost:3000",
+//     "http://preprod.keralastudy.com",
+//   ]
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -43,7 +43,7 @@ require('./app/routes/admin.routes')(app);
 
 
 app.get("/api", (req, res) => {
- res.json({ message: "Welcome to Learntechww.com v1" });
+ res.json({ message: "Welcome to Learntechww.com v1.2805" });
 });
 
 // Start the HTTP server
