@@ -17,7 +17,7 @@ const exam = db.exam;
 const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
-const videos = db.videos;
+const videos = db.video_testimonials;
 // const abroadpages = db.abroadpages;
 
 
@@ -230,7 +230,7 @@ exports.allabroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -282,7 +282,7 @@ exports.allnews = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   news_and_events
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "banner_image",
@@ -334,7 +334,7 @@ exports.allstreams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -387,7 +387,7 @@ exports.allcourses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   courses
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "slug",
@@ -990,7 +990,7 @@ exports.allvideos = async (req, res) => {
       where: {
         [Op.and]: data_array.concat(conditionarray)
       },
-      attributes: ["id", "title", "description", "youtube_link"],
+      attributes: ["id", "name", "designation", "video_url"],
       order: [orderconfig],
       limit,
       offset
@@ -1012,7 +1012,7 @@ exports.allvideos = async (req, res) => {
           status: 0,
           message:
             err.message ||
-            "Some error occurred while retrieving banners.",
+            "Some error occurred while retrieving videos.",
         });
       });
   } catch (err) {
@@ -1135,7 +1135,7 @@ exports.courses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -1395,7 +1395,7 @@ exports.abroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "country_id",
@@ -1497,7 +1497,7 @@ exports.allentranceexams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
