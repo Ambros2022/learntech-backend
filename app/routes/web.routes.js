@@ -40,35 +40,57 @@ module.exports = function (app) {
   });
 
 
+  // Loction apis //
+
   app.get("/api/website/country/get", webapicontroller.allcountries);
 
   app.get("/api/website/states/get", webapicontroller.allstates);
 
+
+  //End  Loction apis //
+
+  // homrpage apis //
   app.get("/api/website/stream_exams/get", webapicontroller.allstream_exams);
-
-  app.get("/api/website/allabroadpages/get", webapicontroller.allabroadpages);
-
-  app.get("/api/website/news/get", webapicontroller.allnews);
-
-  app.get("/api/website/stream/get", webapicontroller.allstreams);
-
-  app.get("/api/website/allcourses/get", webapicontroller.allcourses);
 
   app.get("/api/website/home/searchbar", webapicontroller.searchbarhome);
 
-
-  app.post(
-    "/api/website/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.enquiry
-  );
   app.get("/api/website/banner/get", webapicontroller.allbanners);
-
-  app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
 
   app.get("/api/website/explorecollege/get", webapicontroller.exploreCollege);
 
   app.get("/api/website/exploreexam/get", webapicontroller.exploreexam);
 
   app.get("/api/website/explorecourses/get", webapicontroller.explorecourses);
+
+  app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
+
+
+  // end home page apis
+
+
+
+
+
+
+
+
+  app.get("/api/website/stream/get", webapicontroller.allstreams);
+
+  app.get("/api/website/allcourses/get", webapicontroller.allcourses);
+
+
+
+
+  app.post(
+    "/api/website/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.enquiry
+  );
+
+
+
+
+
+
+
 
   app.get("/api/website/colleges/get", webapicontroller.allcolleges);
 
@@ -91,6 +113,22 @@ module.exports = function (app) {
   app.get("/api/website/allentranceexams/get", webapicontroller.allentranceexams);
 
   app.get("/api/website/allentranceexams/get/:id", webapicontroller.findoneexam);
+
+  app.get("/api/website/news/get", webapicontroller.news);
+
+  app.get("/api/website/newsfindone/get/:id", webapicontroller.newsfindone);
+
+  app.get("/api/website/blog/get", webapicontroller.blogs);
+
+  app.get("/api/website/blogfindone/get/:id", webapicontroller.blogfindone);
+
+  app.get("/api/website/schoolboard/get", webapicontroller.schoolboards);
+
+  app.get("/api/website/schoolboardfindone/get/:id", webapicontroller.schoolboardfindone);
+
+  app.get("/api/website/scholarships/get", webapicontroller.scholarships);
+
+  app.get("/api/website/scholarshipfindone/get/:id", webapicontroller.scholarshipfindone);
 
 
 

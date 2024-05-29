@@ -3,11 +3,23 @@ const path = require("path");
 const banner = db.banner;
 const sendsearch = require("../utility/Customsearch");
 const fileTypes = require("../config/fileTypes");
+const fs = require("fs").promises;
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
 // Allowed file size in mb
 const allowed_file_size = 2;
+
+
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;

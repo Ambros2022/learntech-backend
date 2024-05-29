@@ -227,7 +227,18 @@ db.school_board_faqs.belongsTo(db.schoolboards, {
   as: "schoolboardfaqs",
 });
 
-
+db.schoolboards.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+db.schoolboards.belongsTo(db.state, {
+  foreignKey: "state_id",
+  as: "state",
+});
+db.schoolboards.belongsTo(db.city, {
+  foreignKey: "city_id",
+  as: "citys",
+});
 
 /***  Relation ship school  */
 
