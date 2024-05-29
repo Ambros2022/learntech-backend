@@ -72,7 +72,7 @@ module.exports = function (app) {
 
 
 
-  app.get("/api/website/allnews/get", webapicontroller.allnews);
+
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 

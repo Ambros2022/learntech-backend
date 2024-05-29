@@ -232,7 +232,7 @@ exports.allabroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -263,58 +263,7 @@ exports.allabroadpages = async (req, res) => {
     });
 };
 
-exports.allnews = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [{ status: "Published" }];
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  news_and_events
-    .findAndCountAll({
-      where: data_array,limit, offset,
-      attributes: [
-        "id",
-        "name",
-        "slug",
-        "banner_image",
-        "meta_description",
-      ],
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving news and events.",
-      });
-    });
-};
 
 exports.allstreams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -337,7 +286,7 @@ exports.allstreams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -390,7 +339,7 @@ exports.allcourses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   courses
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "slug",
@@ -613,7 +562,7 @@ exports.newsandblogs = async (req, res) => {
   try {
     const blogsPromise = blog.findAndCountAll({
       where: data_array,
-      attributes: ["id", "meta_title", "meta_description"],
+      attributes: ["id", "name", "slug", "meta_description","created_at"],
       order: [orderconfig],
       limit,
       offset
@@ -621,7 +570,7 @@ exports.newsandblogs = async (req, res) => {
 
     const newsPromise = news_and_events.findAndCountAll({
       where: data_array,
-      attributes: ["id", "meta_title", "meta_description"],
+      attributes: ["id", "name", "slug", "meta_description","created_at"],
       order: [orderconfig],
       limit,
       offset
@@ -1138,7 +1087,7 @@ exports.courses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1398,7 +1347,7 @@ exports.abroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "country_id",
@@ -1500,7 +1449,7 @@ exports.allentranceexams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1592,12 +1541,14 @@ exports.news = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   news_and_events
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
+        "name",
+        "slug",
         "banner_image",
-        "meta_title",
         "meta_description",
+        "created_at",
       ],
       order: [orderconfig]
     })
@@ -1681,7 +1632,7 @@ exports.blogs = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   blog
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1786,7 +1737,7 @@ exports.schoolboards = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   schoolboards
     .findAndCountAll({
-      where: data_array.concat(conditionarray),limit, offset,
+      where: data_array.concat(conditionarray), limit, offset,
       attributes: [
         "id",
         "name",
@@ -1889,7 +1840,7 @@ exports.scholarships = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   scholarships
     .findAndCountAll({
-      where: data_array.concat(conditionarray),limit, offset,
+      where: data_array.concat(conditionarray), limit, offset,
       attributes: [
         "id",
         "name",
