@@ -108,6 +108,10 @@ module.exports = function (app) {
 
   app.get("/api/website/scholarshipfindone/get/:id", webapicontroller.scholarshipfindone);
 
+  app.get("/api/website/pagefindone/get/:id", webapicontroller.pagefindone);
+
+  app.get("/api/website/allvideotestimonials/get", webapicontroller.videotestimonial);
+
 
 
 

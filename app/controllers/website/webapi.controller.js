@@ -18,10 +18,11 @@ const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
 const videos = db.video_testimonials;
-// const abroadpages = db.abroadpages;
 const schoolboards = db.schoolboards;
 const scholarships = db.scholarships;
-
+const page = db.page;
+const video_testimonials = db.video_testimonials;
+// db.page,db.video_testimonials
 
 
 
@@ -175,7 +176,7 @@ exports.allstream_exams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -232,7 +233,7 @@ exports.allabroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -284,7 +285,7 @@ exports.allnews = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   news_and_events
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "banner_image",
@@ -336,7 +337,7 @@ exports.allstreams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -389,7 +390,7 @@ exports.allcourses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   courses
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "slug",
@@ -1137,7 +1138,7 @@ exports.courses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1397,7 +1398,7 @@ exports.abroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "country_id",
@@ -1499,7 +1500,7 @@ exports.allentranceexams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1591,7 +1592,7 @@ exports.news = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   news_and_events
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "banner_image",
@@ -1680,7 +1681,7 @@ exports.blogs = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   blog
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1785,7 +1786,7 @@ exports.schoolboards = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   schoolboards
     .findAndCountAll({
-      where: data_array.concat(conditionarray),limit, offset,
+      where: data_array.concat(conditionarray), limit, offset,
       attributes: [
         "id",
         "name",
@@ -1888,7 +1889,7 @@ exports.scholarships = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   scholarships
     .findAndCountAll({
-      where: data_array.concat(conditionarray),limit, offset,
+      where: data_array.concat(conditionarray), limit, offset,
       attributes: [
         "id",
         "name",
@@ -1974,6 +1975,97 @@ exports.scholarshipfindone = (req, res) => {
       res.status(500).send({
         status: 0,
         message: err.message || "Error retrieving scholarships with id=" + id,
+      });
+    });
+};
+
+exports.pagefindone = (req, res) => {
+  const id = req.params.id;
+  page.findByPk(id)
+    .then(data => {
+      if (data) {
+
+
+        res.status(200).send({
+          status: 1,
+          message: 'successfully retrieved',
+          data: data
+
+        });
+
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find page with id=${id}.`
+
+        });
+
+
+      }
+    })
+    .catch(err => {
+
+
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving Page with id=" + id
+
+      });
+    });
+};
+
+exports.videotestimonial = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+  let conditionarray = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  video_testimonials
+    .findAndCountAll({
+      where: data_array.concat(conditionarray), limit, offset,
+      attributes: [
+        "id",
+        "title",
+        "name",
+        "designation",
+        "video_url",
+        "full_url",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving video testimonials.",
       });
     });
 };
