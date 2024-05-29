@@ -41,7 +41,7 @@ const getPagingData = (data, page, limit) => {
 
 
 exports.allcountries = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, india, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -56,6 +56,13 @@ exports.allcountries = async (req, res) => {
   let data_array = [];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+  india ? data_array.push({
+    name: {
+      [Op.ne]: 'india'
+    }
+  }) : null;
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -562,7 +569,7 @@ exports.newsandblogs = async (req, res) => {
   try {
     const blogsPromise = blog.findAndCountAll({
       where: data_array,
-      attributes: ["id", "name", "slug", "meta_description","created_at"],
+      attributes: ["id", "name", "slug", "meta_description", "created_at"],
       order: [orderconfig],
       limit,
       offset
@@ -570,7 +577,7 @@ exports.newsandblogs = async (req, res) => {
 
     const newsPromise = news_and_events.findAndCountAll({
       where: data_array,
-      attributes: ["id", "name", "slug", "meta_description","created_at"],
+      attributes: ["id", "name", "slug", "meta_description", "created_at"],
       order: [orderconfig],
       limit,
       offset
