@@ -173,7 +173,7 @@ exports.allstream_exams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -181,7 +181,7 @@ exports.allstream_exams = async (req, res) => {
       include: [{
         required: false,
         association: "exam",
-        attributes: ["id", "exam_title"],
+        attributes: ["id", "exam_title", "slug"],
         where: { status: "Published" }
       }],
       order: [orderconfig]
@@ -285,8 +285,9 @@ exports.allnews = async (req, res) => {
       where: data_array,
       attributes: [
         "id",
+        "name",
+        "slug",
         "banner_image",
-        "meta_title",
         "meta_description",
       ],
       order: [orderconfig]
