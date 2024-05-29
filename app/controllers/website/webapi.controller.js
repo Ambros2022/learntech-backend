@@ -17,8 +17,10 @@ const exam = db.exam;
 const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
-const videos = db.videos;
+const videos = db.video_testimonials;
 // const abroadpages = db.abroadpages;
+const schoolboards = db.schoolboards;
+const scholarships = db.scholarships;
 
 
 
@@ -230,7 +232,7 @@ exports.allabroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -282,7 +284,7 @@ exports.allnews = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   news_and_events
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -335,7 +337,7 @@ exports.allstreams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -388,7 +390,7 @@ exports.allcourses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   courses
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "slug",
@@ -991,7 +993,7 @@ exports.allvideos = async (req, res) => {
       where: {
         [Op.and]: data_array.concat(conditionarray)
       },
-      attributes: ["id", "title", "description", "youtube_link"],
+      attributes: ["id", "name", "designation", "video_url"],
       order: [orderconfig],
       limit,
       offset
@@ -1013,7 +1015,7 @@ exports.allvideos = async (req, res) => {
           status: 0,
           message:
             err.message ||
-            "Some error occurred while retrieving banners.",
+            "Some error occurred while retrieving videos.",
         });
       });
   } catch (err) {
@@ -1136,7 +1138,7 @@ exports.courses = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -1396,7 +1398,7 @@ exports.abroadpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   abroadpages
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "country_id",
@@ -1498,7 +1500,7 @@ exports.allentranceexams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   stream
     .findAndCountAll({
-      where: data_array,
+      where: data_array,limit, offset,
       attributes: [
         "id",
         "name",
@@ -1565,6 +1567,414 @@ exports.findoneexam = (req, res) => {
       res.status(500).send({
         status: 0,
         message: "Error retrieving exams with id=" + id,
+      });
+    });
+};
+
+exports.news = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [{ status: "Published" }];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  news_and_events
+    .findAndCountAll({
+      where: data_array,limit, offset,
+      attributes: [
+        "id",
+        "banner_image",
+        "meta_title",
+        "meta_description",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving news and events.",
+      });
+    });
+};
+
+exports.newsfindone = (req, res) => {
+  const id = req.params.id;
+  news_and_events
+    .findByPk(id, {
+      attributes: ['id', 'banner_image', 'meta_title', 'meta_description'],
+      include: [
+        {
+          required: false,
+          association: "newscategories",
+          attributes: ["id", "name"],
+        },
+
+
+      ],
+    })
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find newsandevents with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving newsandevents with id=" + id,
+      });
+    });
+};
+
+exports.blogs = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [{ status: "Published" }];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  blog
+    .findAndCountAll({
+      where: data_array,limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "slug",
+        "banner_image",
+        "meta_title",
+        "meta_description",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving news and events.",
+      });
+    });
+};
+
+exports.blogfindone = (req, res) => {
+  const id = req.params.id;
+
+  blog
+    .findOne({
+      where: {
+        [Op.or]: [
+          {
+            id: {
+              [Op.eq]: id,
+            },
+          },
+          {
+            slug: {
+              [Op.eq]: id,
+            },
+          },
+        ],
+      },
+      subQuery: false,
+    })
+
+    .then((data) => {
+      if (data) {
+
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find blog with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        error: err.message,
+        message: "Error retrieving blog with id=" + id,
+      });
+    });
+};
+
+exports.schoolboards = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, board_type } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+  let conditionarray = [];
+
+  if (board_type) {
+    conditionarray.push({ board_type });
+  }
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  schoolboards
+    .findAndCountAll({
+      where: data_array.concat(conditionarray),limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "board_type",
+        "logo",
+        "established",
+        "gender",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving schoolboards.",
+      });
+    });
+};
+
+exports.schoolboardfindone = (req, res) => {
+  const id = req.params.id;
+  schoolboards.findByPk(id, {
+    attributes: [
+      "id",
+      "name",
+      "board_type",
+      "logo",
+      "established",
+      "gender",
+    ],
+    include: [
+
+      {
+        required: false,
+        association: "schoolboardfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+
+    ],
+  })
+
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find schoolboards with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving schoolboards with id=" + id,
+      });
+    });
+};
+
+exports.scholarships = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [{ status: "Published" }];
+  let conditionarray = [];
+
+  if (gender) {
+    conditionarray.push({ gender });
+  }
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  scholarships
+    .findAndCountAll({
+      where: data_array.concat(conditionarray),limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "slug",
+        "gender",
+        "is_eligible",
+        "logo",
+        "meta_title",
+        "meta_description",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving scholarships.",
+      });
+    });
+};
+
+exports.scholarshipfindone = (req, res) => {
+  const id = req.params.id;
+  scholarships
+    .findByPk(id, {
+      attributes: [
+        "id",
+        "name",
+        "slug",
+        "gender",
+        "is_eligible",
+        "logo",
+        "meta_title",
+        "meta_description",
+      ],
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholarlevels",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholartypes",
+          attributes: ["id", "name"],
+        },
+
+      ],
+    })
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find scholarships with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: err.message || "Error retrieving scholarships with id=" + id,
       });
     });
 };

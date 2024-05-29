@@ -375,33 +375,3 @@ exports.updatefaqs = async (req, res) => {
     });
   }
 };
-
-// exports.updatefaqs = async (req, res) => {
-
-//   try {
-//     if (req.body.faqs && req.body.id) {
-//       await school_faqs.destroy({
-//         where: { school_id: req.body.id },
-//       });
-//       const faqss = JSON.parse(req.body.faqs);
-//       await _.forEach(faqss, function (value) {
-//         school_faqs.create({
-//           school_id: req.body.id,
-//           questions: value.questions ? value.questions : null,
-//           answers: value.answers ? value.answers : null,
-//         });
-//       });
-//     }
-
-//     res.status(200).send({
-//       status: 1,
-//       message: "Data Save Successfully",
-//     });
-//   } catch (error) {
-//     return res.status(400).send({
-//       message: "Unable to update data",
-//       errors: error,
-//       status: 0,
-//     });
-//   }
-// };
