@@ -143,7 +143,22 @@ exports.findAll = async (req, res) => {
           association: "schoolboardfaqs",
           attributes: ["id", "questions", "answers"],
         },
-  
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+
       ],
       order: [orderconfig],
     })
@@ -204,6 +219,21 @@ exports.findOne = (req, res) => {
         required: false,
         association: "schoolboardfaqs",
         attributes: ["id", "questions", "answers"],
+      },
+      {
+        required: false,
+        association: "country",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "state",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "citys",
+        attributes: ["id", "name"],
       },
 
     ],

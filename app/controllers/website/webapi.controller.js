@@ -42,7 +42,7 @@ const getPagingData = (data, page, limit) => {
 
 
 exports.allcountries = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, india, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -57,6 +57,13 @@ exports.allcountries = async (req, res) => {
   let data_array = [];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+  india ? data_array.push({
+    name: {
+      [Op.ne]: 'india'
+    }
+  }) : null;
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -184,7 +191,7 @@ exports.allstream_exams = async (req, res) => {
       include: [{
         required: false,
         association: "exam",
-        attributes: ["id", "exam_title"],
+        attributes: ["id", "exam_title", "slug"],
         where: { status: "Published" }
       }],
       order: [orderconfig]
@@ -264,57 +271,7 @@ exports.allabroadpages = async (req, res) => {
     });
 };
 
-exports.allnews = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [{ status: "Published" }];
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  news_and_events
-    .findAndCountAll({
-      where: data_array, limit, offset,
-      attributes: [
-        "id",
-        "banner_image",
-        "meta_title",
-        "meta_description",
-      ],
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving news and events.",
-      });
-    });
-};
 
 exports.allstreams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -613,7 +570,7 @@ exports.newsandblogs = async (req, res) => {
   try {
     const blogsPromise = blog.findAndCountAll({
       where: data_array,
-      attributes: ["id", "meta_title", "meta_description"],
+      attributes: ["id", "name", "slug", "meta_description", "created_at"],
       order: [orderconfig],
       limit,
       offset
@@ -621,7 +578,7 @@ exports.newsandblogs = async (req, res) => {
 
     const newsPromise = news_and_events.findAndCountAll({
       where: data_array,
-      attributes: ["id", "meta_title", "meta_description"],
+      attributes: ["id", "name", "slug", "meta_description", "created_at"],
       order: [orderconfig],
       limit,
       offset
@@ -1595,9 +1552,11 @@ exports.news = async (req, res) => {
       where: data_array, limit, offset,
       attributes: [
         "id",
+        "name",
+        "slug",
         "banner_image",
-        "meta_title",
         "meta_description",
+        "created_at",
       ],
       order: [orderconfig]
     })

@@ -40,35 +40,57 @@ module.exports = function (app) {
   });
 
 
+  // Loction apis //
+
   app.get("/api/website/country/get", webapicontroller.allcountries);
 
   app.get("/api/website/states/get", webapicontroller.allstates);
 
+
+  //End  Loction apis //
+
+  // homrpage apis //
   app.get("/api/website/stream_exams/get", webapicontroller.allstream_exams);
-
-  app.get("/api/website/allabroadpages/get", webapicontroller.allabroadpages);
-
-  app.get("/api/website/allnews/get", webapicontroller.allnews);
-
-  app.get("/api/website/stream/get", webapicontroller.allstreams);
-
-  app.get("/api/website/allcourses/get", webapicontroller.allcourses);
 
   app.get("/api/website/home/searchbar", webapicontroller.searchbarhome);
 
-
-  app.post(
-    "/api/website/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.enquiry
-  );
   app.get("/api/website/banner/get", webapicontroller.allbanners);
-
-  app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
 
   app.get("/api/website/explorecollege/get", webapicontroller.exploreCollege);
 
   app.get("/api/website/exploreexam/get", webapicontroller.exploreexam);
 
   app.get("/api/website/explorecourses/get", webapicontroller.explorecourses);
+
+  app.get("/api/website/newsandblogs/get", webapicontroller.newsandblogs);
+
+
+  // end home page apis
+
+
+
+
+
+
+
+
+  app.get("/api/website/stream/get", webapicontroller.allstreams);
+
+  app.get("/api/website/allcourses/get", webapicontroller.allcourses);
+
+
+
+
+  app.post(
+    "/api/website/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.enquiry
+  );
+
+
+
+
+
+
+
 
   app.get("/api/website/colleges/get", webapicontroller.allcolleges);
 
