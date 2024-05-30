@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const Stream = sequelize.define("pages", {
+  const pages = sequelize.define("pages", {
     url: {
       type: Sequelize.STRING,
     },
@@ -37,5 +37,5 @@ module.exports = (sequelize, Sequelize) => {
      Stream.hasMany(models.stream_faqs, {as: 'streamfaqs'});
    };*/
 
-  return Stream;
+  return pages;
 };
