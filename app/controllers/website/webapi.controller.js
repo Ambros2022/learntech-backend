@@ -22,7 +22,11 @@ const schoolboards = db.schoolboards;
 const scholarships = db.scholarships;
 const page = db.page;
 const video_testimonials = db.video_testimonials;
-// db.page,db.video_testimonials
+const jobs_positions = db.jobs_positions;
+const all_job_locations = db.all_job_locations;
+const jobsenquires = db.jobs_enquires;
+const our_teams = db.our_teams;
+// db.page,db.video_testimonials,db.jobs_positions,db.all_job_locations,db.jobs_enquires
 
 
 
@@ -1823,7 +1827,7 @@ exports.schoolboardfindone = (req, res) => {
 };
 
 exports.scholarships = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, gender } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender, level_id, type_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1841,6 +1845,12 @@ exports.scholarships = async (req, res) => {
   if (gender) {
     conditionarray.push({ gender });
   }
+
+  if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
+  if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
+  if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -2028,3 +2038,198 @@ exports.videotestimonial = async (req, res) => {
       });
     });
 };
+
+exports.jobpositions = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [{ status: "Published" }];
+  let conditionarray = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  jobs_positions
+    .findAndCountAll({
+      where: data_array.concat(conditionarray), limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "job_description",
+        "exp_required",
+        "total_positions",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving job positions.",
+      });
+    });
+};
+
+exports.alljoblocations = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [{ status: "Published" }];
+  let conditionarray = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  all_job_locations
+    .findAndCountAll({
+      where: data_array.concat(conditionarray), limit, offset,
+      attributes: [
+        "id",
+        "name",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving all job locations.",
+      });
+    });
+};
+
+exports.addjobenquires = async (req, res) => {
+
+  try {
+      const jobsenquiresDetails = await jobsenquires.create({
+          jobs_position_id: req.body.jobs_position_id,
+          job_location_id: req.body.job_location_id,
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          d_o_b: req.body.d_o_b,
+          current_location: req.body.current_location,
+          total_exp: req.body.total_exp,
+          resume: req.body.resume,
+          status: req.body.status,
+
+      });
+
+      res.status(200).send({
+          status: 1,
+          message: 'Data Save Successfully',
+          data: jobsenquiresDetails
+      });
+  }
+  catch (error) {
+      return res.status(400).send({
+          message: 'Unable to insert data',
+          errors: error,
+          status: 0
+      });
+  }
+}
+
+exports.ourteams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+  let conditionarray = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  our_teams
+    .findAndCountAll({
+      where: data_array.concat(conditionarray), limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "designation",
+        "linked_in_link",
+        "image",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving all our teams.",
+      });
+    });
+};
+
