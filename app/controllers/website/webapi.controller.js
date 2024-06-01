@@ -332,6 +332,40 @@ exports.allstreams = async (req, res) => {
     });
 };
 
+exports.findOnestream = (req, res) => {
+  const id = req.params.id;
+  stream.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "streamfaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+      
+      ],
+  })
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: "successfully retrieved",
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find streams with id=${id}.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving streams with id=" + id,
+      });
+    });
+};
+
 exports.allcourses = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
 
