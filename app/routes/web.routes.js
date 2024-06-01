@@ -138,9 +138,13 @@ module.exports = function (app) {
 
   app.get("/api/website/allvideotestimonials/get", webapicontroller.videotestimonial);
 
+  app.get("/api/website/jobposition/get", webapicontroller.jobpositions);
 
+  app.get("/api/website/alljoblocation/get", webapicontroller.alljoblocations);
 
+  app.post("/api/website/addjobsenquires/get", webapicontroller.addjobenquires);
 
+  app.get("/api/website/ourteams/get", webapicontroller.ourteams);
 
 
 

@@ -25,6 +25,12 @@ const page = db.page;
 const video_testimonials = db.video_testimonials;
 // db.page,db.video_testimonials
 const { Sequelize } = require('sequelize');
+const jobs_positions = db.jobs_positions;
+const all_job_locations = db.all_job_locations;
+const jobsenquires = db.jobs_enquires;
+const our_teams = db.our_teams;
+// db.page,db.video_testimonials,db.jobs_positions,db.all_job_locations,db.jobs_enquires
+
 
 
 const getPagination = (page, size) => {
@@ -1834,7 +1840,7 @@ exports.schoolboardfindone = (req, res) => {
 };
 
 exports.scholarships = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, gender } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender, level_id, type_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1852,6 +1858,12 @@ exports.scholarships = async (req, res) => {
   if (gender) {
     conditionarray.push({ gender });
   }
+
+  if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
+  if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
+  if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -2158,4 +2170,15 @@ exports.streamGeneralcourse = async (req, res) => {
           "Some error occurred while retrieving streams.",
       });
     });
+};
+exports.jobpositions = async (req, res) => {
+};
+
+exports.alljoblocations = async (req, res) => {
+};
+
+exports.addjobenquires = async (req, res) => {
+}
+
+exports.ourteams = async (req, res) => {
 };
