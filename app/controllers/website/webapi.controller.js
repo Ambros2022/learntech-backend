@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { where } = require("sequelize");
 const db = require("../../models");
 const sendsearch = require("../../utility/Customsearch");
 const state = db.state;
@@ -9,7 +10,7 @@ const countries = db.countries;
 const enquiry = db.enquiry;
 const college = db.college;
 const school = db.school;
-
+const generalcourse = db.general_course;
 const banner = db.banner;
 const abroadpages = db.abroadpages;
 const Op = db.Sequelize.Op;
@@ -18,10 +19,17 @@ const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
 const videos = db.video_testimonials;
-// const abroadpages = db.abroadpages;
 const schoolboards = db.schoolboards;
 const scholarships = db.scholarships;
-
+const page = db.page;
+const video_testimonials = db.video_testimonials;
+// db.page,db.video_testimonials
+const { Sequelize } = require('sequelize');
+const jobs_positions = db.jobs_positions;
+const all_job_locations = db.all_job_locations;
+const jobsenquires = db.jobs_enquires;
+const our_teams = db.our_teams;
+// db.page,db.video_testimonials,db.jobs_positions,db.all_job_locations,db.jobs_enquires
 
 
 
@@ -612,8 +620,11 @@ exports.newsandblogs = async (req, res) => {
   }
 };
 
+
+
+
 exports.exploreCollege = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -625,58 +636,56 @@ exports.exploreCollege = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
-
-  var condition = searchtext && searchfrom ? { [searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` } } : null;
-  if (condition) data_array.push(condition);
-
   const { limit, offset } = getPagination(page, size);
-
   try {
-    const data = await stream.findAndCountAll({
-      where: data_array,
-      attributes: ["id", "name", "logo"],
-      include: [
-        {
-          required: false,
-          association: "clgstreamm",
-          attributes: ["college_id"],
-        },
-      ],
-      order: [orderconfig],
+    // Count the total number of streams
+    const totalItems = await stream.count();
+
+    // Fetch the paginated data
+    const data = await stream.findAll({
+      attributes: ["id", "name", "slug", "logo"],
+      include: [{
+        required: false,
+        association: "clgstreamm",
+        attributes: ["college_id"],
+      }],
       limit,
-      offset
+      offset,
+      order: [orderconfig],
     });
 
-    const response = getPagingData(data, page, limit);
-
-
-    const finaldataWithCollegeCounts = response.finaldata.map(item => {
-      const uniqueColleges = new Set(item.clgstreamm.map(clg => clg.college_id));
+    // Map the data to include the course count
+    const formattedData = data.map(stream => {
+      const courseCount = stream.clgstreamm.length;
       return {
-        ...item.dataValues,
-        uniqueCollegeCount: uniqueColleges.size
+        id: stream.id,
+        name: stream.name,
+        slug: stream.slug,
+        logo: stream.logo,
+        uniqueCollegeCount: courseCount,
       };
     });
+
+    const totalPages = Math.ceil(totalItems / limit);
+    const currentPage = page ? +page : 1;
 
     res.status(200).send({
       status: 1,
       message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: finaldataWithCollegeCounts,
+      totalItems,
+      currentPage,
+      totalPages,
+      data: formattedData,
     });
   } catch (err) {
     res.status(500).send({
       status: 0,
-      message: err.message || "Some error occurred while retrieving explore colleges."
+      message: err.message || "Some error occurred while retrieving explore courses.",
     });
   }
 };
-
 exports.exploreexam = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -688,57 +697,56 @@ exports.exploreexam = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
-
-  var condition = searchtext && searchfrom ? { [searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` } } : null;
-  if (condition) data_array.push(condition);
-
   const { limit, offset } = getPagination(page, size);
-
   try {
-    const data = await stream.findAndCountAll({
-      where: data_array,
-      attributes: ["id", "name", "logo"],
+    // Count the total number of streams
+    const totalItems = await stream.count();
+
+    // Fetch the paginated data
+    const data = await stream.findAll({
+      attributes: ["id", "name", "slug", "logo"],
       include: [{
         required: false,
         association: "exam",
-        attributes: ["id", "exam_title"],
-        where: { status: "Published" }
+        attributes: ["id"],
       }],
-      order: [orderconfig],
       limit,
-      offset
+      offset,
+      order: [orderconfig],
     });
 
-    const response = getPagingData(data, page, limit);
-
-
-    const finaldataWithexamCounts = response.finaldata.map(item => {
-      const uniqueexam = new Set(item.exam.map(exm => exm.id));
+    // Map the data to include the course count
+    const formattedData = data.map(stream => {
+      const courseCount = stream.exam.length;
       return {
-        ...item.dataValues,
-        uniqueCollegeCount: uniqueexam.size
+        id: stream.id,
+        name: stream.name,
+        slug: stream.slug,
+        logo: stream.logo,
+        uniqueCollegeCount: courseCount,
       };
     });
+
+    const totalPages = Math.ceil(totalItems / limit);
+    const currentPage = page ? +page : 1;
 
     res.status(200).send({
       status: 1,
       message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: finaldataWithexamCounts,
+      totalItems,
+      currentPage,
+      totalPages,
+      data: formattedData,
     });
   } catch (err) {
     res.status(500).send({
       status: 0,
-      message: err.message || "Some error occurred while retrieving explore exams."
+      message: err.message || "Some error occurred while retrieving explore courses.",
     });
   }
 };
-
 exports.explorecourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -750,55 +758,65 @@ exports.explorecourses = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
-
-  var condition = searchtext && searchfrom ? { [searchfrom]: { [Sequelize.Op.like]: `%${searchtext}%` } } : null;
-  if (condition) data_array.push(condition);
 
   const { limit, offset } = getPagination(page, size);
+  console.log(limit, offset);
 
   try {
-    const data = await stream.findAndCountAll({
-      where: data_array,
-      attributes: ["id", "name", "logo"],
+    // Count the total number of streams
+    const totalItems = await stream.count();
+
+    // Fetch the paginated data
+    const data = await stream.findAll({
+      attributes: ["id", "name", "slug", "logo"],
       include: [{
         required: false,
         association: "general_courses",
-        attributes: ["id", "name", "slug"],
-        where: { status: "Published" }
+        attributes: ["id"],
       }],
-      order: [orderconfig],
       limit,
-      offset
+      offset,
+      order: [orderconfig],
     });
 
-    const response = getPagingData(data, page, limit);
-
-
-    const finaldataWithcourseCounts = response.finaldata.map(item => {
-      const uniquecourse = new Set(item.general_courses.map(exm => exm.stream_id));
+    // Map the data to include the course count
+    const formattedData = data.map(stream => {
+      const courseCount = stream.general_courses.length;
       return {
-        ...item.dataValues,
-        uniqueCollegeCount: uniquecourse.size
+        id: stream.id,
+        name: stream.name,
+        slug: stream.slug,
+        logo: stream.logo,
+        uniqueCollegeCount: courseCount,
       };
     });
+
+    const totalPages = Math.ceil(totalItems / limit);
+    const currentPage = page ? +page : 1;
 
     res.status(200).send({
       status: 1,
       message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: finaldataWithcourseCounts,
-      // data: response.finaldata,
+      totalItems,
+      currentPage,
+      totalPages,
+      data: formattedData,
     });
   } catch (err) {
     res.status(500).send({
       status: 0,
-      message: err.message || "Some error occurred while retrieving explore courses."
+      message: err.message || "Some error occurred while retrieving explore courses.",
     });
   }
 };
+
+
+
+
+
+
+
+
 
 exports.allcolleges = async (req, res) => {
   const {
@@ -1822,7 +1840,7 @@ exports.schoolboardfindone = (req, res) => {
 };
 
 exports.scholarships = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, gender } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender, level_id, type_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1840,6 +1858,12 @@ exports.scholarships = async (req, res) => {
   if (gender) {
     conditionarray.push({ gender });
   }
+
+  if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
+  if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
+  if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1935,4 +1959,226 @@ exports.scholarshipfindone = (req, res) => {
         message: err.message || "Error retrieving scholarships with id=" + id,
       });
     });
+};
+
+exports.pagefindone = (req, res) => {
+  const slug = req.params.url;  // Assuming the slug is passed as a URL parameter
+
+  page.findOne({ where: { url: slug } })
+    .then(data => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: 'successfully retrieved',
+          data: data
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find page with slug=${slug}.`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        status: 0,
+        message: "Error retrieving Page with slug=" + slug
+      });
+    });
+};
+
+
+exports.videotestimonial = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+  let conditionarray = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  video_testimonials
+    .findAndCountAll({
+      where: data_array.concat(conditionarray), limit, offset,
+      attributes: [
+        "id",
+        "title",
+        "name",
+        "designation",
+        "video_url",
+        "full_url",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving video testimonials.",
+      });
+    });
+};
+
+exports.allgeneralcourses = async (req, res) => {
+  const { page, size, searchtext, stream_id, is_trending, is_top_rank, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+
+  condition ? data_array.push(condition) : null;
+  stream_id ? data_array.push({ stream_id: stream_id }) : null;
+  is_trending ? data_array.push({ is_trending: is_trending }) : null;
+  is_top_rank ? data_array.push({ is_top_rank: is_top_rank }) : null;
+  const { limit, offset } = getPagination(page, size);
+  generalcourse
+    .findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      attributes: [
+        "id",
+        "name",
+        "short_name",
+        "slug",
+      ],
+      include: [
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id", "name", "slug"],
+        },
+      ],
+      order: [orderconfig],
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving video testimonials.",
+      });
+    });
+};
+
+exports.streamGeneralcourse = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+
+  stream
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "slug",
+        "logo",
+      ],
+      include: [
+        {
+          required: false,
+          where: [{ is_top_rank: "1" }],
+          limit: 2,
+          association: "general_courses",
+          attributes: ["id", "short_name", "slug"],
+        },
+      ],
+      order: [orderconfig],
+      subQuery: false
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving streams.",
+      });
+    });
+};
+exports.jobpositions = async (req, res) => {
+};
+
+exports.alljoblocations = async (req, res) => {
+};
+
+exports.addjobenquires = async (req, res) => {
+}
+
+exports.ourteams = async (req, res) => {
 };

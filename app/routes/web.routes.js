@@ -72,7 +72,11 @@ module.exports = function (app) {
 
 
 
+  app.get(
+    "/api/website/generalcourse/get",webapicontroller.allgeneralcourses
+  );
 
+  app.get("/api/website/stream/general/get", webapicontroller.streamGeneralcourse);
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 
@@ -130,9 +134,17 @@ module.exports = function (app) {
 
   app.get("/api/website/scholarshipfindone/get/:id", webapicontroller.scholarshipfindone);
 
+  app.get("/api/website/pagefindone/get/:url", webapicontroller.pagefindone);
 
+  app.get("/api/website/allvideotestimonials/get", webapicontroller.videotestimonial);
 
+  app.get("/api/website/jobposition/get", webapicontroller.jobpositions);
 
+  app.get("/api/website/alljoblocation/get", webapicontroller.alljoblocations);
+
+  app.post("/api/website/addjobsenquires/get", webapicontroller.addjobenquires);
+
+  app.get("/api/website/ourteams/get", webapicontroller.ourteams);
 
 
 
