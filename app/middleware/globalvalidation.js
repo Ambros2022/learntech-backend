@@ -451,6 +451,7 @@ const schoolUpdateSchema = [
 
 const StreamSchema = [
   checkField('name', 150, stream, true),
+  checkField('listing_order', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
@@ -468,6 +469,7 @@ const StreamSchema = [
 const StreamSchemaUpdate = [
   ...validateIdRequired_id(stream, "id"),
   checkField_update('name', 150, stream, true),
+  checkField_update('listing_order', 150, stream, true),
 
   body("slug")
     .exists({ checkFalsy: true })
