@@ -874,13 +874,26 @@ exports.allcolleges = async (req, res) => {
 
   let include = [];
 
+  // if (course_type) {
+  //   include.push({
+  //     association: "courses",
+  //     required: true,
+  //     attributes: ["id", "general_course_id", "course_type"],
+  //     where: {
+  //       course_type // Filter by course_type
+  //     }
+  //   });
+  // }
+
   if (course_type || general_course_id) {
     include.push({
       association: "courses",
       required: true,
       attributes: ["id", "general_course_id", "course_type"],
-      where: {}
+      where: { course_type }
     });
+
+  
 
     if (course_type) include[include.length - 1].where.course_type = course_type;
     if (general_course_id) include[include.length - 1].where.general_course_id = JSON.parse(general_course_id);
