@@ -73,12 +73,14 @@ module.exports = function (app) {
 
 
   app.get(
-    "/api/website/generalcourse/get",webapicontroller.allgeneralcourses
+    "/api/website/generalcourse/get", webapicontroller.allgeneralcourses
   );
 
   app.get("/api/website/stream/general/get", webapicontroller.streamGeneralcourse);
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
+
+  app.get("/api/website/streamfindone/get/:id", webapicontroller.findOnestream);
 
   app.get("/api/website/allcourses/get", webapicontroller.allcourses);
 
@@ -155,6 +157,88 @@ module.exports = function (app) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 
 
