@@ -73,12 +73,14 @@ module.exports = function (app) {
 
 
   app.get(
-    "/api/website/generalcourse/get",webapicontroller.allgeneralcourses
+    "/api/website/generalcourse/get", webapicontroller.allgeneralcourses
   );
 
   app.get("/api/website/stream/general/get", webapicontroller.streamGeneralcourse);
 
   app.get("/api/website/stream/get", webapicontroller.allstreams);
+
+  app.get("/api/website/streamfindone/get/:id", webapicontroller.findOnestream);
 
   app.get("/api/website/allcourses/get", webapicontroller.allcourses);
 
@@ -114,7 +116,7 @@ module.exports = function (app) {
 
   app.get("/api/website/abroadpagefindone/get/:id", webapicontroller.abroadcollegefindone);
 
-  app.get("/api/website/allentranceexams/get", webapicontroller.allentranceexams);
+  app.get("/api/website/exams/get", webapicontroller.allentranceexams);
 
   app.get("/api/website/allentranceexams/get/:id", webapicontroller.findoneexam);
 
@@ -155,6 +157,88 @@ module.exports = function (app) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 
 
@@ -222,7 +306,7 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/website/home/allentranceexams", homecontroller.allentranceexams
+    "/api/website/home/exams", homecontroller.allentranceexams
   );
   app.get(
     "/api/website/home/allentranceexams/get/:slug", homecontroller.findoneexam
