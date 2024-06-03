@@ -116,7 +116,7 @@ module.exports = function (app) {
 
   app.get("/api/website/abroadpagefindone/get/:id", webapicontroller.abroadcollegefindone);
 
-  app.get("/api/website/allentranceexams/get", webapicontroller.allentranceexams);
+  app.get("/api/website/exams/get", webapicontroller.allentranceexams);
 
   app.get("/api/website/allentranceexams/get/:id", webapicontroller.findoneexam);
 
@@ -306,7 +306,7 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/website/home/allentranceexams", homecontroller.allentranceexams
+    "/api/website/home/exams", homecontroller.allentranceexams
   );
   app.get(
     "/api/website/home/allentranceexams/get/:slug", homecontroller.findoneexam
