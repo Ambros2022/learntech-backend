@@ -3,17 +3,11 @@ const path = require("path");
 const video_testimonials = db.video_testimonials;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
-
+const fileTypes = require("../config/fileTypes");
 
 // Array of allowed files
 const sendsearch = require("../utility/Customsearch");
-const array_of_allowed_file_types = [
-    "image/png",
-    "image/jpeg",
-    "image/jpg",
-    "image/gif",
-    "image/svg+xml",
-];
+const array_of_allowed_file_types = fileTypes.Imageformat;
 
 // Allowed file size in mb
 const allowed_file_size = 2;
