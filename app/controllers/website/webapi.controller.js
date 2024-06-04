@@ -281,7 +281,7 @@ exports.allabroadpages = async (req, res) => {
 
 
 exports.allstreams = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, not_stream_id, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -297,6 +297,12 @@ exports.allstreams = async (req, res) => {
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
+  not_stream_id ? data_array.push({
+    id: {
+      [Op.ne]: not_stream_id
+    }
+  }
+  ) : null;
 
   const { limit, offset } = getPagination(page, size);
   stream
@@ -306,6 +312,7 @@ exports.allstreams = async (req, res) => {
         "id",
         "name",
         "slug",
+        "logo",
       ],
 
       order: [orderconfig]
@@ -341,8 +348,8 @@ exports.findOnestream = (req, res) => {
         association: "streamfaqs",
         attributes: ["id", "questions", "answers"],
       },
-      
-      ],
+
+    ],
   })
     .then((data) => {
       if (data) {
@@ -883,18 +890,18 @@ exports.allcolleges = async (req, res) => {
   }
 
   let data_array = [];
-  let conditionarray = [];
+
 
   if (is_associated) {
-    conditionarray.push({ is_associated });
+    data_array.push({ is_associated });
   }
 
   if (type) {
-    conditionarray.push({ type });
+    data_array.push({ type });
   }
 
   if (college_type) {
-    conditionarray.push({ college_type });
+    data_array.push({ college_type });
   }
 
 
@@ -906,59 +913,51 @@ exports.allcolleges = async (req, res) => {
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
   if (condition) data_array.push(condition);
 
-  let include = [];
+  let includearray = [
+  ];
 
-  // if (course_type) {
-  //   include.push({
-  //     association: "courses",
-  //     required: true,
-  //     attributes: ["id", "general_course_id", "course_type"],
-  //     where: {
-  //       course_type // Filter by course_type
-  //     }
-  //   });
-  // }
-
-  if (course_type || general_course_id) {
-    include.push({
-      association: "courses",
+  if (course_type) {
+    includearray.push({
       required: true,
-      attributes: ["id", "general_course_id", "course_type"],
-      where: { course_type }
+      association: "courses",
+      attributes: ["id"],
+      where: {
+        course_type: JSON.parse(course_type)
+      }
     });
-
-  
-
-    if (course_type) include[include.length - 1].where.course_type = course_type;
-    if (general_course_id) include[include.length - 1].where.general_course_id = JSON.parse(general_course_id);
+  }
+  if (general_course_id) {
+    includearray.push({
+      required: true,
+      association: "courses",
+      attributes: ["id"],
+      where: {
+        general_course_id: JSON.parse(general_course_id)
+      }
+    });
   }
 
   if (stream_id) {
-    include.push({
+    includearray.push({
       association: "collegestreams",
       required: true,
-      attributes: ["id", "college_id", "stream_id"],
+      attributes: ["id"],
       where: {
         stream_id: JSON.parse(stream_id)
       }
     });
   }
 
+
   const { limit, offset } = getPagination(page, size);
 
   try {
     const data = await college.findAndCountAll({
       where: {
-        [Op.and]: data_array.concat(conditionarray),
+        [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating"],
-      include: [
-        {
-          required: false,
-          association: "state",
-          attributes: ["id", "name"],
-        },
-      ],
+      attributes: ["id", "name", "slug", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating"],
+      include: includearray,
       order: [orderconfig],
       limit,
       offset,
@@ -1500,7 +1499,7 @@ exports.abroadcollegefindone = (req, res) => {
 };
 
 exports.allentranceexams = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
+  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1517,21 +1516,25 @@ exports.allentranceexams = async (req, res) => {
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
-
+  stream_id ? data_array.push({ stream_id: stream_id }) : null;
   const { limit, offset } = getPagination(page, size);
-  stream
+  exam
     .findAndCountAll({
       where: data_array, limit, offset,
       attributes: [
         "id",
-        "name",
+        "exam_title",
+        "slug",
+        "exam_short_name",
+        "cover_image",
+        "stream_id",
       ],
-      include: [{
-        required: false,
-        association: "exam",
-        attributes: ["id", "exam_title"],
-        where: { status: "Published" }
-      }],
+      // include: [{
+      //   required: false,
+      //   association: "exam",
+      //   attributes: ["id", "exam_title"],
+      //   where: { status: "Published" }
+      // }],
       order: [orderconfig]
     })
     .then((data) => {
@@ -2328,32 +2331,32 @@ exports.alljoblocations = async (req, res) => {
 exports.addjobenquires = async (req, res) => {
 
   try {
-      const jobsenquiresDetails = await jobsenquires.create({
-          jobs_position_id: req.body.jobs_position_id,
-          job_location_id: req.body.job_location_id,
-          name: req.body.name,
-          email: req.body.email,
-          phone: req.body.phone,
-          d_o_b: req.body.d_o_b,
-          current_location: req.body.current_location,
-          total_exp: req.body.total_exp,
-          resume: req.body.resume,
-          status: req.body.status,
+    const jobsenquiresDetails = await jobsenquires.create({
+      jobs_position_id: req.body.jobs_position_id,
+      job_location_id: req.body.job_location_id,
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      d_o_b: req.body.d_o_b,
+      current_location: req.body.current_location,
+      total_exp: req.body.total_exp,
+      resume: req.body.resume,
+      status: req.body.status,
 
-      });
+    });
 
-      res.status(200).send({
-          status: 1,
-          message: 'Data Save Successfully',
-          data: jobsenquiresDetails
-      });
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: jobsenquiresDetails
+    });
   }
   catch (error) {
-      return res.status(400).send({
-          message: 'Unable to insert data',
-          errors: error,
-          status: 0
-      });
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
   }
 }
 
