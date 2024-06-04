@@ -1023,7 +1023,7 @@ exports.collegefindOne = (req, res) => {
         include: [
           {
             association: "clgamenities",
-            attributes: ["id", "amenities_name"],
+            attributes: ["id", "amenities_name","amenities_logo"],
           },
         ],
       },
