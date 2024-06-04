@@ -67,6 +67,9 @@ module.exports = (sequelize, Sequelize) => {
     info: {
       type: Sequelize.STRING
     },
+    course_fees: {
+      type: Sequelize.STRING
+    },
     admissions: {
       type: Sequelize.STRING
     },
