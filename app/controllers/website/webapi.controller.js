@@ -18,7 +18,7 @@ const exam = db.exam;
 const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
-const videos = db.video_testimonials;
+// const videos = db.video_testimonials;
 const schoolboards = db.schoolboards;
 const scholarships = db.scholarships;
 const page = db.page;
@@ -31,6 +31,8 @@ const our_teams = db.our_teams;
 const PUBLISHED = 'Published';
 const city = db.city;
 const User = db.user;
+// const schoolboards = db.schoolboards;
+// db.schoolboards
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -1473,6 +1475,7 @@ exports.allentranceexams = async (req, res) => {
         "exam_short_name",
         "cover_image",
         "stream_id",
+        "created_at",
       ],
       order: [orderconfig]
     })
@@ -2339,91 +2342,203 @@ exports.ourteams = async (req, res) => {
     });
 };
 
+// exports.dashboard = async (req, res) => {
+
+
+//   const Total_colleges = await college.count({
+//     where: {
+//       type: "college"
+//     }
+//   });
+//   const Total_universitys = await college.count({
+//     where: {
+//       type: "university"
+//     }
+//   });
+//   const total_Users = await User.count();
+//   const total_country = await countries.count();
+//   const total_states = await state.count();
+//   const total_cities = await city.count();
+//   const total_schools = await school.count();
+//   const total_streams = await stream.count();
+//   const total_generalcourses = await generalcourse.count();
+//   const total_abroadpage = await abroadpages.count();
+//   const total_exams = await exam.count();
+//   const total_course = await courses.count();
+//   const total_enquires = await enquiry.count();
+//   const total_blogs = await blog.count();
+//   const total_jobs_position = await jobs_positions.count();
+//   const total_schoolboard = await schoolboards.count();
+//   const total_scholarship = await scholarships.count();
+
+//   const Published_colleges = await college.count({
+//     where: {
+//       status: "PUBLISHED",
+//       type: "college"
+//     }
+//   });
+//   const Published_universities = await college.count({
+//     where: {
+//       status: "PUBLISHED",
+//       type: "university"
+//     }
+//   });
+//   const Published_school = await school.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_courses = await courses.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_exam = await exam.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_scholarships = await scholarships.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_blog = await blog.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+
+
+
+//   res.status(200).send({
+//     status: 1,
+//     message: "success",
+//     data: {
+//       Users: total_Users,
+//       Total_colleges: Total_colleges,
+//       Published_colleges: Published_colleges,
+//       Total_universitys: Total_universitys,
+//       Published_universities: Published_universities,
+//       countries: total_country,
+//       state: total_states,
+//       city: total_cities,
+//       school: total_schools,
+//       Published_school: Published_school,
+//       stream: total_streams,
+//       generalcourse: total_generalcourses,
+//       abroadpages: total_abroadpage,
+//       exam: total_exams,
+//       Published_exam: Published_exam,
+//       courses: total_course,
+//       Published_courses: Published_courses,
+//       enquiry: total_enquires,
+//       blog: total_blogs,
+//       Published_blog: Published_blog,
+//       jobs_positions: total_jobs_position,
+//       schoolboards: total_schoolboard,
+//       scholarships: total_scholarship,
+//       Published_scholarships: Published_scholarships,
+
+
+
+
+//     }
+//   });
+// };
+
+
 exports.dashboard = async (req, res) => {
+  try {
+    const [
+      totalColleges,
+      totalUniversities,
+      totalUsers,
+      totalCountry,
+      totalStates,
+      totalCities,
+      totalSchools,
+      totalStreams,
+      totalGeneralCourses,
+      totalAbroadPages,
+      totalExams,
+      totalCourses,
+      totalEnquiries,
+      totalBlogs,
+      totalJobsPositions,
+      totalSchoolBoards,
+      totalScholarships,
+      publishedColleges,
+      publishedUniversities,
+      publishedSchool,
+      publishedCourses,
+      publishedExams,
+      publishedScholarships,
+      publishedBlogs
+    ] = await Promise.all([
+      college.count({ where: { type: "college" } }),
+      college.count({ where: { type: "university" } }),
+      User.count(),
+      countries.count(),
+      state.count(),
+      city.count(),
+      school.count(),
+      stream.count(),
+      generalcourse.count(),
+      abroadpages.count(),
+      exam.count(),
+      courses.count(),
+      enquiry.count(),
+      blog.count(),
+      jobs_positions.count(),
+      schoolboards.count(),
+      scholarships.count(),
+      college.count({ where: { status: "PUBLISHED", type: "college" } }),
+      college.count({ where: { status: "PUBLISHED", type: "university" } }),
+      school.count({ where: { status: "PUBLISHED" } }),
+      courses.count({ where: { status: "PUBLISHED" } }),
+      exam.count({ where: { status: "PUBLISHED" } }),
+      scholarships.count({ where: { status: "PUBLISHED" } }),
+      blog.count({ where: { status: "PUBLISHED" } })
+    ]);
 
-
-  const Total_colleges = await college.count({
-    where: {
-      type: "college"
-    }
-  });
-  const Total_universitys = await college.count({
-    where: {
-      type: "university"
-    }
-  });
-  const Users = await User.count();
-  const country = await countries.count();
-  const states = await state.count();
-  const cities = await city.count();
-  const schools = await school.count();
-  const streams = await stream.count();
-  const generalcourses = await generalcourse.count();
-  const abroadpage = await abroadpages.count();
-  const exams = await exam.count();
-  const course = await courses.count();
-  const enquires = await enquiry.count();
-  const blogs = await blog.count();
-  const jobs_position = await jobs_positions.count();
-
-  const Published_colleges = await college.count({
-    where: {
-      status: "PUBLISHED",
-      type: "college"
-    }
-  });
-  const Published_universities = await college.count({
-    where: {
-      status: "PUBLISHED",
-      type: "university"
-    }
-  });
-  const Published_school = await school.count({
-    where: {
-      status: "PUBLISHED"
-    }
-  });
-  const Published_courses = await courses.count({
-    where: {
-      status: "PUBLISHED"
-    }
-  });
-  const Published_exam = await exam.count({
-    where: {
-      status: "PUBLISHED"
-    }
-  });
-
-
-
-  res.status(200).send({
-    status: 1,
-    message: "success",
-    data: {
-      Users: Users,
-      Total_colleges: Total_colleges,
-      Published_colleges: Published_colleges,
-      Total_universitys: Total_universitys,
-      Published_universities: Published_universities,
-      countries: country,
-      state: states,
-      city: cities,
-      school: schools,
-      Published_school: Published_school,
-      stream: streams,
-      generalcourse: generalcourses,
-      abroadpages: abroadpage,
-      exam: exams,
-      Published_exam: Published_exam,
-      courses: course,
-      Published_courses: Published_courses,
-      enquiry: enquires,
-      blog: blogs,
-      jobs_positions: jobs_position,
-
-
-
-
-    }
-  });
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      data: {
+        Users: totalUsers,
+        Total_colleges: totalColleges,
+        Published_colleges: publishedColleges,
+        Total_universitys: totalUniversities,
+        Published_universities: publishedUniversities,
+        countries: totalCountry,
+        state: totalStates,
+        city: totalCities,
+        school: totalSchools,
+        Published_school: publishedSchool,
+        stream: totalStreams,
+        generalcourse: totalGeneralCourses,
+        abroadpages: totalAbroadPages,
+        exam: totalExams,
+        Published_exam: publishedExams,
+        courses: totalCourses,
+        Published_courses: publishedCourses,
+        enquiry: totalEnquiries,
+        blog: totalBlogs,
+        Published_blog: publishedBlogs,
+        jobs_positions: totalJobsPositions,
+        schoolboards: totalSchoolBoards,
+        scholarships: totalScholarships,
+        Published_scholarships: publishedScholarships,
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    res.status(500).send({
+      status: 0,
+      message: "An error occurred",
+      error: error.message
+    });
+  }
 };
+
