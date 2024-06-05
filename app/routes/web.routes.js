@@ -147,7 +147,7 @@ module.exports = function (app) {
 
   app.get("/api/website/ourteams/get", webapicontroller.ourteams);
 
-  app.get("/api/website/dashboard/get", webapicontroller.dashboard);
+
 
 
 

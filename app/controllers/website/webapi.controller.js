@@ -30,7 +30,7 @@ const jobsenquires = db.jobs_enquires;
 const our_teams = db.our_teams;
 const PUBLISHED = 'Published';
 const city = db.city;
-
+const User = db.user;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -2342,7 +2342,17 @@ exports.ourteams = async (req, res) => {
 exports.dashboard = async (req, res) => {
 
 
-  const colleges = await college.count();
+  const Total_colleges = await college.count({
+    where: {
+      type: "college"
+    }
+  });
+  const Total_universitys = await college.count({
+    where: {
+      type: "university"
+    }
+  });
+  const Users = await User.count();
   const country = await countries.count();
   const states = await state.count();
   const cities = await city.count();
@@ -2356,24 +2366,31 @@ exports.dashboard = async (req, res) => {
   const blogs = await blog.count();
   const jobs_position = await jobs_positions.count();
 
-  const college_status = await college.count({
+  const Published_colleges = await college.count({
     where: {
-      status: PUBLISHED
+      status: "PUBLISHED",
+      type: "college"
     }
   });
-  const school_status = await school.count({
+  const Published_universities = await college.count({
     where: {
-      status: PUBLISHED
+      status: "PUBLISHED",
+      type: "university"
     }
   });
-  const courses_status = await courses.count({
+  const Published_school = await school.count({
     where: {
-      status: PUBLISHED
+      status: "PUBLISHED"
     }
   });
-  const exam_status = await exam.count({
+  const Published_courses = await courses.count({
     where: {
-      status: PUBLISHED
+      status: "PUBLISHED"
+    }
+  });
+  const Published_exam = await exam.count({
+    where: {
+      status: "PUBLISHED"
     }
   });
 
@@ -2383,23 +2400,30 @@ exports.dashboard = async (req, res) => {
     status: 1,
     message: "success",
     data: {
-      college: colleges,
+      Users: Users,
+      Total_colleges: Total_colleges,
+      Published_colleges: Published_colleges,
+      Total_universitys: Total_universitys,
+      Published_universities: Published_universities,
       countries: country,
       state: states,
       city: cities,
       school: schools,
+      Published_school: Published_school,
       stream: streams,
       generalcourse: generalcourses,
       abroadpages: abroadpage,
       exam: exams,
+      Published_exam: Published_exam,
       courses: course,
+      Published_courses: Published_courses,
       enquiry: enquires,
       blog: blogs,
       jobs_positions: jobs_position,
-      college_status: college_status,
-      school_status: school_status,
-      courses_status: courses_status,
-      exam_status: exam_status,
+
+
+
+
     }
   });
 };
