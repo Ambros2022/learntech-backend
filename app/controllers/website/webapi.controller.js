@@ -23,13 +23,11 @@ const schoolboards = db.schoolboards;
 const scholarships = db.scholarships;
 const page = db.page;
 const video_testimonials = db.video_testimonials;
-// db.page,db.video_testimonials
 const { Sequelize } = require('sequelize');
 const jobs_positions = db.jobs_positions;
 const all_job_locations = db.all_job_locations;
 const jobsenquires = db.jobs_enquires;
 const our_teams = db.our_teams;
-// db.page,db.video_testimonials,db.jobs_positions,db.all_job_locations,db.jobs_enquires
 const PUBLISHED = 'Published';
 const city = db.city;
 
@@ -1023,7 +1021,7 @@ exports.collegefindOne = (req, res) => {
         include: [
           {
             association: "clgamenities",
-            attributes: ["id", "amenities_name","amenities_logo"],
+            attributes: ["id", "amenities_name", "amenities_logo"],
           },
         ],
       },
@@ -1208,7 +1206,7 @@ exports.allschools = async (req, res) => {
   if (home_view_status) {
     data_array.push({ home_view_status });
   }
- 
+
 
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
   if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
@@ -1453,7 +1451,7 @@ exports.allentranceexams = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  
+
   if (promo_banner_status) {
     data_array.push({ promo_banner_status });
   }
@@ -1682,12 +1680,12 @@ exports.blogs = async (req, res) => {
 };
 
 exports.blogfindone = (req, res) => {
-    const id = req.params.id;
-    blog
-      .findByPk(id, {
-        attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description'],
-        
-      })
+  const id = req.params.id;
+  blog
+    .findByPk(id, {
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description'],
+
+    })
     .then((data) => {
       if (data) {
 
@@ -1726,7 +1724,7 @@ exports.schoolboards = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
- 
+
 
 
   if (board_type) {
@@ -1830,7 +1828,7 @@ exports.scholarships = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
- 
+
   if (gender) {
     data_array.push({ gender });
   }
@@ -1979,7 +1977,7 @@ exports.videotestimonial = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
- 
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2162,7 +2160,7 @@ exports.jobpositions = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2217,7 +2215,7 @@ exports.alljoblocations = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
- 
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2301,7 +2299,7 @@ exports.ourteams = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-  
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -2341,42 +2339,67 @@ exports.ourteams = async (req, res) => {
     });
 };
 
-exports.dashboard = async  (req, res) => {
-  
-
-  const colleges = await  college.count();
-  const country = await  countries.count();
-  const states = await  state.count();
-  const cities = await  city.count();
-  const schools = await  school.count();
-  const streams = await  stream.count();
-  const generalcourses = await  generalcourse.count();
-  const abroadpage = await  abroadpages.count();
-  const exams = await  exam.count();
-  const course = await  courses.count();
+exports.dashboard = async (req, res) => {
 
 
-  const college_status = await  college.count({
+  const colleges = await college.count();
+  const country = await countries.count();
+  const states = await state.count();
+  const cities = await city.count();
+  const schools = await school.count();
+  const streams = await stream.count();
+  const generalcourses = await generalcourse.count();
+  const abroadpage = await abroadpages.count();
+  const exams = await exam.count();
+  const course = await courses.count();
+  const enquires = await enquiry.count();
+  const blogs = await blog.count();
+  const jobs_position = await jobs_positions.count();
+
+  const college_status = await college.count({
     where: {
-        status: PUBLISHED
-      }
+      status: PUBLISHED
+    }
   });
- 
- res.status(200).send({
-    status:1,
-    message:"success",
-    data:{
-    college: colleges,
-    countries: country,
-    state: states,
-    city: cities,
-    school: schools,
-    stream: streams,
-    generalcourse: generalcourses,
-    abroadpages: abroadpage,
-    exam: exams,
-    courses: course,
-    college_status: college_status
-  }
-    });
-  };
+  const school_status = await school.count({
+    where: {
+      status: PUBLISHED
+    }
+  });
+  const courses_status = await courses.count({
+    where: {
+      status: PUBLISHED
+    }
+  });
+  const exam_status = await exam.count({
+    where: {
+      status: PUBLISHED
+    }
+  });
+
+
+
+  res.status(200).send({
+    status: 1,
+    message: "success",
+    data: {
+      college: colleges,
+      countries: country,
+      state: states,
+      city: cities,
+      school: schools,
+      stream: streams,
+      generalcourse: generalcourses,
+      abroadpages: abroadpage,
+      exam: exams,
+      courses: course,
+      enquiry: enquires,
+      blog: blogs,
+      jobs_positions: jobs_position,
+      college_status: college_status,
+      school_status: school_status,
+      courses_status: courses_status,
+      exam_status: exam_status,
+    }
+  });
+};
