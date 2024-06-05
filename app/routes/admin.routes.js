@@ -30,7 +30,7 @@ const jobsenquirescontroller = require("../controllers/jobsenquires.controller")
 const ourteamscontroller = require("../controllers/ourteams.controller");
 const videotestimonialscontroller = require("../controllers/videotestimonials.controller");
 const schoolboardrecognitionscontroller = require("../controllers/schoolboardrecognitions.controller");
-
+const webapicontroller = require("../controllers/website/webapi.controller");
 
 
 
@@ -134,31 +134,32 @@ module.exports = function (app) {
     next();
   });
 
-    /* ENQUIRY Routes start*/
+  /* ENQUIRY Routes start*/
 
-    app.get(
-      "/api/admin/enquiry/get",
-      [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-      enquirycontroller.findAll
-    );
-  
-    app.get(
-      "/api/admin/enquiry/get/:id",
-      [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-      enquirycontroller.findOne
-    );
-  
+  app.get(
+    "/api/admin/enquiry/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    enquirycontroller.findAll
+  );
+  app.get("/api/website/dashboard/get", [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate], webapicontroller.dashboard);
 
-  
-    app.post(
-      "/api/admin/enquiry/delete/:id",
-      [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-      enquirycontroller.delete
-    );
-  
+  app.get(
+    "/api/admin/enquiry/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    enquirycontroller.findOne
+  );
 
-    
-    /** enquiry Routes End*/
+
+
+  app.post(
+    "/api/admin/enquiry/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    enquirycontroller.delete
+  );
+
+
+
+  /** enquiry Routes End*/
 
   /*  Recognisation route End    */
 
@@ -393,9 +394,9 @@ module.exports = function (app) {
   );
   /** amenities Routes End*/
 
-   /** courses  route  start*/
+  /** courses  route  start*/
 
-   app.get(
+  app.get(
     "/api/admin/courses/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     coursescontroller.findAll
@@ -545,7 +546,7 @@ module.exports = function (app) {
     schoolboardrecognitionscontroller.update
   );
 
-  
+
   //**** school Routes start  *****/
 
   app.get(
@@ -594,7 +595,7 @@ module.exports = function (app) {
   );
 
 
- 
+
 
   app.post(
     "/api/admin/school/updategallery",
@@ -845,8 +846,8 @@ module.exports = function (app) {
   /** generalcourse Routes End*/
 
 
-   /**  abroad pages Routes Start*/
-   app.get(
+  /**  abroad pages Routes Start*/
+  app.get(
     "/api/admin/abroadpage/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     abroadpagecontroller.findAll
@@ -887,11 +888,11 @@ module.exports = function (app) {
 
   /**  Stream Routes End*/
 
-  
 
-   /**  landingpage Routes End*/
-   
-   app.get(
+
+  /**  landingpage Routes End*/
+
+  app.get(
     "/api/admin/landingpage/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     landingpagecontroller.findAll
@@ -926,470 +927,470 @@ module.exports = function (app) {
   /**  landingpage Routes End*/
 
 
-/**  news categories Routes Start*/
-   
-app.get(
-  "/api/admin/newscategories/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newscategoriecontroller.findAll
-);
+  /**  news categories Routes Start*/
 
-app.get(
-  "/api/admin/newscategories/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newscategoriecontroller.findOne
-);
+  app.get(
+    "/api/admin/newscategories/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newscategoriecontroller.findAll
+  );
 
-app.post(
-  "/api/admin/newscategories/add",
-  globalvalidation.newscategoriesSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newscategoriecontroller.create
-);
+  app.get(
+    "/api/admin/newscategories/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newscategoriecontroller.findOne
+  );
 
-app.post(
-  "/api/admin/newscategories/update",
-  globalvalidation.newscategoriesUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newscategoriecontroller.update
-);
+  app.post(
+    "/api/admin/newscategories/add",
+    globalvalidation.newscategoriesSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newscategoriecontroller.create
+  );
 
-app.post(
-  "/api/admin/newscategories/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newscategoriecontroller.delete
-);
+  app.post(
+    "/api/admin/newscategories/update",
+    globalvalidation.newscategoriesUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newscategoriecontroller.update
+  );
 
-/**  news categories Routes End*/
+  app.post(
+    "/api/admin/newscategories/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newscategoriecontroller.delete
+  );
 
-
-
-/**  news and events Routes Start*/
-   
-app.get(
-  "/api/admin/newsevents/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newsandeventscontroller.findAll
-);
-
-app.get(
-  "/api/admin/newsevents/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newsandeventscontroller.findOne
-);
-
-app.post(
-  "/api/admin/newsevents/add",
-  globalvalidation.newsandeventsSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newsandeventscontroller.create
-);
-
-app.post(
-  "/api/admin/newsevents/update",
-  globalvalidation.newsandeventsUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newsandeventscontroller.update
-);
-
-app.post(
-  "/api/admin/newsevents/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  newsandeventscontroller.delete
-);
-
-/**  news and events Routes End*/
-
- /* blog Routes start*/
-
- app.get(
-  "/api/admin/blog/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  blogcontroller.findAll
-);
-
-app.get(
-  "/api/admin/blog/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  blogcontroller.findOne
-);
-
-app.post(
-  "/api/admin/blog/add",
-  globalvalidation.blogSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  blogcontroller.create
-);
-
-app.post(
-  "/api/admin/blog/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  blogcontroller.delete
-);
-
-app.post(
-  "/api/admin/blog/update",
-  globalvalidation.blogUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  blogcontroller.update
-);
-
-  
- /** exam  route  End*/
-
- app.get(
-  "/api/admin/exam/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  examcontroller.findAll
-);
-app.get(
-  "/api/admin/exam/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  examcontroller.findOne
-);
-app.post(
-  "/api/admin/exam/add",
-  globalvalidation.examSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  examcontroller.create
-);
-app.post(
-  "/api/admin/exam/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  examcontroller.delete
-);
-app.post(
-  "/api/admin/exam/update",
-  globalvalidation.examUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  examcontroller.update
-);
-app.post(
-  "/api/admin/exam/updatefaq",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  examcontroller.updatefaq
-);
-// app.post(
-//   "/api/admin/exam/updateeligibilities",
-//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-//   examcontroller.updateeligibilities
-// );
-// app.post(
-//   "/api/admin/exam/updatefees",
-//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-//   examcontroller.updatefees
-// );
-// app.post(
-//   "/api/admin/exam/updateexamdates",
-//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-//   examcontroller.updateexamdates
-// );
-
-// app.post(
-//   "/api/admin/exam/updateexamagelimit",
-//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-//   examcontroller.updateexamagelimit
-// );
-// app.post(
-//   "/api/admin/exam/updateexamifproof",
-//   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-//   examcontroller.updateexamifproof
-// );
+  /**  news categories Routes End*/
 
 
-/** Exam  route  End*/
 
-/** scholar level route  start*/
+  /**  news and events Routes Start*/
 
-app.get(
-  "/api/admin/scholarlevel/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarlevelcontroller.findAll
-);
-app.get(
-  "/api/admin/scholarlevel/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarlevelcontroller.findOne
-);
-app.post(
-  "/api/admin/scholarlevel/add",
-  globalvalidation.scholarlevelSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarlevelcontroller.create
-);
-app.post(
-  "/api/admin/scholarlevel/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarlevelcontroller.delete
-);
-app.post(
-  "/api/admin/scholarlevel/update",
-  globalvalidation.scholarlevelUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarlevelcontroller.update
-);
+  app.get(
+    "/api/admin/newsevents/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newsandeventscontroller.findAll
+  );
 
-/**scholar level route end   */
+  app.get(
+    "/api/admin/newsevents/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newsandeventscontroller.findOne
+  );
 
-/** scholar type route  start*/
+  app.post(
+    "/api/admin/newsevents/add",
+    globalvalidation.newsandeventsSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newsandeventscontroller.create
+  );
 
-app.get(
-  "/api/admin/scholartype/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholartypecontroller.findAll
-);
-app.get(
-  "/api/admin/scholartype/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholartypecontroller.findOne
-);
-app.post(
-  "/api/admin/scholartype/add",
-  globalvalidation.scholartypeSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholartypecontroller.create
-);
-app.post(
-  "/api/admin/scholartype/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholartypecontroller.delete
-);
-app.post(
-  "/api/admin/scholartype/update",
-  globalvalidation.scholartypeUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholartypecontroller.update
-);
+  app.post(
+    "/api/admin/newsevents/update",
+    globalvalidation.newsandeventsUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newsandeventscontroller.update
+  );
 
-/**scholar level route end   */
+  app.post(
+    "/api/admin/newsevents/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    newsandeventscontroller.delete
+  );
 
-/** scholarship route  start*/
+  /**  news and events Routes End*/
 
-app.get(
-  "/api/admin/scholarship/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarshipcontroller.findAll
-);
-app.get(
-  "/api/admin/scholarship/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarshipcontroller.findOne
-);
-app.post(
-  "/api/admin/scholarship/add",
-  globalvalidation.scholarshipSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarshipcontroller.create
-);
-app.post(
-  "/api/admin/scholarship/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarshipcontroller.delete
-);
-app.post(
-  "/api/admin/scholarship/update",
-  globalvalidation.scholarshipUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  scholarshipcontroller.update
-);
+  /* blog Routes start*/
 
-/**scholar level route end   */
+  app.get(
+    "/api/admin/blog/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcontroller.findAll
+  );
+
+  app.get(
+    "/api/admin/blog/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcontroller.findOne
+  );
+
+  app.post(
+    "/api/admin/blog/add",
+    globalvalidation.blogSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcontroller.create
+  );
+
+  app.post(
+    "/api/admin/blog/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcontroller.delete
+  );
+
+  app.post(
+    "/api/admin/blog/update",
+    globalvalidation.blogUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcontroller.update
+  );
 
 
-/** all job locations route  start*/
+  /** exam  route  End*/
 
-app.get(
-  "/api/admin/alljoblocation/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  alljobslocationcontroller.findAll
-);
-app.get(
-  "/api/admin/alljoblocation/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  alljobslocationcontroller.findOne
-);
-app.post(
-  "/api/admin/alljoblocation/add",
-  globalvalidation.alljoblocationSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  alljobslocationcontroller.create
-);
-app.post(
-  "/api/admin/alljoblocation/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  alljobslocationcontroller.delete
-);
-app.post(
-  "/api/admin/alljoblocation/update",
-  globalvalidation.alljoblocationUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  alljobslocationcontroller.update
-);
+  app.get(
+    "/api/admin/exam/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    examcontroller.findAll
+  );
+  app.get(
+    "/api/admin/exam/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    examcontroller.findOne
+  );
+  app.post(
+    "/api/admin/exam/add",
+    globalvalidation.examSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    examcontroller.create
+  );
+  app.post(
+    "/api/admin/exam/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    examcontroller.delete
+  );
+  app.post(
+    "/api/admin/exam/update",
+    globalvalidation.examUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    examcontroller.update
+  );
+  app.post(
+    "/api/admin/exam/updatefaq",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    examcontroller.updatefaq
+  );
+  // app.post(
+  //   "/api/admin/exam/updateeligibilities",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   examcontroller.updateeligibilities
+  // );
+  // app.post(
+  //   "/api/admin/exam/updatefees",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   examcontroller.updatefees
+  // );
+  // app.post(
+  //   "/api/admin/exam/updateexamdates",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   examcontroller.updateexamdates
+  // );
 
-/**all job locations route end   */
-
-
-/** jobs positions route  start*/
-
-app.get(
-  "/api/admin/jobsposition/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobspositioncontroller.findAll
-);
-app.get(
-  "/api/admin/jobsposition/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobspositioncontroller.findOne
-);
-app.post(
-  "/api/admin/jobsposition/add",
-  globalvalidation.jobspositionsSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobspositioncontroller.create
-);
-app.post(
-  "/api/admin/jobsposition/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobspositioncontroller.delete
-);
-app.post(
-  "/api/admin/jobsposition/update",
-  globalvalidation.jobspositionsUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobspositioncontroller.update
-);
-
-/**jobs positions route end   */
-
-/** job locations route  start*/
-
-app.get(
-  "/api/admin/joblocations/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  joblocationscontroller.findAll
-);
-app.get(
-  "/api/admin/joblocations/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  joblocationscontroller.findOne
-);
-app.post(
-  "/api/admin/joblocations/add",
-  globalvalidation.joblocationsSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  joblocationscontroller.create
-);
-app.post(
-  "/api/admin/joblocations/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  joblocationscontroller.delete
-);
-app.post(
-  "/api/admin/joblocations/update",
-  globalvalidation.joblocationsUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  joblocationscontroller.update
-);
-
-/**job locations route end   */
+  // app.post(
+  //   "/api/admin/exam/updateexamagelimit",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   examcontroller.updateexamagelimit
+  // );
+  // app.post(
+  //   "/api/admin/exam/updateexamifproof",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   examcontroller.updateexamifproof
+  // );
 
 
-/** jobs enquires route  start*/
+  /** Exam  route  End*/
 
-app.get(
-  "/api/admin/jobsenquires/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobsenquirescontroller.findAll
-);
-app.get(
-  "/api/admin/jobsenquires/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobsenquirescontroller.findOne
-);
-app.post(
-  "/api/admin/jobsenquires/add",
-  globalvalidation.jobsenquiresSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobsenquirescontroller.create
-);
-app.post(
-  "/api/admin/jobsenquires/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobsenquirescontroller.delete
-);
-app.post(
-  "/api/admin/jobsenquires/update",
-  globalvalidation.jobsenquiresUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  jobsenquirescontroller.update
-);
+  /** scholar level route  start*/
 
-/**all-job-locations route end   */
+  app.get(
+    "/api/admin/scholarlevel/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarlevelcontroller.findAll
+  );
+  app.get(
+    "/api/admin/scholarlevel/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarlevelcontroller.findOne
+  );
+  app.post(
+    "/api/admin/scholarlevel/add",
+    globalvalidation.scholarlevelSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarlevelcontroller.create
+  );
+  app.post(
+    "/api/admin/scholarlevel/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarlevelcontroller.delete
+  );
+  app.post(
+    "/api/admin/scholarlevel/update",
+    globalvalidation.scholarlevelUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarlevelcontroller.update
+  );
+
+  /**scholar level route end   */
+
+  /** scholar type route  start*/
+
+  app.get(
+    "/api/admin/scholartype/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholartypecontroller.findAll
+  );
+  app.get(
+    "/api/admin/scholartype/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholartypecontroller.findOne
+  );
+  app.post(
+    "/api/admin/scholartype/add",
+    globalvalidation.scholartypeSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholartypecontroller.create
+  );
+  app.post(
+    "/api/admin/scholartype/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholartypecontroller.delete
+  );
+  app.post(
+    "/api/admin/scholartype/update",
+    globalvalidation.scholartypeUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholartypecontroller.update
+  );
+
+  /**scholar level route end   */
+
+  /** scholarship route  start*/
+
+  app.get(
+    "/api/admin/scholarship/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarshipcontroller.findAll
+  );
+  app.get(
+    "/api/admin/scholarship/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarshipcontroller.findOne
+  );
+  app.post(
+    "/api/admin/scholarship/add",
+    globalvalidation.scholarshipSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarshipcontroller.create
+  );
+  app.post(
+    "/api/admin/scholarship/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarshipcontroller.delete
+  );
+  app.post(
+    "/api/admin/scholarship/update",
+    globalvalidation.scholarshipUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    scholarshipcontroller.update
+  );
+
+  /**scholar level route end   */
 
 
-/** our teams route  start*/
+  /** all job locations route  start*/
 
-app.get(
-  "/api/admin/ourteams/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  ourteamscontroller.findAll
-);
-app.get(
-  "/api/admin/ourteams/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  ourteamscontroller.findOne
-);
-app.post(
-  "/api/admin/ourteams/add",
-  globalvalidation.ourteamsSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  ourteamscontroller.create
-);
-app.post(
-  "/api/admin/ourteams/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  ourteamscontroller.delete
-);
-app.post(
-  "/api/admin/ourteams/update",
-  globalvalidation.ourteamsUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  ourteamscontroller.update
-);
+  app.get(
+    "/api/admin/alljoblocation/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    alljobslocationcontroller.findAll
+  );
+  app.get(
+    "/api/admin/alljoblocation/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    alljobslocationcontroller.findOne
+  );
+  app.post(
+    "/api/admin/alljoblocation/add",
+    globalvalidation.alljoblocationSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    alljobslocationcontroller.create
+  );
+  app.post(
+    "/api/admin/alljoblocation/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    alljobslocationcontroller.delete
+  );
+  app.post(
+    "/api/admin/alljoblocation/update",
+    globalvalidation.alljoblocationUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    alljobslocationcontroller.update
+  );
 
-/** our teams route end   */
+  /**all job locations route end   */
 
-/** video testimonials route  start*/
 
-app.get(
-  "/api/admin/videotestimonials/get",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  videotestimonialscontroller.findAll
-);
-app.get(
-  "/api/admin/videotestimonials/get/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  videotestimonialscontroller.findOne
-);
-app.post(
-  "/api/admin/videotestimonials/add",
-  globalvalidation.videotestimonialsSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  videotestimonialscontroller.create
-);
-app.post(
-  "/api/admin/videotestimonials/delete/:id",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  videotestimonialscontroller.delete
-);
-app.post(
-  "/api/admin/videotestimonials/update",
-  globalvalidation.videotestimonialsUpdateSchema,
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  videotestimonialscontroller.update
-);
+  /** jobs positions route  start*/
 
-/** video testimonials route end   */
+  app.get(
+    "/api/admin/jobsposition/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobspositioncontroller.findAll
+  );
+  app.get(
+    "/api/admin/jobsposition/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobspositioncontroller.findOne
+  );
+  app.post(
+    "/api/admin/jobsposition/add",
+    globalvalidation.jobspositionsSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobspositioncontroller.create
+  );
+  app.post(
+    "/api/admin/jobsposition/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobspositioncontroller.delete
+  );
+  app.post(
+    "/api/admin/jobsposition/update",
+    globalvalidation.jobspositionsUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobspositioncontroller.update
+  );
+
+  /**jobs positions route end   */
+
+  /** job locations route  start*/
+
+  app.get(
+    "/api/admin/joblocations/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    joblocationscontroller.findAll
+  );
+  app.get(
+    "/api/admin/joblocations/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    joblocationscontroller.findOne
+  );
+  app.post(
+    "/api/admin/joblocations/add",
+    globalvalidation.joblocationsSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    joblocationscontroller.create
+  );
+  app.post(
+    "/api/admin/joblocations/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    joblocationscontroller.delete
+  );
+  app.post(
+    "/api/admin/joblocations/update",
+    globalvalidation.joblocationsUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    joblocationscontroller.update
+  );
+
+  /**job locations route end   */
+
+
+  /** jobs enquires route  start*/
+
+  app.get(
+    "/api/admin/jobsenquires/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobsenquirescontroller.findAll
+  );
+  app.get(
+    "/api/admin/jobsenquires/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobsenquirescontroller.findOne
+  );
+  app.post(
+    "/api/admin/jobsenquires/add",
+    globalvalidation.jobsenquiresSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobsenquirescontroller.create
+  );
+  app.post(
+    "/api/admin/jobsenquires/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobsenquirescontroller.delete
+  );
+  app.post(
+    "/api/admin/jobsenquires/update",
+    globalvalidation.jobsenquiresUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    jobsenquirescontroller.update
+  );
+
+  /**all-job-locations route end   */
+
+
+  /** our teams route  start*/
+
+  app.get(
+    "/api/admin/ourteams/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    ourteamscontroller.findAll
+  );
+  app.get(
+    "/api/admin/ourteams/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    ourteamscontroller.findOne
+  );
+  app.post(
+    "/api/admin/ourteams/add",
+    globalvalidation.ourteamsSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    ourteamscontroller.create
+  );
+  app.post(
+    "/api/admin/ourteams/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    ourteamscontroller.delete
+  );
+  app.post(
+    "/api/admin/ourteams/update",
+    globalvalidation.ourteamsUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    ourteamscontroller.update
+  );
+
+  /** our teams route end   */
+
+  /** video testimonials route  start*/
+
+  app.get(
+    "/api/admin/videotestimonials/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    videotestimonialscontroller.findAll
+  );
+  app.get(
+    "/api/admin/videotestimonials/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    videotestimonialscontroller.findOne
+  );
+  app.post(
+    "/api/admin/videotestimonials/add",
+    globalvalidation.videotestimonialsSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    videotestimonialscontroller.create
+  );
+  app.post(
+    "/api/admin/videotestimonials/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    videotestimonialscontroller.delete
+  );
+  app.post(
+    "/api/admin/videotestimonials/update",
+    globalvalidation.videotestimonialsUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    videotestimonialscontroller.update
+  );
+
+  /** video testimonials route end   */
 
 
 
@@ -1983,7 +1984,7 @@ app.post(
     polytechniccontroller.update
   );
 
- 
+
   /* author Routes start*/
 
   app.get(
@@ -2331,7 +2332,7 @@ app.post(
   /**upcoming_courses  route end   */
 
 
- 
+
 
   /**upcoming_courses  route end   */
 
@@ -2517,7 +2518,7 @@ app.post(
   );
   /**syllabus route end   */
 
-  
+
 
 
 

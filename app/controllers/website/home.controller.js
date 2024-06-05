@@ -54,13 +54,8 @@ const videotestimonial = db.videotestimonial;
 const abroad_universities = db.abroad_universities;
 const abroadcountries = db.abroadcountries;
 const youtubevideos = db.youtubevideos;
-const array_of_allowed_file_types = [
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/gif",
-  "image/svg+xml",
-];
+const fileTypes = require("../../config/fileTypes");
+const array_of_allowed_file_types = fileTypes.Imageformat;
 
 const allowed_file_size = 2;
 
