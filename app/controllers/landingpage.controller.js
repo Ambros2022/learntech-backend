@@ -3,7 +3,7 @@ const path = require("path");
 const landingpage = db.landing_pages;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
-
+const fileTypes = require("../config/fileTypes");
 const groups = db.groups;
 
 // / Function to remove a file
@@ -21,13 +21,7 @@ async function removeFile(filePath) {
 
 // Array of allowed files
 const sendsearch = require("../utility/Customsearch");
-const array_of_allowed_file_types = [
-    "image/png",
-    "image/jpeg",
-    "image/jpg",
-    "image/gif",
-    "image/svg+xml",
-];
+const array_of_allowed_file_types = fileTypes.Imageformat;
 
 // Allowed file size in mb
 const allowed_file_size = 2;

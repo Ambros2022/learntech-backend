@@ -18,20 +18,21 @@ const exam = db.exam;
 const blog = db.blog;
 const courses = db.courses;
 const college_stream = db.college_stream;
-const videos = db.video_testimonials;
+// const videos = db.video_testimonials;
 const schoolboards = db.schoolboards;
 const scholarships = db.scholarships;
 const page = db.page;
 const video_testimonials = db.video_testimonials;
-// db.page,db.video_testimonials
 const { Sequelize } = require('sequelize');
 const jobs_positions = db.jobs_positions;
 const all_job_locations = db.all_job_locations;
 const jobsenquires = db.jobs_enquires;
 const our_teams = db.our_teams;
-// db.page,db.video_testimonials,db.jobs_positions,db.all_job_locations,db.jobs_enquires
-
-
+const PUBLISHED = 'Published';
+const city = db.city;
+const User = db.user;
+// const schoolboards = db.schoolboards;
+// db.schoolboards
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -889,7 +890,7 @@ exports.allcolleges = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  let data_array = [];
+  let data_array = [{ status: "Published" }];
 
 
   if (is_associated) {
@@ -983,70 +984,6 @@ exports.allcolleges = async (req, res) => {
 
 
 
-
-
-exports.allvideos = async (req, res) => {
-  try {
-    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-    var column = columnname || "id";
-    var order = orderby || "ASC";
-    var orderconfig = [column, order];
-
-    const myArray = column.split(".");
-    if (myArray.length > 1) {
-      var table = myArray[0];
-      column = myArray[1];
-      orderconfig = [[table, column], order];
-    }
-
-    let data_array = [];
-    let conditionarray = [];
-
-    const condition = sendsearch.customseacrh(searchtext, searchfrom);
-    if (condition) {
-      data_array.push(condition);
-    }
-
-    const { limit, offset } = getPagination(page, size);
-    const data = await videos.findAndCountAll({
-      where: {
-        [Op.and]: data_array.concat(conditionarray)
-      },
-      attributes: ["id", "name", "designation", "video_url"],
-      order: [orderconfig],
-      limit,
-      offset
-    })
-      .then((data) => {
-        const response = getPagingData(data, page, limit);
-
-        res.status(200).send({
-          status: 1,
-          message: "success",
-          totalItems: response.totalItems,
-          currentPage: response.currentPage,
-          totalPages: response.totalPages,
-          data: response.finaldata,
-        });
-      })
-      .catch((err) => {
-        res.status(500).send({
-          status: 0,
-          message:
-            err.message ||
-            "Some error occurred while retrieving videos.",
-        });
-      });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send({
-      status: 0,
-      message: err.message || "Some error occurred while retrieving videos.",
-    });
-  }
-};
-
 exports.collegefindOne = (req, res) => {
   const id = req.params.id;
   college.findByPk(id, {
@@ -1086,7 +1023,7 @@ exports.collegefindOne = (req, res) => {
         include: [
           {
             association: "clgamenities",
-            attributes: ["id", "amenities_name","amenities_logo"],
+            attributes: ["id", "amenities_name", "amenities_logo"],
           },
         ],
       },
@@ -1248,6 +1185,7 @@ exports.allschools = async (req, res) => {
     columnname,
     orderby,
     school_type,
+    home_view_status,
   } = req.query;
 
   let column = columnname || "id";
@@ -1261,11 +1199,14 @@ exports.allschools = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  let data_array = [];
-  let conditionarray = [];
+  let data_array = [{ status: "Published" }];
 
   if (school_type) {
-    conditionarray.push({ school_type });
+    data_array.push({ school_type });
+  }
+
+  if (home_view_status) {
+    data_array.push({ home_view_status });
   }
 
 
@@ -1277,17 +1218,17 @@ exports.allschools = async (req, res) => {
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
   if (condition) data_array.push(condition);
 
-  let include = [];
+  let includearray = [];
 
   const { limit, offset } = getPagination(page, size);
 
   try {
     const data = await school.findAndCountAll({
       where: {
-        [Op.and]: data_array.concat(conditionarray),
+        [Op.and]: data_array,
       },
       attributes: ["id", "name", "city_id", "established", "icon"],
-      include,
+      include: includearray,
       order: [orderconfig],
       limit,
       offset,
@@ -1499,7 +1440,7 @@ exports.abroadcollegefindone = (req, res) => {
 };
 
 exports.allentranceexams = async (req, res) => {
-  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, } = req.query;
+  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1511,12 +1452,18 @@ exports.allentranceexams = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{ status: "Published" }];
+
+  if (promo_banner_status) {
+    data_array.push({ promo_banner_status });
+  }
 
 
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-  stream_id ? data_array.push({ stream_id: stream_id }) : null;
+  if (stream_id) data_array.push({ stream_id: JSON.parse(stream_id) });
+
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) data_array.push(condition);
+
   const { limit, offset } = getPagination(page, size);
   exam
     .findAndCountAll({
@@ -1528,13 +1475,8 @@ exports.allentranceexams = async (req, res) => {
         "exam_short_name",
         "cover_image",
         "stream_id",
+        "created_at",
       ],
-      // include: [{
-      //   required: false,
-      //   association: "exam",
-      //   attributes: ["id", "exam_title"],
-      //   where: { status: "Published" }
-      // }],
       order: [orderconfig]
     })
     .then((data) => {
@@ -1742,26 +1684,11 @@ exports.blogs = async (req, res) => {
 
 exports.blogfindone = (req, res) => {
   const id = req.params.id;
-
   blog
-    .findOne({
-      where: {
-        [Op.or]: [
-          {
-            id: {
-              [Op.eq]: id,
-            },
-          },
-          {
-            slug: {
-              [Op.eq]: id,
-            },
-          },
-        ],
-      },
-      subQuery: false,
-    })
+    .findByPk(id, {
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description'],
 
+    })
     .then((data) => {
       if (data) {
 
@@ -1800,10 +1727,11 @@ exports.schoolboards = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-  let conditionarray = [];
+
+
 
   if (board_type) {
-    conditionarray.push({ board_type });
+    data_array.push({ board_type });
   }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -1812,7 +1740,7 @@ exports.schoolboards = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   schoolboards
     .findAndCountAll({
-      where: data_array.concat(conditionarray), limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -1903,11 +1831,11 @@ exports.scholarships = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  let conditionarray = [];
 
   if (gender) {
-    conditionarray.push({ gender });
+    data_array.push({ gender });
   }
+
 
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
@@ -1921,7 +1849,7 @@ exports.scholarships = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   scholarships
     .findAndCountAll({
-      where: data_array.concat(conditionarray), limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -2052,7 +1980,7 @@ exports.videotestimonial = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-  let conditionarray = [];
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2061,7 +1989,7 @@ exports.videotestimonial = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   video_testimonials
     .findAndCountAll({
-      where: data_array.concat(conditionarray), limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "title",
@@ -2235,7 +2163,7 @@ exports.jobpositions = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  let conditionarray = [];
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2244,7 +2172,7 @@ exports.jobpositions = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   jobs_positions
     .findAndCountAll({
-      where: data_array.concat(conditionarray), limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -2290,7 +2218,7 @@ exports.alljoblocations = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  let conditionarray = [];
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2299,7 +2227,7 @@ exports.alljoblocations = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   all_job_locations
     .findAndCountAll({
-      where: data_array.concat(conditionarray), limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -2374,7 +2302,6 @@ exports.ourteams = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-  let conditionarray = [];
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2383,7 +2310,7 @@ exports.ourteams = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
   our_teams
     .findAndCountAll({
-      where: data_array.concat(conditionarray), limit, offset,
+      where: data_array, limit, offset,
       attributes: [
         "id",
         "name",
@@ -2414,3 +2341,204 @@ exports.ourteams = async (req, res) => {
       });
     });
 };
+
+// exports.dashboard = async (req, res) => {
+
+
+//   const Total_colleges = await college.count({
+//     where: {
+//       type: "college"
+//     }
+//   });
+//   const Total_universitys = await college.count({
+//     where: {
+//       type: "university"
+//     }
+//   });
+//   const total_Users = await User.count();
+//   const total_country = await countries.count();
+//   const total_states = await state.count();
+//   const total_cities = await city.count();
+//   const total_schools = await school.count();
+//   const total_streams = await stream.count();
+//   const total_generalcourses = await generalcourse.count();
+//   const total_abroadpage = await abroadpages.count();
+//   const total_exams = await exam.count();
+//   const total_course = await courses.count();
+//   const total_enquires = await enquiry.count();
+//   const total_blogs = await blog.count();
+//   const total_jobs_position = await jobs_positions.count();
+//   const total_schoolboard = await schoolboards.count();
+//   const total_scholarship = await scholarships.count();
+
+//   const Published_colleges = await college.count({
+//     where: {
+//       status: "PUBLISHED",
+//       type: "college"
+//     }
+//   });
+//   const Published_universities = await college.count({
+//     where: {
+//       status: "PUBLISHED",
+//       type: "university"
+//     }
+//   });
+//   const Published_school = await school.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_courses = await courses.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_exam = await exam.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_scholarships = await scholarships.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+//   const Published_blog = await blog.count({
+//     where: {
+//       status: "PUBLISHED"
+//     }
+//   });
+
+
+
+//   res.status(200).send({
+//     status: 1,
+//     message: "success",
+//     data: {
+//       Users: total_Users,
+//       Total_colleges: Total_colleges,
+//       Published_colleges: Published_colleges,
+//       Total_universitys: Total_universitys,
+//       Published_universities: Published_universities,
+//       countries: total_country,
+//       state: total_states,
+//       city: total_cities,
+//       school: total_schools,
+//       Published_school: Published_school,
+//       stream: total_streams,
+//       generalcourse: total_generalcourses,
+//       abroadpages: total_abroadpage,
+//       exam: total_exams,
+//       Published_exam: Published_exam,
+//       courses: total_course,
+//       Published_courses: Published_courses,
+//       enquiry: total_enquires,
+//       blog: total_blogs,
+//       Published_blog: Published_blog,
+//       jobs_positions: total_jobs_position,
+//       schoolboards: total_schoolboard,
+//       scholarships: total_scholarship,
+//       Published_scholarships: Published_scholarships,
+
+
+
+
+//     }
+//   });
+// };
+
+
+exports.dashboard = async (req, res) => {
+  try {
+    const [
+      totalColleges,
+      totalUniversities,
+      totalUsers,
+      totalCountry,
+      totalStates,
+      totalCities,
+      totalSchools,
+      totalStreams,
+      totalGeneralCourses,
+      totalAbroadPages,
+      totalExams,
+      totalCourses,
+      totalEnquiries,
+      totalBlogs,
+      totalJobsPositions,
+      totalSchoolBoards,
+      totalScholarships,
+      publishedColleges,
+      publishedUniversities,
+      publishedSchool,
+      publishedCourses,
+      publishedExams,
+      publishedScholarships,
+      publishedBlogs
+    ] = await Promise.all([
+      college.count({ where: { type: "college" } }),
+      college.count({ where: { type: "university" } }),
+      User.count(),
+      countries.count(),
+      state.count(),
+      city.count(),
+      school.count(),
+      stream.count(),
+      generalcourse.count(),
+      abroadpages.count(),
+      exam.count(),
+      courses.count(),
+      enquiry.count(),
+      blog.count(),
+      jobs_positions.count(),
+      schoolboards.count(),
+      scholarships.count(),
+      college.count({ where: { status: "PUBLISHED", type: "college" } }),
+      college.count({ where: { status: "PUBLISHED", type: "university" } }),
+      school.count({ where: { status: "PUBLISHED" } }),
+      courses.count({ where: { status: "PUBLISHED" } }),
+      exam.count({ where: { status: "PUBLISHED" } }),
+      scholarships.count({ where: { status: "PUBLISHED" } }),
+      blog.count({ where: { status: "PUBLISHED" } })
+    ]);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      data: {
+        Users: totalUsers,
+        Total_colleges: totalColleges,
+        Published_colleges: publishedColleges,
+        Total_universitys: totalUniversities,
+        Published_universities: publishedUniversities,
+        countries: totalCountry,
+        state: totalStates,
+        city: totalCities,
+        school: totalSchools,
+        Published_school: publishedSchool,
+        stream: totalStreams,
+        generalcourse: totalGeneralCourses,
+        abroadpages: totalAbroadPages,
+        exam: totalExams,
+        Published_exam: publishedExams,
+        courses: totalCourses,
+        Published_courses: publishedCourses,
+        enquiry: totalEnquiries,
+        blog: totalBlogs,
+        Published_blog: publishedBlogs,
+        jobs_positions: totalJobsPositions,
+        schoolboards: totalSchoolBoards,
+        scholarships: totalScholarships,
+        Published_scholarships: publishedScholarships,
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    res.status(500).send({
+      status: 0,
+      message: "An error occurred",
+      error: error.message
+    });
+  }
+};
+
