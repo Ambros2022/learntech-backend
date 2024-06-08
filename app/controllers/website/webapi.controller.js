@@ -872,6 +872,7 @@ exports.allcolleges = async (req, res) => {
     type,
     college_type,
     is_associated,
+    home_view_status,
     columnname,
     orderby,
     course_type,
@@ -895,6 +896,9 @@ exports.allcolleges = async (req, res) => {
 
   if (is_associated) {
     data_array.push({ is_associated });
+  }
+  if (home_view_status) {
+    data_array.push({ home_view_status });
   }
 
   if (type) {
@@ -1134,17 +1138,19 @@ exports.coursefindone = (req, res) => {
   const id = req.params.id;
   courses
     .findByPk(id, {
-      attributes: ['id', 'college_id', 'slug'],
+      attributes: ['id', "slug", "meta_title", 'meta_description', "meta_keywords", "course_details", "eligibility", "fee_structure"],
       include: [
         {
           required: false,
           association: "college",
-          attributes: ["id", "name"],
+          attributes: ["id", "name","slug"],
         },
         {
           required: false,
           association: "generalcourse",
-          attributes: ["id", "name"],
+          attributes: ["id", "name","stream_id"],
+
+          
         },
 
 
