@@ -1510,7 +1510,7 @@ exports.allentranceexams = async (req, res) => {
 exports.findoneexam = (req, res) => {
   const id = req.params.id;
   exam.findByPk(id, {
-    attributes: ['id', 'exam_title', 'slug'],
+    // attributes: ['id', 'exam_title', 'slug'],
     include: [
       {
         required: false,
