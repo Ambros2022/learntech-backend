@@ -1545,7 +1545,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id  } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1558,6 +1558,8 @@ exports.news = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
+  let conditioncategoryid = category_id ? { category_id: category_id } : null;
+  conditioncategoryid ? data_array.push(conditioncategoryid) : null;
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1573,6 +1575,7 @@ exports.news = async (req, res) => {
         "banner_image",
         "meta_description",
         "created_at",
+        "category_id",
       ],
       order: [orderconfig]
     })
