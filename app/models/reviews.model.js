@@ -9,19 +9,37 @@ module.exports = (sequelize, Sequelize) => {
       user_id: {
         type: Sequelize.INTEGER
       },
-      item_id: {
-        type: Sequelize.INTEGER
-      },
       content: {
-        type: Sequelize.TEXT
-      },
-      type: {
         type: Sequelize.TEXT
       },
       is_approved: {
         type: Sequelize.INTEGER
       },
-      slug: {
+      review_type: {
+        type: Sequelize.ENUM('school', 'college'),
+      },
+      college_id: {
+        type: Sequelize.TEXT
+      },
+      course_id: {
+        type: Sequelize.INTEGER
+      },
+      course_type: {
+        type: Sequelize.ENUM('UG', 'PG', 'Diploma', 'Doctorate', 'Default'),
+      },
+      school_id: {
+        type: Sequelize.STRING
+      },
+      school_board_id: {
+        type: Sequelize.STRING
+      },
+      grade: {
+        type: Sequelize.STRING
+      },
+      likes: {
+        type: Sequelize.STRING
+      },
+      dislikes: {
         type: Sequelize.STRING
       },
     }

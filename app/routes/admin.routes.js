@@ -1392,6 +1392,38 @@ module.exports = function (app) {
 
   /** video testimonials route end   */
 
+  /** review route  start*/
+
+  // app.get(
+  //   "/api/admin/videotestimonials/get",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   videotestimonialscontroller.findAll
+  // );
+  // app.get(
+  //   "/api/admin/videotestimonials/get/:id",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   videotestimonialscontroller.findOne
+  // );
+  app.post(
+    "/api/admin/review/add",
+    globalvalidation.videotestimonialsSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    videotestimonialscontroller.create
+  );
+  // app.post(
+  //   "/api/admin/videotestimonials/delete/:id",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   videotestimonialscontroller.delete
+  // );
+  // app.post(
+  //   "/api/admin/videotestimonials/update",
+  //   globalvalidation.videotestimonialsUpdateSchema,
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   videotestimonialscontroller.update
+  // );
+
+  /** review route end   */
+
 
 
   ////////////////////////old apis-------------------------------------------------------------------------------

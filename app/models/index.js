@@ -82,6 +82,7 @@ db.our_teams = require("./our_teams.model.js")(sequelize, Sequelize);
 db.video_testimonials = require("./video_testimonials.model.js")(sequelize, Sequelize);
 db.school_board_faqs = require("./school_board_faqs.model.js")(sequelize, Sequelize);
 db.school_board_recognitions = require("./school_board_recognitions.model.js")(sequelize, Sequelize);
+db.reviews = require("./reviews.model.js")(sequelize, Sequelize);
 
 
 
@@ -136,7 +137,7 @@ db.polytechnictype = require("../models/polytechnictype.model.js")(sequelize, Se
 db.polytechnicaccreditations = require("../models/polytechnicaccreditations.model.js")(sequelize, Sequelize);
 db.polytechnicamenities = require("../models/polytechnicamenities.model.js")(sequelize, Sequelize);
 db.polytechnicmanagment = require("../models/polytechnicmanagment.model.js")(sequelize, Sequelize);
-db.review = require("../models/review.model.js")(sequelize, Sequelize);
+// db.review = require("../models/review.model.js")(sequelize, Sequelize);
 db.upcoming_courses = require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
 
 db.course_modes = require("./course_modes.model.js")(sequelize, Sequelize);
@@ -261,11 +262,11 @@ db.school.belongsTo(db.schoolboards, {
   foreignKey: "school_board_id",
   as: "schoolboard",
 });
-db.review.belongsTo(db.school, {
-  foreignKey: "item_id",
-  where: { type: 'school' },
-  as: "reviewschools",
-});
+// db.review.belongsTo(db.school, {
+//   foreignKey: "item_id",
+//   where: { type: 'school' },
+//   as: "reviewschools",
+// });
 
 
 
