@@ -31,6 +31,7 @@ const our_teams = db.our_teams;
 const PUBLISHED = 'Published';
 const city = db.city;
 const User = db.user;
+const landing_pages = db.landing_pages;
 // const schoolboards = db.schoolboards;
 // db.schoolboards
 
@@ -1143,14 +1144,14 @@ exports.coursefindone = (req, res) => {
         {
           required: false,
           association: "college",
-          attributes: ["id", "name","slug"],
+          attributes: ["id", "name", "slug"],
         },
         {
           required: false,
           association: "generalcourse",
-          attributes: ["id", "name","stream_id"],
+          attributes: ["id", "name", "stream_id"],
 
-          
+
         },
 
 
@@ -2483,7 +2484,12 @@ exports.dashboard = async (req, res) => {
       publishedCourses,
       publishedExams,
       publishedScholarships,
-      publishedBlogs
+      publishedBlogs,
+      totalnews,
+      publishednews,
+      totallandingpage,
+      publishedlandingpage,
+
     ] = await Promise.all([
       college.count({ where: { type: "college" } }),
       college.count({ where: { type: "university" } }),
@@ -2508,7 +2514,11 @@ exports.dashboard = async (req, res) => {
       courses.count({ where: { status: "PUBLISHED" } }),
       exam.count({ where: { status: "PUBLISHED" } }),
       scholarships.count({ where: { status: "PUBLISHED" } }),
-      blog.count({ where: { status: "PUBLISHED" } })
+      blog.count({ where: { status: "PUBLISHED" } }),
+      news_and_events.count(),
+      news_and_events.count({ where: { status: "PUBLISHED" } }),
+      landing_pages.count(),
+      landing_pages.count({ where: { status: "PUBLISHED" } }),
     ]);
 
     res.status(200).send({
@@ -2539,6 +2549,10 @@ exports.dashboard = async (req, res) => {
         schoolboards: totalSchoolBoards,
         scholarships: totalScholarships,
         Published_scholarships: publishedScholarships,
+        Total_news: totalnews,
+        Published_news: publishednews,
+        Total_landingpage: totallandingpage,
+        Published_landingpage: publishedlandingpage,
       }
     });
   } catch (error) {
