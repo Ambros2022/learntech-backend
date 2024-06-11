@@ -2165,14 +2165,14 @@ const userforgotpasswordnew = [
     min: 6,
   }),
 
-  body("confirmpassword").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Password confirmation does not match password");
-    }
+  // body("confirmpassword").custom((value, { req }) => {
+  //   if (value !== req.body.password) {
+  //     throw new Error("Password confirmation does not match password");
+  //   }
 
-    // Indicates the success of this synchronous custom validator
-    return true;
-  }),
+  //   // Indicates the success of this synchronous custom validator
+  //   return true;
+  // }),
 ];
 
 const groupsSchema = [
