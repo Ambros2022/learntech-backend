@@ -10,6 +10,7 @@ var sendemails = require("../config/email.config");
 const ResetToken = db.resettokens;
 const sendsearch = require("../utility/Customsearch");
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const getPagination = (page, size) => {
 
@@ -28,6 +29,9 @@ const getPagingData = (data, page, limit) => {
 
 
 exports.signup = (req, res) => {
+
+  console.log(req.body);
+  // return
   try {
     User.create({
       name: req.body.name,
@@ -36,7 +40,7 @@ exports.signup = (req, res) => {
       password: bcrypt.hashSync(req.body.password, 8),
     }).then((data) => {
 
-      sendemails.Regesteredmail(req.body.email);
+      // sendemails.Regesteredmail(req.body.email);
       var request = { email: req.body.email };
       User.findOne({
         where: request,
@@ -54,7 +58,7 @@ exports.signup = (req, res) => {
 
           res.status(200).send({
             status: 1,
-            message: "User successfully created",
+            message: "Thankyou, Your account has been sucessfully created.",
             data: {
 
               id: user.id,
@@ -66,21 +70,6 @@ exports.signup = (req, res) => {
             },
           });
         })
-
-
-
-      ///console.log(data);
-      /* res.status(200).send({
-         status: 1,
-         message: "user successfully created",
-       });*/
-
-
-
-
-
-
-
 
     });
   } catch (error) {
@@ -160,7 +149,7 @@ exports.socialsignup = async (req, res) => {
 
     return res.status(200).send({
       status: 1,
-      message: "success",
+      message: "Thankyou, Your account has been sucessfully created.",
       data: {
         id: New.id,
         name: New.name,
@@ -180,13 +169,8 @@ exports.socialsignup = async (req, res) => {
 
 
 exports.signin = (req, res) => {
-  /*if (req.body.email) {
-    var request = { email: req.body.email };
-  }
-  if (req.body.mobile) {
-    var request = { mobile: req.body.mobile };
-  }*/
-
+  // console.log(req.body);
+  // return
   User.findOne({
     where: {
       [Op.or]: [
@@ -226,12 +210,11 @@ exports.signin = (req, res) => {
 
       return res.status(200).send({
         status: 1,
-        message: "success",
+        message: "Your are successfully Login.",
         data: {
           id: user.id,
           email: user.email,
           name: user.name,
-          isadmin: 0,
           accessToken: token,
         },
       });
@@ -251,67 +234,6 @@ exports.signout = async (req, res) => {
     this.next(err);
   }
 };
-
-// exports.forgotPassword = async (req, res) => {
-//   var email = req.body.email;
-//   try {
-//     User.findOne({
-//       where: { email: email },
-//     }).then((user) => {
-//       if (!user) {
-//         return res.status(404).send({ message: "User Not found." });
-//       }
-
-//       function generator() {
-//         const ran1 = () =>
-//           [1, 2, 3, 4, 5, 6, 7, 8, 9, 0].sort((x, z) => {
-//             ren = Math.random();
-//             if (ren == 0.5) return 0;
-//             return ren > 0.5 ? 1 : -1;
-//           });
-//         const ran2 = () =>
-//           ran1().sort((x, z) => {
-//             ren = Math.random();
-//             if (ren == 0.5) return 0;
-//             return ren > 0.5 ? 1 : -1;
-//           });
-
-//         return Array(6)
-//           .fill(null)
-//           .map((x) => ran2()[(Math.random() * 9).toFixed()])
-//           .join("");
-//       }
-
-//       var Otp = generator();
-
-//       ResetToken.create({
-//         email: req.body.email,
-//         expiration: 10,
-//         token: Otp,
-//         user_id: user.id,
-//         used: 0,
-//       });
-
-//       sendemails.forgotpasswordmail(req.body.email, Otp);
-
-//       return res.status(200).send({
-//         status: 1,
-//         message: "Reset otp sent to your email.",
-//         data: {
-//           id: user.id,
-//           email: user.email,
-//           Otp: Otp,
-//         },
-//       });
-//     });
-//   } catch (error) {
-//     return res.status(400).send({
-//       message: "Unable to insert data",
-//       errors: error,
-//       status: 0,
-//     });
-//   }
-// };
 
 
 
@@ -357,31 +279,33 @@ exports.forgotPassword = async (req, res) => {
         used: 0,
       });
 
-      // Nodemailer configuration
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: 'amankumar0149@gmail.com', // Your Gmail email address
-          pass: '922912', // Your Gmail password
-        },
-      });
+      sendemails.forgotpasswordmail(req.body.email, Otp);
 
-      // Email options
-      const mailOptions = {
-        from: 'amankumar0149@gmail.com', // Sender's email address
-        to: req.body.email, // Recipient's email address
-        subject: 'Password Reset OTP', // Email subject
-        text: `Your OTP for password reset is: ${Otp}`, // Email body
-      };
+      // // Nodemailer configuration
+      // const transporter = nodemailer.createTransport({
+      //   service: 'gmail',
+      //   auth: {
+      //     user: process.env.EMAIL_USER, // Your Gmail email address
+      //     pass: process.env.EMAIL_PASS, // Your Gmail password
+      //   },
+      // });
 
-      // Sending email
-      transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
+      // // Email options
+      // const mailOptions = {
+      //   from: process.env.EMAIL_USER, // Sender's email address
+      //   to: req.body.email, // Recipient's email address
+      //   subject: 'Password Reset OTP', // Email subject
+      //   text: `Your OTP for password reset is: ${Otp}`, // Email body
+      // };
+
+      // // Sending email
+      // transporter.sendMail(mailOptions, function (error, info) {
+      //   if (error) {
+      //     console.log(error);
+      //   } else {
+      //     console.log('Email sent: ' + info.response);
+      //   }
+      // });
 
       return res.status(200).send({
         status: 1,
@@ -389,7 +313,7 @@ exports.forgotPassword = async (req, res) => {
         data: {
           id: user.id,
           email: user.email,
-          Otp: Otp,
+          // Otp: Otp,
         },
       });
     });
@@ -415,7 +339,7 @@ exports.tokenverify = async (req, res) => {
     })
     if (r == null) {
       return res.status(400).send({
-        message: "Token has expired. Please try password reset again.",
+        message: "OTP did not matched. Please try password reset again.",
         status: 0,
       });
     }
@@ -429,12 +353,10 @@ exports.tokenverify = async (req, res) => {
     if (currentDate > finaltime) {
 
       return res.status(400).send({
-        message: "Token  time has expired. Please try password reset again.",
+        message: "OTP  time has expired. Please try password reset again.",
         // errors: error,
         status: 0,
       });
-
-
 
     }
 
@@ -449,7 +371,7 @@ exports.tokenverify = async (req, res) => {
 
     if (record == null) {
       return res.status(400).send({
-        message: "Token has expired. Please try password reset again.",
+        message: "OTP has expired. Please try password reset again.",
         // errors: error,
         status: 0,
       });
@@ -457,7 +379,7 @@ exports.tokenverify = async (req, res) => {
 
     return res.status(200).send({
       status: 1,
-      message: "token has been verifyed.",
+      message: "OTP has been verifyed.",
 
     });
   } catch (error) {
@@ -468,12 +390,6 @@ exports.tokenverify = async (req, res) => {
     });
   }
 
-
-
-
-
-
-
 };
 
 
@@ -482,52 +398,43 @@ exports.tokenverify = async (req, res) => {
 
 
 exports.forgotPasswordnew = async (req, res) => {
-  var email = req.body.email;
-  var password = req.body.password;
-  var record = await ResetToken.findOne({
-    where: {
-      email: email,
-      token: req.body.token,
-      used: 0
+  const { email, password, token } = req.body;
+
+  try {
+    // Find the reset token record
+    const record = await ResetToken.findOne({
+      where: {
+        email: email,
+        token: token,
+        used: 0
+      }
+    });
+
+    // If the token is not found or already used
+    if (!record) {
+      return res.json({ status: 'error', message: 'Token not found or already used. Please try the reset password process again.' });
     }
-  });
-  if (record == null) {
-    return res.json({ status: 'error', message: 'Token not found. Please try the reset password process again.' });
+
+    // Mark the token as used
+    await ResetToken.update(
+      { used: 1 },
+      { where: { email: email } }
+    );
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 8);
+
+    // Update the user's password
+    await User.update(
+      { password: hashedPassword },
+      { where: { email: email } }
+    );
+
+    return res.json({ status: 1, message: 'Password reset. Please login with your new password.' });
+  } catch (error) {
+    console.error('Error during password reset:', error);
+    return res.status(500).json({ status: 'error', message: 'An error occurred while resetting the password. Please try again later.' });
   }
-
-  var upd = await ResetToken.update({
-    used: 1
-  },
-    {
-      where: {
-        email: email
-      }
-    });
-
-
-
-  var pss = await User.update({
-    password: bcrypt.hashSync(req.body.password, 8),
-
-  },
-    {
-      where: {
-        email: email
-      }
-    });
-
-  return res.json({ status: 'ok', message: 'Password reset. Please login with your new password.' });
-
-
-
-
-
-
-
-
-
-
-
 };
 
 
