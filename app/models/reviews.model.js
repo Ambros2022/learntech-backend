@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM('school', 'college'),
       },
       college_id: {
-        type: Sequelize.TEXT
+        type: Sequelize.INTEGER
       },
       course_id: {
         type: Sequelize.INTEGER
@@ -28,10 +28,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.ENUM('UG', 'PG', 'Diploma', 'Doctorate', 'Default'),
       },
       school_id: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       school_board_id: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       grade: {
         type: Sequelize.STRING
@@ -41,6 +41,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       dislikes: {
         type: Sequelize.STRING
+      },
+      is_reported: {
+        type: Sequelize.INTEGER
       },
     }
     ,

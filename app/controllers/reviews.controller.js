@@ -17,32 +17,31 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-  const { count: totalItems, rows: stream } = data;
+  const { count: totalItems, rows: reviews } = data;
   const currentPage = page ? +page : 1;
   const totalPages = Math.ceil(totalItems / limit);
-  return { totalItems, stream, totalPages, currentPage };
+  return { totalItems, reviews, totalPages, currentPage };
 };
 
 
 exports.create = async (req, res) => {
-
   try {
 
     const reviewsDetails = await reviews.create({
-        name: req.body.name,
-        userrating: req.body.userrating,
-        user_id: req.body.user_id,
-        content: req.body.content,
-        is_approved: req.body.is_approved,
-        review_type: req.body.review_type,
-        college_id: req.body.college_id,
-        course_id: req.body.course_id,
-        course_type: req.body.course_type,
-        school_id: req.body.school_id,
-        school_board_id: req.body.school_board_id,
-        grade: req.body.grade,
-        likes: req.body.likes,
-        dislikes: req.body.dislikes,
+      name: req.body.name,
+      userrating: req.body.userrating,
+      user_id: req.body.user_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      review_type: req.body.review_type,
+      college_id: req.body.college_id,
+      course_id: req.body.course_id,
+      course_type: req.body.course_type,
+      school_id: req.body.school_id,
+      school_board_id: req.body.school_board_id,
+      grade: req.body.grade,
+      likes: req.body.likes,
+      dislikes: req.body.dislikes,
     });
 
     res.status(200).send({
@@ -60,10 +59,8 @@ exports.create = async (req, res) => {
   }
 }
 
-exports.findAll = async (req, res, next) => {
-
-  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby } = req.query;
-
+exports.findAll = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : 'id';
   var order = orderby ? orderby : 'ASC';
@@ -74,26 +71,19 @@ exports.findAll = async (req, res, next) => {
   if (typeof myArray[1] !== "undefined") {
     var table = myArray[0];
     column = myArray[1];
-
     orderconfig = [table, column, order];
   }
-
-  var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  let data_array = [];
 
 
-  var data_array = [];
-  conditionStreamId ? data_array.push(conditionStreamId) : null;
+  let condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
 
-
-
   const { limit, offset } = getPagination(page, size);
-  stream.findAndCountAll({
-    where: data_array, limit, offset,
-    include: { association: 'stream', attributes: ['id', 'name'] }, order: [orderconfig]
-  })
-    .then(data => {
+
+  reviews
+    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .then((data) => {
       const response = getPagingData(data, page, limit);
 
       res.status(200).send({
@@ -102,15 +92,22 @@ exports.findAll = async (req, res, next) => {
         totalItems: response.totalItems,
         currentPage: response.currentPage,
         totalPages: response.totalPages,
-        data: response.stream
+        data: response.reviews
       });
+    })
+    .catch(err => {
+      res.status(500).send({
+        status: 0,
+        message:
 
+          err.message || "Some error occurred while retrieving review ."
+      });
     });
 };
 
 exports.delete = (req, res) => {
   const id = req.params.id;
-  stream.destroy({
+  reviews.destroy({
     where: { id: id }
   })
     .then(num => {
@@ -118,14 +115,14 @@ exports.delete = (req, res) => {
 
         res.status(200).send({
           status: 1,
-          message: 'Sub Stream  deleted successfully',
+          message: 'reviews  deleted successfully',
 
         });
 
       } else {
         res.status(400).send({
           status: 0,
-          message: ` delete Sub Stream with id=${id}. Maybe Sub Stream was not found!`
+          message: ` delete reviews with id=${id}. Maybe reviews was not found!`
         });
       }
     })
@@ -133,7 +130,7 @@ exports.delete = (req, res) => {
 
       res.status(500).send({
         status: 0,
-        message: "Could not delete Stream with id=" + id
+        message: "Could not delete reviews with id=" + id
       });
     });
 };
@@ -141,7 +138,7 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  stream.findByPk(id, { include: { association: 'stream', attributes: ['id', 'name'] } })
+  reviews.findByPk(id,)
     .then(data => {
       if (data) {
 
@@ -156,7 +153,7 @@ exports.findOne = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find Sub Stream with id=${id}.`
+          message: `Cannot find reviews with id=${id}.`
 
         });
 
@@ -168,38 +165,77 @@ exports.findOne = (req, res) => {
 
       res.status(500).send({
         status: 0,
-        message: "Error retrieving Substream with id=" + id
+        message: "Error retrieving reviews with id=" + id
 
       });
     });
 };
 
 
-exports.update = (req, res) => {
-  const id = req.body.id;
+// exports.update = (req, res) => {
+//   const id = req.body.id;
+
+//   try {
+//     reviews.update({
+//       name: req.body.name,
+//         userrating: req.body.userrating,
+//         user_id: req.body.user_id,
+//         content: req.body.content,
+//         is_approved: req.body.is_approved,
+//         review_type: req.body.review_type,
+//         college_id: req.body.college_id,
+//         course_id: req.body.course_id,
+//         course_type: req.body.course_type,
+//         school_id: req.body.school_id,
+//         school_board_id: req.body.school_board_id,
+//         grade: req.body.grade,
+//         likes: req.body.likes,
+//         dislikes: req.body.dislikes,
+//     }, {
+//       where: { id: req.body.id }
+//     });
+
+
+//     res.status(200).send({
+//       status: 1,
+//       message: 'Data Save Successfully'
+//     });
+//   }
+//   catch (error) {
+//     return res.status(400).send({
+//       message: 'Unable to update data',
+//       errors: error,
+//       status: 0
+//     });
+//   }
+
+// };
+
+exports.update = async (req, res) => {
+  const { id, is_approved } = req.body;
+
+  if (id === undefined || is_approved === undefined) {
+    return res.status(400).send({
+      status: 0,
+      message: 'ID and is_approved are required fields'
+    });
+  }
 
   try {
-    stream.update({
-      stream_id: req.body.stream_id,
-      sub_stream_name: req.body.sub_stream_name,
-      sub_stream_slug: req.body.sub_stream_slug,
-      sub_stream_description: req.body.sub_stream_description,
-    }, {
-      where: { id: req.body.id }
-    });
-
+    await reviews.update(
+      { is_approved: is_approved },
+      { where: { id: id } }
+    );
 
     res.status(200).send({
       status: 1,
-      message: 'Data Save Successfully'
+      message: 'is_approved field updated successfully'
     });
-  }
-  catch (error) {
-    return res.status(400).send({
+  } catch (error) {
+    res.status(500).send({
+      status: 0,
       message: 'Unable to update data',
-      errors: error,
-      status: 0
+      errors: error.message
     });
   }
-
 };
