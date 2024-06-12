@@ -82,13 +82,15 @@ db.our_teams = require("./our_teams.model.js")(sequelize, Sequelize);
 db.video_testimonials = require("./video_testimonials.model.js")(sequelize, Sequelize);
 db.school_board_faqs = require("./school_board_faqs.model.js")(sequelize, Sequelize);
 db.school_board_recognitions = require("./school_board_recognitions.model.js")(sequelize, Sequelize);
+db.reviews = require("./reviews.model.js")(sequelize, Sequelize);
+db.review_replies = require("./review_reply.model.js")(sequelize, Sequelize);
+db.users = require("../models/user.model.js")(sequelize, Sequelize);
 
 
 
 
 
-
-db.user = require("../models/user.model.js")(sequelize, Sequelize);
+// db.user = require("../models/user.model.js")(sequelize, Sequelize);
 db.role = require("../models/role.model.js")(sequelize, Sequelize);
 
 
@@ -136,7 +138,7 @@ db.polytechnictype = require("../models/polytechnictype.model.js")(sequelize, Se
 db.polytechnicaccreditations = require("../models/polytechnicaccreditations.model.js")(sequelize, Sequelize);
 db.polytechnicamenities = require("../models/polytechnicamenities.model.js")(sequelize, Sequelize);
 db.polytechnicmanagment = require("../models/polytechnicmanagment.model.js")(sequelize, Sequelize);
-db.review = require("../models/review.model.js")(sequelize, Sequelize);
+// db.review = require("../models/review.model.js")(sequelize, Sequelize);
 db.upcoming_courses = require("../models/upcoming_courses.model.js")(sequelize, Sequelize);
 
 db.course_modes = require("./course_modes.model.js")(sequelize, Sequelize);
@@ -261,11 +263,11 @@ db.school.belongsTo(db.schoolboards, {
   foreignKey: "school_board_id",
   as: "schoolboard",
 });
-db.review.belongsTo(db.school, {
-  foreignKey: "item_id",
-  where: { type: 'school' },
-  as: "reviewschools",
-});
+// db.review.belongsTo(db.school, {
+//   foreignKey: "item_id",
+//   where: { type: 'school' },
+//   as: "reviewschools",
+// });
 
 
 
@@ -329,10 +331,10 @@ db.school_board_recognitions.belongsTo(db.schoolboards, {
 
 /***  resettokens ship users  */
 
-db.resettokens.belongsTo(db.user, {
-  foreignKey: "user_id",
-  as: "users",
-});
+// db.resettokens.belongsTo(db.user, {
+//   foreignKey: "user_id",
+//   as: "users",
+// });
 
 
 /*** states relationship */
@@ -618,19 +620,19 @@ db.commingform.belongsTo(db.studentform, {
 
 /***  Relation ship review  */
 
-db.review.belongsTo(db.user, {
-  foreignKey: "user_id",
-  as: "users",
-});
+// db.review.belongsTo(db.user, {
+//   foreignKey: "user_id",
+//   as: "users",
+// });
 
 // db.review.belongsTo(db.courses, {
 //   foreignKey: "item_id",
 //   as: "maincourse",
 // });
-db.review.belongsTo(db.stream, {
-  foreignKey: "item_id",
-  as: "reviewstream",
-});
+// db.review.belongsTo(db.stream, {
+//   foreignKey: "item_id",
+//   as: "reviewstream",
+// });
 
 
 
@@ -882,16 +884,16 @@ db.area.belongsTo(db.city, {
 /***course relationship */
 
 
-db.role.belongsToMany(db.user, {
-  through: "user_roles",
-  foreignKey: "roleId",
-  otherKey: "userId"
-});
-db.user.belongsToMany(db.role, {
-  through: "user_roles",
-  foreignKey: "userId",
-  otherKey: "roleId"
-});
+// db.role.belongsToMany(db.user, {
+//   through: "user_roles",
+//   foreignKey: "roleId",
+//   otherKey: "userId"
+// });
+// db.user.belongsToMany(db.role, {
+//   through: "user_roles",
+//   foreignKey: "userId",
+//   otherKey: "roleId"
+// });
 
 
 

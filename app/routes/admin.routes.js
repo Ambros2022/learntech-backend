@@ -31,6 +31,8 @@ const ourteamscontroller = require("../controllers/ourteams.controller");
 const videotestimonialscontroller = require("../controllers/videotestimonials.controller");
 const schoolboardrecognitionscontroller = require("../controllers/schoolboardrecognitions.controller");
 const webapicontroller = require("../controllers/website/webapi.controller");
+const reviewscontroller = require("../controllers/reviews.controller");
+const reviewsrepliescontroller = require("../controllers/review_reply.controller");
 
 
 
@@ -1391,6 +1393,71 @@ module.exports = function (app) {
   );
 
   /** video testimonials route end   */
+
+  /** review route  start*/
+
+  app.get(
+    "/api/admin/review/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewscontroller.findAll
+  );
+  app.get(
+    "/api/admin/review/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewscontroller.findOne
+  );
+  app.post(
+    "/api/admin/review/add",
+    globalvalidation.reviewSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewscontroller.create
+  );
+  app.post(
+    "/api/admin/review/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewscontroller.delete
+  );
+  app.post(
+    "/api/admin/review/update",
+    globalvalidation.reviewUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewscontroller.update
+  );
+
+  /** review route end   */
+
+
+  /** review replies route  start*/
+
+  app.get(
+    "/api/admin/reviewreplies/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewsrepliescontroller.findAll
+  );
+  app.get(
+    "/api/admin/reviewreplies/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewsrepliescontroller.findOne
+  );
+  app.post(
+    "/api/admin/reviewreplies/add",
+    globalvalidation.reviewrepliesSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewsrepliescontroller.create
+  );
+  app.post(
+    "/api/admin/reviewreplies/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewsrepliescontroller.delete
+  );
+  app.post(
+    "/api/admin/reviewreplies/update",
+    globalvalidation.reviewrepliesUpdateSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    reviewsrepliescontroller.update
+  );
+
+  /** review replies route end   */
 
 
 

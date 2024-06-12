@@ -30,7 +30,7 @@ const jobsenquires = db.jobs_enquires;
 const our_teams = db.our_teams;
 const PUBLISHED = 'Published';
 const city = db.city;
-const User = db.user;
+const User = db.users;
 const landing_pages = db.landing_pages;
 // const schoolboards = db.schoolboards;
 // db.schoolboards
@@ -371,6 +371,51 @@ exports.findOnestream = (req, res) => {
       res.status(500).send({
         status: 0,
         message: "Error retrieving streams with id=" + id,
+      });
+    });
+};
+
+
+exports.genralOnestream = (req, res) => {
+
+  const { id, slug } = req.params;
+
+  // Build the where clause based on the provided parameters
+  let whereClause = {};
+  if (id) whereClause.stream_id = id;
+  if (slug) whereClause.slug = slug;
+
+  generalcourse
+    .findOne({
+      where: whereClause,
+      
+      include: [
+        {
+          required: false,
+          association: "generalcoursefaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+      ],
+    })
+    .then((data) => {
+      if (data) {
+        res.status(200).send({
+          status: 1,
+          message: 'successfully retrieved',
+          data: data,
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `Cannot find course with the provided criteria.`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        error: err,
+        message: 'Error retrieving course with the provided criteria',
       });
     });
 };
@@ -1136,38 +1181,42 @@ exports.courses = async (req, res) => {
 };
 
 exports.coursefindone = (req, res) => {
-  const id = req.params.id;
+  console.log(req.params);
+  const { id, slug } = req.params;
+
+  // Build the where clause based on the provided parameters
+  let whereClause = {};
+  if (id) whereClause.college_id = id;
+  if (slug) whereClause.slug = slug;
+
   courses
-    .findByPk(id, {
-      attributes: ['id', "slug", "meta_title", 'meta_description', "meta_keywords", "course_details", "eligibility", "fee_structure"],
+    .findOne({
+      where: whereClause,
+      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure'],
       include: [
         {
           required: false,
-          association: "college",
-          attributes: ["id", "name", "slug"],
+          association: 'college',
+          attributes: ['id', 'name', 'slug'],
         },
         {
           required: false,
-          association: "generalcourse",
-          attributes: ["id", "name", "stream_id"],
-
-
+          association: 'generalcourse',
+          attributes: ['id', 'name', 'stream_id'],
         },
-
-
       ],
     })
     .then((data) => {
       if (data) {
         res.status(200).send({
           status: 1,
-          message: "successfully retrieved",
+          message: 'successfully retrieved',
           data: data,
         });
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find courses with id=${id}.`,
+          message: `Cannot find course with the provided criteria.`,
         });
       }
     })
@@ -1175,10 +1224,11 @@ exports.coursefindone = (req, res) => {
       res.status(500).send({
         status: 0,
         error: err,
-        message: "Error retrievingdd courses with id=" + id,
+        message: 'Error retrieving course with the provided criteria',
       });
     });
 };
+
 
 exports.allschools = async (req, res) => {
   const {
@@ -1545,7 +1595,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, category_id  } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";

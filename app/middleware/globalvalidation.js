@@ -33,7 +33,9 @@ const ourteams = db.our_teams;
 const videotestimonials = db.video_testimonials;
 const schoolboardrecognition = db.school_board_recognitions;
 const recognition = db.recognition;
-
+const reviews = db.reviews;
+const review_replies = db.review_replies;
+const users = db.users;
 
 
 
@@ -58,7 +60,7 @@ const schoollevel = db.schoollevel;
 
 const polytechnic = db.polytechnic;
 const polytechnictype = db.polytechnictype;
-const user = db.user;
+const user = db.users;
 const reviewtokens = db.resettokens;
 const groups = db.groups;
 const testimonial = db.testimonial;
@@ -181,6 +183,7 @@ function checkField_update(fieldName, maxLength, model, requireUnique = false) {
   return validationChain;
 }
 const validateIdRequired_id = (modelName, fieldName) => [
+  
   body(fieldName)
     .exists({ checkFalsy: true })
     .withMessage(`${fieldName} is required`)
@@ -935,6 +938,37 @@ const schoolboardrecognitionUpdateSchema = [
 
 ];
 
+const reviewSchema = [
+  ...validateIdRequired_id(users, "user_id"),
+  ...validateIdRequired_id(college, "college_id"),
+  ...validateIdRequired_id(courses, "course_id"),
+  ...validateIdRequired_id(school, "school_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
+
+
+];
+
+const reviewUpdateSchema = [
+  ...validateIdRequired_id(reviews, "id"),
+
+  
+
+];
+
+const reviewrepliesSchema = [
+  checkField('content', 250, review_replies, true),
+  ...validateIdRequired_id(reviews, "review_id"),
+
+];
+
+const reviewrepliesUpdateSchema = [
+  ...validateIdRequired_id(review_replies, "id"),
+
+  checkField_update('content', 250, review_replies, true),
+  ...validateIdRequired_id(reviews, "review_id"),
+
+];
+
 
 
 
@@ -1602,136 +1636,136 @@ const polytechnicUpdateSchema = [
     }),
 ];
 
-const reviewSchema = [
-  body("userrating")
-    .exists({ checkFalsy: true })
-    .withMessage("userrating is required")
-    .isFloat({ min: 0, max: 5 })
-    .withMessage("userrating in between 0 to 5"),
+// const reviewSchema = [
+//   body("userrating")
+//     .exists({ checkFalsy: true })
+//     .withMessage("userrating is required")
+//     .isFloat({ min: 0, max: 5 })
+//     .withMessage("userrating in between 0 to 5"),
 
-  body("content")
-    .exists({ checkFalsy: true })
-    .withMessage("review  name is required"),
+//   body("content")
+//     .exists({ checkFalsy: true })
+//     .withMessage("review  name is required"),
 
-  body("type").exists({ checkFalsy: true }).withMessage("type  is required"),
+//   body("type").exists({ checkFalsy: true }).withMessage("type  is required"),
 
-  body("is_approved")
-    .exists({ checkFalsy: true })
-    .withMessage("is_approved  is required"),
+//   body("is_approved")
+//     .exists({ checkFalsy: true })
+//     .withMessage("is_approved  is required"),
 
-  body("user_id")
-    .exists({ checkFalsy: true })
-    .withMessage("User Id is required")
-    .custom((value) => {
-      return user
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((user) => {
-          if (user) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("User Id Not exist");
-          }
-        });
-    }),
+//   body("user_id")
+//     .exists({ checkFalsy: true })
+//     .withMessage("User Id is required")
+//     .custom((value) => {
+//       return user
+//         .findOne({
+//           where: {
+//             id: value,
+//           },
+//         })
+//         .then((user) => {
+//           if (user) {
+//             return true;
+//           } else {
+//             // Indicates the success of this synchronous custom validator
+//             return Promise.reject("User Id Not exist");
+//           }
+//         });
+//     }),
 
-  body("item_id")
-    .exists({ checkFalsy: true })
-    .withMessage("CollegeAndUniversity Id is required")
-    .custom((value) => {
-      return CollegeAndUniversity.findOne({
-        where: {
-          id: value,
-        },
-      }).then((CollegeAndUniversity) => {
-        if (CollegeAndUniversity) {
-          return true;
-        } else {
-          // Indicates the success of this synchronous custom validator
-          return Promise.reject("CollegeAndUniversity Id Not exist");
-        }
-      });
-    }),
-];
-const reviewUpdateSchema = [
-  // body("userrating")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("userrating is required")
-  //   .isFloat({ min: 0, max: 5 })
-  //   .withMessage("userrating in between 0 to 5"),
+//   body("item_id")
+//     .exists({ checkFalsy: true })
+//     .withMessage("CollegeAndUniversity Id is required")
+//     .custom((value) => {
+//       return CollegeAndUniversity.findOne({
+//         where: {
+//           id: value,
+//         },
+//       }).then((CollegeAndUniversity) => {
+//         if (CollegeAndUniversity) {
+//           return true;
+//         } else {
+//           // Indicates the success of this synchronous custom validator
+//           return Promise.reject("CollegeAndUniversity Id Not exist");
+//         }
+//       });
+//     }),
+// ];
+// const reviewUpdateSchema = [
+//   // body("userrating")
+//   //   .exists({ checkFalsy: true })
+//   //   .withMessage("userrating is required")
+//   //   .isFloat({ min: 0, max: 5 })
+//   //   .withMessage("userrating in between 0 to 5"),
 
-  // body("content")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("content  is required"),
+//   // body("content")
+//   //   .exists({ checkFalsy: true })
+//   //   .withMessage("content  is required"),
 
-  // body("type").exists({ checkFalsy: true }).withMessage("type  is required"),
+//   // body("type").exists({ checkFalsy: true }).withMessage("type  is required"),
 
-  // body("is_approved")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("is_approved  is required"),
+//   // body("is_approved")
+//   //   .exists({ checkFalsy: true })
+//   //   .withMessage("is_approved  is required"),
 
-  body("id")
-    .exists({ checkFalsy: true })
-    .withMessage("id is required")
-    .custom((value) => {
-      return review
-        .findOne({
-          where: {
-            id: value,
-          },
-        })
-        .then((review) => {
-          if (review) {
-            return true;
-          } else {
-            // Indicates the success of this synchronous custom validator
-            return Promise.reject("review Does not exist");
-          }
-        });
-    }),
+//   body("id")
+//     .exists({ checkFalsy: true })
+//     .withMessage("id is required")
+//     .custom((value) => {
+//       return review
+//         .findOne({
+//           where: {
+//             id: value,
+//           },
+//         })
+//         .then((review) => {
+//           if (review) {
+//             return true;
+//           } else {
+//             // Indicates the success of this synchronous custom validator
+//             return Promise.reject("review Does not exist");
+//           }
+//         });
+//     }),
 
-  // body("user_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("User Id is required")
-  //   .custom((value) => {
-  //     return user
-  //       .findOne({
-  //         where: {
-  //           id: value,
-  //         },
-  //       })
-  //       .then((user) => {
-  //         if (user) {
-  //           return true;
-  //         } else {
-  //           // Indicates the success of this synchronous custom validator
-  //           return Promise.reject("User Id Not exist");
-  //         }
-  //       });
-  //   }),
+//   // body("user_id")
+//   //   .exists({ checkFalsy: true })
+//   //   .withMessage("User Id is required")
+//   //   .custom((value) => {
+//   //     return user
+//   //       .findOne({
+//   //         where: {
+//   //           id: value,
+//   //         },
+//   //       })
+//   //       .then((user) => {
+//   //         if (user) {
+//   //           return true;
+//   //         } else {
+//   //           // Indicates the success of this synchronous custom validator
+//   //           return Promise.reject("User Id Not exist");
+//   //         }
+//   //       });
+//   //   }),
 
-  // body("item_id")
-  //   .exists({ checkFalsy: true })
-  //   .withMessage("item Id is required")
-  //   .custom((value) => {
-  //     return CollegeAndUniversity.findOne({
-  //       where: {
-  //         id: value,
-  //       },
-  //     }).then((CollegeAndUniversity) => {
-  //       if (CollegeAndUniversity) {
-  //         return true;
-  //       } else {
-  //         // Indicates the success of this synchronous custom validator
-  //         return Promise.reject("CollegeAndUniversity Id Not exist");
-  //       }
-  //     });
-  //   }),
-];
+//   // body("item_id")
+//   //   .exists({ checkFalsy: true })
+//   //   .withMessage("item Id is required")
+//   //   .custom((value) => {
+//   //     return CollegeAndUniversity.findOne({
+//   //       where: {
+//   //         id: value,
+//   //       },
+//   //     }).then((CollegeAndUniversity) => {
+//   //       if (CollegeAndUniversity) {
+//   //         return true;
+//   //       } else {
+//   //         // Indicates the success of this synchronous custom validator
+//   //         return Promise.reject("CollegeAndUniversity Id Not exist");
+//   //       }
+//   //     });
+//   //   }),
+// ];
 
 const reviewchangestatusSchema = [
   // body("id")
@@ -2921,6 +2955,10 @@ const globalvalidation = {
   videotestimonialsUpdateSchema: videotestimonialsUpdateSchema,
   schoolboardrecognitionSchema: schoolboardrecognitionSchema,
   schoolboardrecognitionUpdateSchema: schoolboardrecognitionUpdateSchema,
+  reviewSchema: reviewSchema,
+  reviewUpdateSchema: reviewUpdateSchema,
+  reviewrepliesSchema: reviewrepliesSchema,
+  reviewrepliesUpdateSchema: reviewrepliesUpdateSchema,
 
 
 
@@ -2957,7 +2995,7 @@ const globalvalidation = {
 
   polytechnicSchema: polytechnicSchema,
   polytechnicUpdateSchema: polytechnicUpdateSchema,
-  reviewSchema: reviewSchema,
+  // reviewSchema: reviewSchema,
   reviewUpdateSchema: reviewUpdateSchema,
   reviewchangestatusSchema: reviewchangestatusSchema,
   upcoming_coursesUpdateSchema: upcoming_coursesUpdateSchema,
