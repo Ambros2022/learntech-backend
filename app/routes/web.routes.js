@@ -82,6 +82,8 @@ module.exports = function (app) {
 
   app.get("/api/website/streamfindone/get/:id", webapicontroller.findOnestream);
 
+  app.get("/api/website/general/stream/get/:slug/:id", webapicontroller.genralOnestream);
+
   app.get("/api/website/allcourses/get", webapicontroller.allcourses);
 
 
@@ -105,7 +107,7 @@ module.exports = function (app) {
 
   app.get("/api/website/courses/get", webapicontroller.courses);
 
-  app.get("/api/website/coursefindone/get/:id", webapicontroller.coursefindone);
+  app.get("/api/website/coursefindone/get/:slug/:id", webapicontroller.coursefindone);
 
   app.get("/api/website/schools/get", webapicontroller.allschools);
 

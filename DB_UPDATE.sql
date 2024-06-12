@@ -701,3 +701,6 @@ ALTER TABLE `colleges` ADD `course_fees` LONGTEXT CHARACTER SET utf8mb4 COLLATE 
 ALTER TABLE `colleges` CHANGE `map` `map` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE blogs ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER status;
+
+
+ALTER TABLE `banners` CHANGE `promo_banner` `promo_banner` ENUM('Draft','All_Exams_page','All_News_page','All_Scholarship_page','Nri_page','Study_Abroad_page','All_college_page','All_courses_page','All_university_page','All_school_page','Services_Page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft';
