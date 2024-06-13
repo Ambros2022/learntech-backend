@@ -957,6 +957,7 @@ const reviewUpdateSchema = [
 
 const reviewrepliesSchema = [
   checkField('content', 250, review_replies, true),
+  ...validateIdRequired_id(users, "user_id"),
   ...validateIdRequired_id(reviews, "review_id"),
 
 ];
@@ -965,6 +966,7 @@ const reviewrepliesUpdateSchema = [
   ...validateIdRequired_id(review_replies, "id"),
 
   checkField_update('content', 250, review_replies, true),
+  ...validateIdRequired_id(users, "user_id"),
   ...validateIdRequired_id(reviews, "review_id"),
 
 ];

@@ -634,6 +634,10 @@ db.commingform.belongsTo(db.studentform, {
 //   as: "reviewstream",
 // });
 
+db.college.hasMany(db.reviews, {
+  foreignKey: "college_id",
+  as: "reviewcollege",
+}); 
 
 
 

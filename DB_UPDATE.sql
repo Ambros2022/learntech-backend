@@ -701,3 +701,5 @@ ALTER TABLE `colleges` ADD `course_fees` LONGTEXT CHARACTER SET utf8mb4 COLLATE 
 ALTER TABLE `colleges` CHANGE `map` `map` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE blogs ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER status;
+
+ALTER TABLE `review_replies` ADD `user_id` INT(11) NULL DEFAULT NULL AFTER `content`;
