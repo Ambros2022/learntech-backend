@@ -155,6 +155,8 @@ module.exports = function (app) {
 
   app.post("/api/website/addreviewreply/post", webapicontroller.addreviewreply);
 
+  app.get("/api/website/sitemap/get", webapicontroller.sitemap);
+
 
 
 
