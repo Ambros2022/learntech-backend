@@ -60,7 +60,7 @@ const schoollevel = db.schoollevel;
 
 const polytechnic = db.polytechnic;
 const polytechnictype = db.polytechnictype;
-const user = db.user;
+const user = db.users;
 const reviewtokens = db.resettokens;
 const groups = db.groups;
 const testimonial = db.testimonial;
