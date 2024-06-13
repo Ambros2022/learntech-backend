@@ -1456,23 +1456,26 @@ exports.abroadpages = async (req, res) => {
 };
 
 exports.abroadcollegefindone = (req, res) => {
-  const id = req.params.id;
-  abroadpages.findByPk(id, {
-    attributes: ['id', 'country_id', 'name', 'slug', 'backgroundimage'],
-    include: [
-      {
-        required: false,
-        association: "country",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "abroadpagefaqs",
-        attributes: ["id", "questions", "answers"],
-      },
+  const slug = req.params.slug;
+  // abroadpages.findByPk(id, 
+  abroadpages.findOne({ where: { slug: slug } },
 
-    ],
-  })
+    {
+      attributes: ['id', 'country_id', 'name', 'slug', 'backgroundimage'],
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "abroadpagefaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+
+      ],
+    })
     .then((data) => {
       if (data) {
 
@@ -1485,14 +1488,14 @@ exports.abroadcollegefindone = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find abroadpages with id=${id}.`,
+          message: `Cannot find abroadpages with id=${slug}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving abroadpages with id=" + id,
+        message: "Error retrieving abroadpages with id=" + slug,
       });
     });
 };
