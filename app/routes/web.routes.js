@@ -115,7 +115,7 @@ module.exports = function (app) {
 
   app.get("/api/website/abroadpages/get", webapicontroller.abroadpages);
 
-  app.get("/api/website/abroadpagefindone/get/:id", webapicontroller.abroadcollegefindone);
+  app.get("/api/website/abroadpagefindone/get/:slug", webapicontroller.abroadcollegefindone);
 
   app.get("/api/website/exams/get", webapicontroller.allentranceexams);
 
