@@ -57,7 +57,7 @@ exports.create = async (req, res) => {
       status: 0
     });
   }
-}
+};
 
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -211,6 +211,10 @@ exports.findOne = (req, res) => {
 
 // };
 
+
+
+
+
 exports.update = async (req, res) => {
   const { id, is_approved } = req.body;
 
@@ -231,6 +235,7 @@ exports.update = async (req, res) => {
       status: 1,
       message: 'is_approved field updated successfully'
     });
+  
   } catch (error) {
     res.status(500).send({
       status: 0,
@@ -239,3 +244,43 @@ exports.update = async (req, res) => {
     });
   }
 };
+
+// exports.update = async (req, res) => {
+//   const { id, is_approved } = req.body;
+
+//   if (typeof id !== 'number' || typeof is_approved !== 'boolean') {
+//     return res.status(400).send({
+//       status: 0,
+//       message: 'ID must be a number and is_approved must be a boolean'
+//     });
+//   }
+
+//   try {
+//     const [updated] = await reviews.update(
+//       { is_approved },
+//       { where: { id } }
+//     );
+
+//     if (updated) {
+//       res.status(200).send({
+//         status: 1,
+//         message: 'is_approved field updated successfully'
+//       });
+//     } else {
+//       res.status(404).send({
+//         status: 0,
+//         message: 'Review not found'
+//       });
+//     }
+//   } catch (error) {
+//     console.error(error); // Log the error for debugging
+//     res.status(500).send({
+//       status: 0,
+//       message: 'Unable to update data',
+//       errors: error.message
+//     });
+//   }
+// };
+
+
+

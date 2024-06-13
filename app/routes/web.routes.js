@@ -149,6 +149,12 @@ module.exports = function (app) {
 
   app.get("/api/website/ourteams/get", webapicontroller.ourteams);
 
+  app.post("/api/website/addreview/post", webapicontroller.addreview);
+
+  app.get("/api/website/college/review/get", webapicontroller.collegereview);
+
+  app.post("/api/website/addreviewreply/post", webapicontroller.addreviewreply);
+
 
 
 

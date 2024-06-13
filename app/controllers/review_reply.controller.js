@@ -25,6 +25,7 @@ exports.create = async (req, res) => {
     try {
         const reviewrepliesDetails = await reviewreplies.create({
             content: req.body.content,
+            user_id: req.body.user_id,
             review_id: req.body.review_id,
 
         });
@@ -130,8 +131,8 @@ exports.update = (req, res) => {
         reviewreplies.update
             ({
                 content: req.body.content,
-            review_id: req.body.review_id,
-
+                user_id: req.body.user_id,
+                review_id: req.body.review_id,
             },
                 {
                     where: { id: req.body.id }

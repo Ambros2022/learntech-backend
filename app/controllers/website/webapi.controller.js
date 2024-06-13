@@ -32,6 +32,7 @@ const PUBLISHED = 'Published';
 const city = db.city;
 const User = db.users;
 const landing_pages = db.landing_pages;
+const reviews = db.reviews;
 // const schoolboards = db.schoolboards;
 // db.schoolboards
 
@@ -2614,6 +2615,155 @@ exports.dashboard = async (req, res) => {
       status: 0,
       message: "An error occurred",
       error: error.message
+    });
+  }
+};
+
+exports.addreview = async (req, res) => {
+  try {
+
+    const reviewsDetails = await reviews.create({
+      name: req.body.name,
+      userrating: req.body.userrating,
+      user_id: req.body.user_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      review_type: req.body.review_type,
+      college_id: req.body.college_id,
+      course_id: req.body.course_id,
+      course_type: req.body.course_type,
+      school_id: req.body.school_id,
+      school_board_id: req.body.school_board_id,
+      grade: req.body.grade,
+      likes: req.body.likes,
+      dislikes: req.body.dislikes,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: reviewsDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
+  }
+};
+
+exports.collegereview = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const data = await college.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      attributes: [
+        "id",
+        "name",
+        "slug",
+        "type",
+        "avg_rating",
+      ],
+      include: [
+        {
+          required: false,
+          association: "reviewcollege",
+          attributes: ["id", "name", "userrating", "likes", "dislikes", "is_reported"],
+          where: { is_approved: true },
+        },
+      ],
+      order: [orderconfig],
+      subQuery: false
+    });
+
+    const colleges = await Promise.all(data.rows.map(async college => {
+      let avgUserRating = 0;
+      let totalLikes = 0;
+      let totalDislikes = 0;
+      let totalIsreported = 0;
+
+      if (college.reviewcollege.length > 0) {
+        const totalRating = college.reviewcollege.reduce((sum, review) => sum + review.userrating, 0);
+        totalLikes = college.reviewcollege.reduce((sum, review) => sum + review.likes, 0);
+        totalDislikes = college.reviewcollege.reduce((sum, review) => sum + review.dislikes, 0);
+        totalIsreported = college.reviewcollege.reduce((sum, review) => sum + review.is_reported, 0);
+        avgUserRating = totalRating / college.reviewcollege.length;
+      }
+      avgUserRating = avgUserRating.toFixed(2);
+
+      await college.update({ avg_rating: avgUserRating });
+
+      return {
+        ...college.get(),
+        avgUserRating,
+        totalLikes,
+        totalDislikes,
+        totalIsreported
+      };
+    }));
+
+    const response = getPagingData({ ...data, rows: colleges }, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving collegereview.",
+    });
+  }
+};
+
+exports.addreviewreply = async (req, res) => {
+  try {
+
+    const reviewsDetails = await reviews.create({
+      content: req.body.content,
+      user_id: req.body.user_id,
+      review_id: req.body.review_id,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: reviewsDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
     });
   }
 };
