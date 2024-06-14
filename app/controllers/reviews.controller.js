@@ -135,7 +135,6 @@ exports.delete = (req, res) => {
     });
 };
 
-
 exports.findOne = (req, res) => {
   const id = req.params.id;
   reviews.findByPk(id,)
@@ -172,50 +171,46 @@ exports.findOne = (req, res) => {
 };
 
 
-// exports.update = (req, res) => {
-//   const id = req.body.id;
+exports.update = (req, res) => {
+  const id = req.body.id;
 
-//   try {
-//     reviews.update({
-//       name: req.body.name,
-//         userrating: req.body.userrating,
-//         user_id: req.body.user_id,
-//         content: req.body.content,
-//         is_approved: req.body.is_approved,
-//         review_type: req.body.review_type,
-//         college_id: req.body.college_id,
-//         course_id: req.body.course_id,
-//         course_type: req.body.course_type,
-//         school_id: req.body.school_id,
-//         school_board_id: req.body.school_board_id,
-//         grade: req.body.grade,
-//         likes: req.body.likes,
-//         dislikes: req.body.dislikes,
-//     }, {
-//       where: { id: req.body.id }
-//     });
-
-
-//     res.status(200).send({
-//       status: 1,
-//       message: 'Data Save Successfully'
-//     });
-//   }
-//   catch (error) {
-//     return res.status(400).send({
-//       message: 'Unable to update data',
-//       errors: error,
-//       status: 0
-//     });
-//   }
-
-// };
+  try {
+    reviews.update({
+      name: req.body.name,
+      userrating: req.body.userrating,
+      user_id: req.body.user_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      review_type: req.body.review_type,
+      college_id: req.body.college_id,
+      course_id: req.body.course_id,
+      course_type: req.body.course_type,
+      school_id: req.body.school_id,
+      school_board_id: req.body.school_board_id,
+      grade: req.body.grade,
+      likes: req.body.likes,
+      dislikes: req.body.dislikes,
+    }, {
+      where: { id: req.body.id }
+    });
 
 
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully'
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to update data',
+      errors: error,
+      status: 0
+    });
+  }
 
+};
 
-
-exports.update = async (req, res) => {
+exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
 
   if (id === undefined || is_approved === undefined) {
@@ -235,7 +230,7 @@ exports.update = async (req, res) => {
       status: 1,
       message: 'is_approved field updated successfully'
     });
-  
+
   } catch (error) {
     res.status(500).send({
       status: 0,
@@ -244,43 +239,3 @@ exports.update = async (req, res) => {
     });
   }
 };
-
-// exports.update = async (req, res) => {
-//   const { id, is_approved } = req.body;
-
-//   if (typeof id !== 'number' || typeof is_approved !== 'boolean') {
-//     return res.status(400).send({
-//       status: 0,
-//       message: 'ID must be a number and is_approved must be a boolean'
-//     });
-//   }
-
-//   try {
-//     const [updated] = await reviews.update(
-//       { is_approved },
-//       { where: { id } }
-//     );
-
-//     if (updated) {
-//       res.status(200).send({
-//         status: 1,
-//         message: 'is_approved field updated successfully'
-//       });
-//     } else {
-//       res.status(404).send({
-//         status: 0,
-//         message: 'Review not found'
-//       });
-//     }
-//   } catch (error) {
-//     console.error(error); // Log the error for debugging
-//     res.status(500).send({
-//       status: 0,
-//       message: 'Unable to update data',
-//       errors: error.message
-//     });
-//   }
-// };
-
-
-
