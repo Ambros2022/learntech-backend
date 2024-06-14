@@ -2625,6 +2625,7 @@ exports.addreview = async (req, res) => {
       content: req.body.content,
       is_approved: req.body.is_approved,
       review_type: req.body.review_type,
+      passing_year: req.body.passing_year,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
       course_type: req.body.course_type,
@@ -2637,7 +2638,7 @@ exports.addreview = async (req, res) => {
 
     res.status(200).send({
       status: 1,
-      message: 'Data Save Successfully',
+      message: 'Thankyou Review Submitted Successfully',
       data: reviewsDetails
     });
   }
