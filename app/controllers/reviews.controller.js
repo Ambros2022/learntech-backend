@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require('path');
 const reviews = db.reviews;
+const college = db.college;
 const Op = db.Sequelize.Op;
 
 const sendsearch = require("../utility/Customsearch");
@@ -213,22 +214,57 @@ exports.update = (req, res) => {
 exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
 
-  if (id === undefined || is_approved === undefined) {
+  if (id === undefined) {
     return res.status(400).send({
       status: 0,
-      message: 'ID and is_approved are required fields'
+      message: 'ID is a required field'
     });
   }
 
   try {
+
+    const review = await reviews.findOne({ where: { id: id } });
+
+    if (!review) {
+      return res.status(404).send({
+        status: 0,
+        message: 'Review not found'
+      });
+    }
+
+    const previousIsApproved = review.is_approved;
+    let updatedIsApproved;
+
+    if (is_approved === undefined) {
+      updatedIsApproved = !previousIsApproved;
+    } else {
+      updatedIsApproved = is_approved;
+    }
+
     await reviews.update(
-      { is_approved: is_approved },
+      { is_approved: updatedIsApproved },
       { where: { id: id } }
     );
 
+    if (previousIsApproved !== updatedIsApproved) {
+      const collegeId = review.college_id;
+
+      const collegeReviews = await reviews.findAll({
+        where: { college_id: collegeId, is_approved: true }
+      });
+
+      const totalRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
+      const avgRating = collegeReviews.length ? totalRating / collegeReviews.length : 0;
+
+      await college.update(
+        { avg_rating: avgRating },
+        { where: { id: collegeId } }
+      );
+    }
+
     res.status(200).send({
       status: 1,
-      message: 'is_approved field updated successfully'
+      message: 'is_approved field updated successfully and average rating updated'
     });
 
   } catch (error) {
