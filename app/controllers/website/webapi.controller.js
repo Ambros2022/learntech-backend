@@ -2700,33 +2700,7 @@ exports.collegereview = async (req, res) => {
       subQuery: false
     });
 
-    const colleges = await Promise.all(data.rows.map(async college => {
-      let avgUserRating = 0;
-      let totalLikes = 0;
-      let totalDislikes = 0;
-      let totalIsreported = 0;
-
-      if (college.reviewcollege.length > 0) {
-        const totalRating = college.reviewcollege.reduce((sum, review) => sum + review.userrating, 0);
-        totalLikes = college.reviewcollege.reduce((sum, review) => sum + review.likes, 0);
-        totalDislikes = college.reviewcollege.reduce((sum, review) => sum + review.dislikes, 0);
-        totalIsreported = college.reviewcollege.reduce((sum, review) => sum + review.is_reported, 0);
-        avgUserRating = totalRating / college.reviewcollege.length;
-      }
-      avgUserRating = avgUserRating.toFixed(2);
-
-      await college.update({ avg_rating: avgUserRating });
-
-      return {
-        ...college.get(),
-        avgUserRating,
-        totalLikes,
-        totalDislikes,
-        totalIsreported
-      };
-    }));
-
-    const response = getPagingData({ ...data, rows: colleges }, page, limit);
+    const response = getPagingData(data, page, limit);
 
     res.status(200).send({
       status: 1,
@@ -2809,8 +2783,8 @@ exports.sitemap = async (req, res) => {
 
     try {
       data.college = await college.findAll({
-        where: data_array,limit,offset,
-        
+        where: data_array, limit, offset,
+
 
         attributes: ["id", "name", "slug", "updated_at"],
 
@@ -2843,7 +2817,7 @@ exports.sitemap = async (req, res) => {
 
     try {
       data.university = await college.findAll({
-        where: data_array,limit,offset,
+        where: data_array, limit, offset,
 
         attributes: ["id", "name", "slug", "updated_at"],
 
@@ -2855,10 +2829,10 @@ exports.sitemap = async (req, res) => {
           return data;
         })
         .catch((err) => {
-        
+
         });
     } catch {
-    
+
     }
   }
 
