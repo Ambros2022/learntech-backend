@@ -29,8 +29,9 @@ const getPagingData = (data, page, limit) => {
 
 
 exports.signup = (req, res) => {
-
   console.log(req.body);
+
+
   // return
   try {
     User.create({
@@ -83,84 +84,81 @@ exports.signup = (req, res) => {
 
 exports.socialsignup = async (req, res) => {
   try {
+    const { provider_id, provider_name, email, name } = req.body;
 
-    if (req.body.userId) {
-      var request = { provider_id: req.body.userId, provider_name: req.body.providername };
+    if (!provider_id || !provider_name) {
+      return res.status(400).send({
+        status: 0,
+        message: "User ID and provider name are required.",
+      });
     }
-    var userr = await User.findOne({
-      where: request
-    })
-    if (userr != null) {
-      var token = jwt.sign({ id: userr.id }, config.secret, {
+
+    let user = await User.findOne({
+      where: {
+        provider_id: provider_id,
+        provider_name: provider_name
+      }
+    });
+
+    if (user) {
+      const token = jwt.sign({ id: user.id }, config.secret, {
         expiresIn: 86400, // 24 hours
       });
+
       return res.status(200).send({
         status: 1,
         message: "success",
         data: {
-          id: userr.id,
-          name: userr.name,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isadmin: 0,
           accessToken: token,
         },
       });
-
     }
 
-    let emails = req.body.email;
-    let nemails = req.body.userId + '@' + req.body.providername + '.com';
-    if (req.body.email) {
-      var request = { email: req.body.email };
+    let userEmail = email || `${provider_id}@${provider_name}.com`;
 
-
-      var userrs = await User.findOne({
-        where: request
-      })
-      if (userrs != null) {
-
-        emails = req.body.userId + '@' + req.body.providername + '.com';
+    if (email) {
+      const existingUser = await User.findOne({
+        where: { email }
+      });
+      if (existingUser) {
+        userEmail = `${provider_id}@${provider_name}.com`;
       }
-
     }
 
+    const newUser = await User.create({
+      provider_id: provider_id,
+      name,
+      provider_name: provider_name,
+      email: userEmail
+    });
 
-
-
-
-
-
-
-    var New = await User.create({
-
-      provider_id: req.body.userId,
-      name: req.body.name,
-      provider_name: req.body.providername,
-      remember_token: req.body.accessTokens,
-      email: emails ? emails : nemails
-
-
-    })
-
-    var token = jwt.sign({ id: New.id }, config.secret, {
+    const newToken = jwt.sign({ id: newUser.id }, config.secret, {
       expiresIn: 86400, // 24 hours
     });
-    if (New.email != null) {
-      sendemails.Regesteredmail(req.body.email);
+
+    if (newUser.email) {
+      sendemails.Regesteredmail(newUser.email);
     }
 
     return res.status(200).send({
       status: 1,
-      message: "Thankyou, Your account has been sucessfully created.",
+      message: "Thank you, Your account has been successfully created.",
       data: {
-        id: New.id,
-        name: New.name,
-        accessToken: token,
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+        isadmin: 0,
+        accessToken: newToken,
       },
     });
-
   } catch (error) {
     return res.status(400).send({
-      message: "Unable to verify  token",
-      errors: error.m,
+      message: "Unable to verify token",
+      errors: error.message,
       status: 0,
     });
   }
