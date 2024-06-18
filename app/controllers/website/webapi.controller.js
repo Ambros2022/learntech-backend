@@ -32,6 +32,7 @@ const PUBLISHED = 'Published';
 const city = db.city;
 const User = db.users;
 const landing_pages = db.landing_pages;
+const reviews = db.reviews;
 // const schoolboards = db.schoolboards;
 // db.schoolboards
 
@@ -388,7 +389,7 @@ exports.genralOnestream = (req, res) => {
   generalcourse
     .findOne({
       where: whereClause,
-      
+
       include: [
         {
           required: false,
@@ -1455,9 +1456,10 @@ exports.abroadpages = async (req, res) => {
 };
 
 exports.abroadcollegefindone = (req, res) => {
-  const id = req.params.id;
-  abroadpages.findByPk(id, {
-    attributes: ['id', 'country_id', 'name', 'slug', 'backgroundimage'],
+  const slug = req.params.slug;
+
+  abroadpages.findOne({
+    where: { slug: slug },
     include: [
       {
         required: false,
@@ -1469,32 +1471,30 @@ exports.abroadcollegefindone = (req, res) => {
         association: "abroadpagefaqs",
         attributes: ["id", "questions", "answers"],
       },
-
     ],
   })
     .then((data) => {
       if (data) {
-
-
         res.status(200).send({
           status: 1,
-          message: "successfully retrieved",
+          message: "Successfully retrieved",
           data: data,
         });
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find abroadpages with id=${id}.`,
+          message: `Cannot find abroadpages with slug=${slug}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving abroadpages with id=" + id,
+        message: "Error retrieving abroadpages with slug=" + slug,
       });
     });
 };
+
 
 exports.allentranceexams = async (req, res) => {
   const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status } = req.query;
@@ -2615,3 +2615,521 @@ exports.dashboard = async (req, res) => {
   }
 };
 
+exports.addreview = async (req, res) => {
+  try {
+
+    const reviewsDetails = await reviews.create({
+      name: req.body.name,
+      userrating: req.body.userrating,
+      user_id: req.body.user_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      review_type: req.body.review_type,
+      passing_year: req.body.passing_year,
+      college_id: req.body.college_id,
+      course_id: req.body.course_id,
+      course_type: req.body.course_type,
+      school_id: req.body.school_id,
+      school_board_id: req.body.school_board_id,
+      grade: req.body.grade,
+      likes: req.body.likes,
+      dislikes: req.body.dislikes,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: 'Thankyou Review Submitted Successfully',
+      data: reviewsDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
+  }
+};
+
+exports.collegereview = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const data = await college.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      attributes: [
+        "id",
+        "name",
+        "slug",
+        "type",
+        "avg_rating",
+      ],
+      include: [
+        {
+          required: false,
+          association: "reviewcollege",
+          attributes: ["id", "name", "userrating", "likes", "dislikes", "is_reported"],
+          where: { is_approved: true },
+        },
+      ],
+      order: [orderconfig],
+      subQuery: false
+    });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving collegereview.",
+    });
+  }
+};
+
+exports.addreviewreply = async (req, res) => {
+  try {
+
+    const reviewsDetails = await reviews.create({
+      content: req.body.content,
+      user_id: req.body.user_id,
+      review_id: req.body.review_id,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: reviewsDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
+  }
+};
+
+exports.sitemap = async (req, res) => {
+  const data = {
+    errors: {},
+  };
+  data.college = [];
+  data.university = [];
+  data.school = [];
+  data.scholarships = [];
+  data.schoolboards = [];
+  data.generalcourse = [];
+  data.stream = [];
+  data.exam = [];
+  data.blog = [];
+  data.newsandevents = [];
+
+
+  const {
+    page,
+    size,
+    columnname,
+    orderby,
+  } = req.body;
+
+  const { limit, offset } = getPagination(page, size);
+
+  if (data.college) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ type: "college" }, { status: PUBLISHED }];
+
+    try {
+      data.college = await college.findAll({
+        where: data_array, limit, offset,
+
+
+        attributes: ["id", "name", "slug", "updated_at"],
+
+        subQuery: false,
+      })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+        });
+    } catch {
+    }
+  }
+
+  if (data.university) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ type: "university" }, { status: PUBLISHED }];
+
+    try {
+      data.university = await college.findAll({
+        where: data_array, limit, offset,
+
+        attributes: ["id", "name", "slug", "updated_at"],
+
+        subQuery: false,
+      })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+  if (data.school) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: PUBLISHED }];
+
+    try {
+      data.school = await school
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+          orderconfig,
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+  if (data.scholarships) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: PUBLISHED }];
+
+    try {
+      data.scholarships = await scholarships
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+          orderconfig,
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+
+  if (data.schoolboards) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [];
+
+    try {
+      data.schoolboards = await schoolboards
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+          orderconfig,
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+  if (data.generalcourse) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: PUBLISHED }];
+
+    try {
+      data.generalcourse = await generalcourse
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+          orderconfig,
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+
+
+  if (data.stream) {
+    var column = columnname ? columnname : "order";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [];
+
+    try {
+      data.stream = await stream
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+        });
+    } catch {
+
+    }
+  }
+
+  if (data.exam) {
+    var column = columnname ? columnname : "slug";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: PUBLISHED }];
+
+    try {
+      data.exam = await exam
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "exam_title", "slug", "updated_at"],
+          orderconfig,
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+        });
+    } catch {
+
+    }
+  }
+
+  if (data.blog) {
+    var column = columnname ? columnname : "slug";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: PUBLISHED }];
+
+    try {
+      data.blog = await blog
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+  if (data.newsandevents) {
+    var column = columnname ? columnname : "title";
+    var order = orderby ? orderby : "ASC";
+    var orderconfig = [column, order];
+
+    const myArray = column.split(".");
+    if (typeof myArray[1] !== "undefined") {
+      var table = myArray[0];
+      column = myArray[1];
+      orderconfig = [table, column, order];
+    }
+
+    let data_array = [{ status: PUBLISHED }];
+
+    try {
+      data.newsandevents = await news_and_events
+        .findAll({
+          where: data_array,
+
+          attributes: ["id", "name", "slug", "updated_at"],
+          orderconfig,
+          subQuery: false,
+        })
+
+        .then((data) => {
+
+          return data;
+        })
+        .catch((err) => {
+
+        });
+    } catch {
+
+    }
+  }
+
+
+
+  res.status(200).send({
+    status: 1,
+    message: "success",
+    data: data,
+  });
+};

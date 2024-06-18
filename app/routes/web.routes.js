@@ -103,6 +103,7 @@ module.exports = function (app) {
   app.get("/api/website/colleges/get", webapicontroller.allcolleges);
 
 
+
   app.get("/api/website/collegefindone/get/:id", webapicontroller.collegefindOne);
 
   app.get("/api/website/courses/get", webapicontroller.courses);
@@ -115,7 +116,7 @@ module.exports = function (app) {
 
   app.get("/api/website/abroadpages/get", webapicontroller.abroadpages);
 
-  app.get("/api/website/abroadpagefindone/get/:id", webapicontroller.abroadcollegefindone);
+  app.get("/api/website/abroadpagefindone/get/:slug", webapicontroller.abroadcollegefindone);
 
   app.get("/api/website/exams/get", webapicontroller.allentranceexams);
 
@@ -148,6 +149,14 @@ module.exports = function (app) {
   app.post("/api/website/addjobsenquires/get", webapicontroller.addjobenquires);
 
   app.get("/api/website/ourteams/get", webapicontroller.ourteams);
+
+  app.post("/api/website/addreview/post", webapicontroller.addreview);
+
+  app.get("/api/website/college/review/get", webapicontroller.collegereview);
+
+  app.post("/api/website/addreviewreply/post", webapicontroller.addreviewreply);
+
+  app.get("/api/website/sitemap/get", webapicontroller.sitemap);
 
 
 

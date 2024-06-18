@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require('path');
 const reviews = db.reviews;
+const college = db.college;
 const Op = db.Sequelize.Op;
 
 const sendsearch = require("../utility/Customsearch");
@@ -57,7 +58,7 @@ exports.create = async (req, res) => {
       status: 0
     });
   }
-}
+};
 
 exports.findAll = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -135,7 +136,6 @@ exports.delete = (req, res) => {
     });
 };
 
-
 exports.findOne = (req, res) => {
   const id = req.params.id;
   reviews.findByPk(id,)
@@ -172,65 +172,101 @@ exports.findOne = (req, res) => {
 };
 
 
-// exports.update = (req, res) => {
-//   const id = req.body.id;
+exports.update = (req, res) => {
+  const id = req.body.id;
 
-//   try {
-//     reviews.update({
-//       name: req.body.name,
-//         userrating: req.body.userrating,
-//         user_id: req.body.user_id,
-//         content: req.body.content,
-//         is_approved: req.body.is_approved,
-//         review_type: req.body.review_type,
-//         college_id: req.body.college_id,
-//         course_id: req.body.course_id,
-//         course_type: req.body.course_type,
-//         school_id: req.body.school_id,
-//         school_board_id: req.body.school_board_id,
-//         grade: req.body.grade,
-//         likes: req.body.likes,
-//         dislikes: req.body.dislikes,
-//     }, {
-//       where: { id: req.body.id }
-//     });
+  try {
+    reviews.update({
+      name: req.body.name,
+      userrating: req.body.userrating,
+      user_id: req.body.user_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      review_type: req.body.review_type,
+      college_id: req.body.college_id,
+      course_id: req.body.course_id,
+      course_type: req.body.course_type,
+      school_id: req.body.school_id,
+      school_board_id: req.body.school_board_id,
+      grade: req.body.grade,
+      likes: req.body.likes,
+      dislikes: req.body.dislikes,
+    }, {
+      where: { id: req.body.id }
+    });
 
 
-//     res.status(200).send({
-//       status: 1,
-//       message: 'Data Save Successfully'
-//     });
-//   }
-//   catch (error) {
-//     return res.status(400).send({
-//       message: 'Unable to update data',
-//       errors: error,
-//       status: 0
-//     });
-//   }
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully'
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to update data',
+      errors: error,
+      status: 0
+    });
+  }
 
-// };
+};
 
-exports.update = async (req, res) => {
+exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
 
-  if (id === undefined || is_approved === undefined) {
+  if (id === undefined) {
     return res.status(400).send({
       status: 0,
-      message: 'ID and is_approved are required fields'
+      message: 'ID is a required field'
     });
   }
 
   try {
+
+    const review = await reviews.findOne({ where: { id: id } });
+
+    if (!review) {
+      return res.status(404).send({
+        status: 0,
+        message: 'Review not found'
+      });
+    }
+
+    const previousIsApproved = review.is_approved;
+    let updatedIsApproved;
+
+    if (is_approved === undefined) {
+      updatedIsApproved = !previousIsApproved;
+    } else {
+      updatedIsApproved = is_approved;
+    }
+
     await reviews.update(
-      { is_approved: is_approved },
+      { is_approved: updatedIsApproved },
       { where: { id: id } }
     );
 
+    if (previousIsApproved !== updatedIsApproved) {
+      const collegeId = review.college_id;
+
+      const collegeReviews = await reviews.findAll({
+        where: { college_id: collegeId, is_approved: true }
+      });
+
+      const totalRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
+      const avgRating = collegeReviews.length ? totalRating / collegeReviews.length : 0;
+
+      await college.update(
+        { avg_rating: avgRating },
+        { where: { id: collegeId } }
+      );
+    }
+
     res.status(200).send({
       status: 1,
-      message: 'is_approved field updated successfully'
+      message: 'is_approved field updated successfully and average rating updated'
     });
+
   } catch (error) {
     res.status(500).send({
       status: 0,

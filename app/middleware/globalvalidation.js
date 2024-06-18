@@ -183,7 +183,7 @@ function checkField_update(fieldName, maxLength, model, requireUnique = false) {
   return validationChain;
 }
 const validateIdRequired_id = (modelName, fieldName) => [
-  
+
   body(fieldName)
     .exists({ checkFalsy: true })
     .withMessage(`${fieldName} is required`)
@@ -951,12 +951,17 @@ const reviewSchema = [
 const reviewUpdateSchema = [
   ...validateIdRequired_id(reviews, "id"),
 
-  
+  ...validateIdRequired_id(users, "user_id"),
+  ...validateIdRequired_id(college, "college_id"),
+  ...validateIdRequired_id(courses, "course_id"),
+  ...validateIdRequired_id(school, "school_id"),
+  ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
 
 const reviewrepliesSchema = [
   checkField('content', 250, review_replies, true),
+  ...validateIdRequired_id(users, "user_id"),
   ...validateIdRequired_id(reviews, "review_id"),
 
 ];
@@ -965,6 +970,7 @@ const reviewrepliesUpdateSchema = [
   ...validateIdRequired_id(review_replies, "id"),
 
   checkField_update('content', 250, review_replies, true),
+  ...validateIdRequired_id(users, "user_id"),
   ...validateIdRequired_id(reviews, "review_id"),
 
 ];
