@@ -157,6 +157,10 @@ module.exports = function (app) {
 
   app.get("/api/website/sitemap/get", webapicontroller.sitemap);
 
+  app.get("/api/website/allreview/get", webapicontroller.allreview);
+
+  app.get("/api/website/reviewrating/get", webapicontroller.reviewrating);
+
 
 
 
