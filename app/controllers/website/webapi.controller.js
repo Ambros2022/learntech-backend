@@ -1457,48 +1457,44 @@ exports.abroadpages = async (req, res) => {
 
 exports.abroadcollegefindone = (req, res) => {
   const slug = req.params.slug;
-  // abroadpages.findByPk(id, 
-  abroadpages.findOne({ where: { slug: slug } },
 
-    {
-      attributes: ['id', 'country_id', 'name', 'slug', 'backgroundimage'],
-      include: [
-        {
-          required: false,
-          association: "country",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "abroadpagefaqs",
-          attributes: ["id", "questions", "answers"],
-        },
-
-      ],
-    })
+  abroadpages.findOne({
+    where: { slug: slug },
+    include: [
+      {
+        required: false,
+        association: "country",
+        attributes: ["id", "name"],
+      },
+      {
+        required: false,
+        association: "abroadpagefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
+    ],
+  })
     .then((data) => {
       if (data) {
-
-
         res.status(200).send({
           status: 1,
-          message: "successfully retrieved",
+          message: "Successfully retrieved",
           data: data,
         });
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find abroadpages with id=${slug}.`,
+          message: `Cannot find abroadpages with slug=${slug}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving abroadpages with id=" + slug,
+        message: "Error retrieving abroadpages with slug=" + slug,
       });
     });
 };
+
 
 exports.allentranceexams = async (req, res) => {
   const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status } = req.query;
@@ -2629,6 +2625,7 @@ exports.addreview = async (req, res) => {
       content: req.body.content,
       is_approved: req.body.is_approved,
       review_type: req.body.review_type,
+      passing_year: req.body.passing_year,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
       course_type: req.body.course_type,
@@ -2641,7 +2638,7 @@ exports.addreview = async (req, res) => {
 
     res.status(200).send({
       status: 1,
-      message: 'Data Save Successfully',
+      message: 'Thankyou Review Submitted Successfully',
       data: reviewsDetails
     });
   }
