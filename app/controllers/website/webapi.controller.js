@@ -732,7 +732,7 @@ exports.exploreCollege = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo"],
+      attributes: ["id", "name", "slug", "logo","listing_order"],
       include: [{
         required: false,
         association: "clgstreamm",
@@ -793,7 +793,7 @@ exports.exploreexam = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo"],
+      attributes: ["id", "name", "slug", "logo","listing_order"],
       include: [{
         required: false,
         association: "exam",
@@ -857,7 +857,7 @@ exports.explorecourses = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo"],
+      attributes: ["id", "name", "slug", "logo","listing_order"],
       include: [{
         required: false,
         association: "general_courses",
