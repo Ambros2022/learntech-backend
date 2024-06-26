@@ -103,6 +103,7 @@ module.exports = function (app) {
   app.get("/api/website/colleges/get", webapicontroller.allcolleges);
 
 
+
   app.get("/api/website/collegefindone/get/:id", webapicontroller.collegefindOne);
 
   app.get("/api/website/courses/get", webapicontroller.courses);
