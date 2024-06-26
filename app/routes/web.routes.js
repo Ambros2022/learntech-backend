@@ -123,6 +123,8 @@ module.exports = function (app) {
 
   app.get("/api/website/news/get", webapicontroller.news);
 
+  app.get("/api/website/newscategory/get", webapicontroller.newscategory);
+
   app.get("/api/website/newsfindone/get/:id", webapicontroller.newsfindone);
 
   app.get("/api/website/blog/get", webapicontroller.blogs);

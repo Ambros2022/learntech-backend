@@ -83,9 +83,39 @@ exports.findAll = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
 
   reviews
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({ where: condition, limit, offset,
+      include: [
+        {
+          required: false,
+          association: "clgreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "reviewuser",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclbrdreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "coursereview",
+          attributes: ["id", "slug"],
+        },
+      ],
+      order: [orderconfig] })
     .then((data) => {
       const response = getPagingData(data, page, limit);
+
+     
 
       res.status(200).send({
         status: 1,
