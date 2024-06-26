@@ -1903,6 +1903,12 @@ exports.schoolboardfindone = (req, res) => {
       "logo",
       "established",
       "gender",
+      "info",
+      "time_table",
+      "reg_form",
+      "syllabus",
+      "results",
+      "sample_paper",
     ],
     include: [
 
