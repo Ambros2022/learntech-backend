@@ -732,7 +732,7 @@ exports.exploreCollege = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo","listing_order"],
+      attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
         association: "clgstreamm",
@@ -793,7 +793,7 @@ exports.exploreexam = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo","listing_order"],
+      attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
         association: "exam",
@@ -857,7 +857,7 @@ exports.explorecourses = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo","listing_order"],
+      attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
         association: "general_courses",
@@ -1864,10 +1864,46 @@ exports.schoolboards = async (req, res) => {
       attributes: [
         "id",
         "name",
+        "slug",
         "board_type",
+        "country_id",
+        "state_id",
+        "city_id",
+        "gender",
         "logo",
         "established",
         "gender",
+        "info",
+        "time_table",
+        "reg_form",
+        "syllabus",
+        "results",
+        "sample_paper",
+        "created_at",
+      ],
+      include: [
+
+        {
+          required: false,
+          association: "schoolboardfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+
       ],
       order: [orderconfig]
     })
