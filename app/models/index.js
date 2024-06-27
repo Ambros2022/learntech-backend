@@ -620,9 +620,9 @@ db.commingform.belongsTo(db.studentform, {
 
 /***  Relation ship review  */
 
-// db.review.belongsTo(db.user, {
-//   foreignKey: "user_id",
-//   as: "users",
+// db.reviews.belongsTo(db.college, {
+//   foreignKey: "college_id",
+//   as: "clgreview",
 // });
 
 // db.review.belongsTo(db.courses, {
@@ -634,13 +634,45 @@ db.commingform.belongsTo(db.studentform, {
 //   as: "reviewstream",
 // });
 
-db.college.hasMany(db.reviews, {
+// db.college.hasMany(db.reviews, {
+//   foreignKey: "college_id",
+//   as: "reviewcollege",
+// }); 
+
+// db.users.hasMany(db.reviews, {
+//   foreignKey: "user_id",
+//   as: "reviewuser",
+// }); 
+
+db.college.hasMany(db.reviews, { as: "clgreview" });
+db.reviews.belongsTo(db.college, {
   foreignKey: "college_id",
-  as: "reviewcollege",
-}); 
+  as: "clgreview",
+});
 
+db.users.hasMany(db.reviews, { as: "reviewuser" });
+db.reviews.belongsTo(db.users, {
+  foreignKey: "user_id",
+  as: "reviewuser",
+});
 
+db.school.hasMany(db.reviews, { as: "sclreview" });
+db.reviews.belongsTo(db.school, {
+  foreignKey: "school_id",
+  as: "sclreview",
+});
 
+db.schoolboards.hasMany(db.reviews, { as: "sclbrdreview" });
+db.reviews.belongsTo(db.schoolboards, {
+  foreignKey: "school_board_id",
+  as: "sclbrdreview",
+});
+
+db.courses.hasMany(db.reviews, { as: "coursereview" });
+db.reviews.belongsTo(db.courses, {
+  foreignKey: "course_id",
+  as: "coursereview",
+});
 
 
 
