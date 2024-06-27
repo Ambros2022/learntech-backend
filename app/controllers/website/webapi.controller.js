@@ -3193,3 +3193,190 @@ exports.sitemap = async (req, res) => {
     data: data,
   });
 };
+
+exports.allreview = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const data = await reviews.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      attributes: [
+        "id",
+        "name",
+        "userrating",
+        "content",
+        "is_approved",
+        "college_id",
+      ],
+     
+      order: [orderconfig],
+      subQuery: false
+    });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving review.",
+    });
+  }
+};
+
+exports.reviewrating = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id } = req.query;
+
+  // Default column and order settings
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  // Handle dot notation in column names
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  let data_array = [];
+
+  // Build search condition
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
+
+  // Filter by college_id if provided
+  if (college_id) {
+    data_array.push({ college_id: college_id });
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    // Fetch reviews with pagination and sorting
+    const data = await reviews.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      attributes: [
+        "id",
+        "name",
+        "userrating",
+        "content",
+        "is_approved",
+        "college_id",
+        "school_id",
+        "school_board_id",
+        "course_id",
+        "likes",
+        "dislikes",
+      ],
+      order: [orderconfig],
+      subQuery: false,
+      raw: true, 
+    });
+
+    // Fetch aggregates for the specified college_id or all colleges
+    const collegeAggregates = await reviews.findAll({
+      where: college_id ? { college_id: college_id } : {},
+      attributes: [
+        "college_id",
+        [Sequelize.fn("AVG", Sequelize.col("userrating")), "avgRating"],
+        [Sequelize.fn("SUM", Sequelize.col("likes")), "totalLikes"],
+        [Sequelize.fn("SUM", Sequelize.col("dislikes")), "totalDislikes"],
+        [Sequelize.fn("COUNT", Sequelize.col("id")), "totalReviews"],
+      ],
+      group: ["college_id"],
+      raw: true,
+    });
+
+    // Fetch rating counts grouped by college and userrating
+    const ratingCounts = await reviews.findAll({
+      where: college_id ? { college_id: college_id } : {},
+      attributes: [
+        "college_id",
+        "userrating",
+        [Sequelize.fn("COUNT", Sequelize.col("userrating")), "ratingCount"],
+      ],
+      group: ["college_id", "userrating"],
+      raw: true,
+    });
+
+    // Format response data
+    const response = getPagingData(data, page, limit);
+
+    const finaldataWithRatings = response.finaldata.map(item => ({
+      ...item,
+    }));
+
+    // Filter aggregates to include only the relevant college if college_id is provided
+    const totalLikesDislikes = collegeAggregates
+      .filter(item => !college_id || item.college_id === college_id)
+      .map(item => ({
+        college_id: item.college_id,
+        totalLikes: parseInt(item.totalLikes),
+        totalDislikes: parseInt(item.totalDislikes),
+        avgRating: parseFloat(item.avgRating).toFixed(2),
+        totalReviews: parseInt(item.totalReviews),
+      }));
+
+    const ratingsGroupedByCollege = ratingCounts.reduce((acc, item) => {
+      if (!acc[item.college_id]) {
+        acc[item.college_id] = {
+          college_id: item.college_id,
+          ratings: {}
+        };
+      }
+      acc[item.college_id].ratings[item.userrating] = parseInt(item.ratingCount);
+      return acc;
+    }, {});
+
+    // Send response
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: finaldataWithRatings,
+      totalLikesDislikes: totalLikesDislikes,
+      ratingCounts: ratingsGroupedByCollege
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving review.",
+    });
+  }
+};

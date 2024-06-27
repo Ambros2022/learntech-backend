@@ -19,7 +19,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.ENUM('draft', 'published')
     },
     promo_banner: {
-      type: Sequelize.ENUM('Draft', 'All_Exam_page', 'All_News_page', 'All_Scholarship_page', 'Nri_page', 'Study_Abroad_page', 'All_college_page', 'All_university_page', 'All_school_page')
+      type: Sequelize.ENUM('Draft','All_Exams_page','All_News_page','All_Scholarship_page','Nri_page','Study_Abroad_page','All_college_page','All_courses_page','All_university_page','All_school_page','Services_Page')
     },
   }
     ,
