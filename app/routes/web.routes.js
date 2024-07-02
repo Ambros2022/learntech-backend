@@ -164,6 +164,8 @@ module.exports = function (app) {
 
   app.get("/api/website/reviewrating/get", webapicontroller.reviewrating);
 
+  app.get("/api/website/findonereview/get", webapicontroller.findreview);
+
 
 
 
