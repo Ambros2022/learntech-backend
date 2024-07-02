@@ -393,6 +393,11 @@ exports.genralOnestream = (req, res) => {
       include: [
         {
           required: false,
+          association: "streams",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
           association: "generalcoursefaqs",
           attributes: ["id", "questions", "answers"],
         },
@@ -1716,7 +1721,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title',  'pdf_file', 'meta_description', 'overview'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview'],
       include: [
         {
           required: false,
@@ -1808,7 +1813,7 @@ exports.blogfindone = (req, res) => {
   const id = req.params.id;
   blog
     .findByPk(id, {
-      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description',  'created_at'],
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at'],
 
     })
     .then((data) => {
@@ -1954,6 +1959,17 @@ exports.schoolboardfindone = (req, res) => {
         required: false,
         association: "schoolboardfaqs",
         attributes: ["id", "questions", "answers"],
+      },
+      {
+        required: false,
+        association: "boardrecognitions",
+        attributes: ["id", "recognition_id"],
+        include: [
+          {
+            association: "brdrecognitions",
+            attributes: ["id", "recognition_approval_name"],
+          },
+        ],
       },
 
     ],
@@ -3273,7 +3289,7 @@ exports.allreview = async (req, res) => {
         "is_approved",
         "college_id",
       ],
-     
+
       order: [orderconfig],
       subQuery: false
     });
@@ -3312,7 +3328,7 @@ exports.reviewrating = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  let data_array = [];
+  let data_array = [{ is_approved: 1 }];
 
   // Build search condition
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -3348,7 +3364,7 @@ exports.reviewrating = async (req, res) => {
       ],
       order: [orderconfig],
       subQuery: false,
-      raw: true, 
+      raw: true,
     });
 
     // Fetch aggregates for the specified college_id or all colleges
