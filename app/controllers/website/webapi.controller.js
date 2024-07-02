@@ -1624,6 +1624,7 @@ exports.news = async (req, res) => {
         "slug",
         "banner_image",
         "meta_description",
+        "pdf_file",
         "created_at",
         "category_id",
       ],
@@ -1715,7 +1716,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'meta_description'],
+      attributes: ['id', 'banner_image', 'meta_title',  'pdf_file', 'meta_description', 'overview'],
       include: [
         {
           required: false,
@@ -1777,6 +1778,7 @@ exports.blogs = async (req, res) => {
         "banner_image",
         "meta_title",
         "meta_description",
+        "created_at",
       ],
       order: [orderconfig]
     })
@@ -1806,7 +1808,7 @@ exports.blogfindone = (req, res) => {
   const id = req.params.id;
   blog
     .findByPk(id, {
-      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description'],
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description',  'created_at'],
 
     })
     .then((data) => {
