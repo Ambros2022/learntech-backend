@@ -228,6 +228,16 @@ db.school_board_faqs.belongsTo(db.schoolboards, {
   foreignKey: "school_board_id",
   as: "schoolboardfaqs",
 });
+db.schoolboards.hasMany(db.school_board_recognitions, { as: "boardrecognitions" });
+db.school_board_recognitions.belongsTo(db.schoolboards, {
+  foreignKey: "school_board_id",
+  as: "boardrecognitions",
+});
+
+db.school_board_recognitions.belongsTo(db.recognition, {
+  foreignKey: "recognition_id",
+  as: "brdrecognitions",
+});
 
 db.schoolboards.belongsTo(db.countries, {
   foreignKey: "country_id",
@@ -485,28 +495,28 @@ db.abroadpage_faqs.belongsTo(db.abroadpages, {
 
 
 db.countries.hasMany(db.abroadpages, { as: "abroadpages", foreignKey: "country_id" });
- db.abroadpages.belongsTo(db.countries, {
-    foreignKey: "country_id",
-    as: "country",
-  });
+db.abroadpages.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
 
 /***  Relation ship news and events  */
 
 
 db.news_categories.hasMany(db.news_and_events, { as: "newsandevents", foreignKey: "category_id" });
- db.news_and_events.belongsTo(db.news_categories, {
-    foreignKey: "category_id",
-    as: "newscategories",
-  });
+db.news_and_events.belongsTo(db.news_categories, {
+  foreignKey: "category_id",
+  as: "newscategories",
+});
 
 
 //Exam RELATIONSHIP
 
 db.stream.hasMany(db.exam, { as: "exams", foreignKey: "stream_id" });
- db.exam.belongsTo(db.stream, {
-    foreignKey: "stream_id",
-    as: "stream",
-  });
+db.exam.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "stream",
+});
 
 
 db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });

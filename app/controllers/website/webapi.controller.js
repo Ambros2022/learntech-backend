@@ -33,6 +33,8 @@ const city = db.city;
 const User = db.users;
 const landing_pages = db.landing_pages;
 const reviews = db.reviews;
+const scholar_levels = db.scholar_levels;
+const scholar_types = db.scholar_types;
 // const schoolboards = db.schoolboards;
 // db.schoolboards
 
@@ -391,6 +393,11 @@ exports.genralOnestream = (req, res) => {
       where: whereClause,
 
       include: [
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id", "name"],
+        },
         {
           required: false,
           association: "generalcoursefaqs",
@@ -1716,7 +1723,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title',  'pdf_file', 'meta_description', 'overview'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview'],
       include: [
         {
           required: false,
@@ -1808,7 +1815,7 @@ exports.blogfindone = (req, res) => {
   const id = req.params.id;
   blog
     .findByPk(id, {
-      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description',  'created_at'],
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at'],
 
     })
     .then((data) => {
@@ -1882,6 +1889,7 @@ exports.schoolboards = async (req, res) => {
         "results",
         "sample_paper",
         "created_at",
+        "result_date",
       ],
       include: [
 
@@ -1947,6 +1955,7 @@ exports.schoolboardfindone = (req, res) => {
       "syllabus",
       "results",
       "sample_paper",
+      "result_date",
     ],
     include: [
 
@@ -1954,6 +1963,17 @@ exports.schoolboardfindone = (req, res) => {
         required: false,
         association: "schoolboardfaqs",
         attributes: ["id", "questions", "answers"],
+      },
+      {
+        required: false,
+        association: "boardrecognitions",
+        attributes: ["id", "recognition_id"],
+        include: [
+          {
+            association: "brdrecognitions",
+            attributes: ["id", "recognition_approval_name"],
+          },
+        ],
       },
 
     ],
@@ -3273,7 +3293,7 @@ exports.allreview = async (req, res) => {
         "is_approved",
         "college_id",
       ],
-     
+
       order: [orderconfig],
       subQuery: false
     });
