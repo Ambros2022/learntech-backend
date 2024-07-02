@@ -164,6 +164,10 @@ module.exports = function (app) {
 
   app.get("/api/website/reviewrating/get", webapicontroller.reviewrating);
 
+  app.get("/api/website/scholarlevel/get", webapicontroller.scholarlevel);
+
+  app.get("/api/website/scholartypes/get", webapicontroller.scholartypes);
+
 
 
 

@@ -4,7 +4,7 @@ const schoolboards = db.schoolboards;
 const school_board_faqs = db.school_board_faqs;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
-
+const Schoolrecoginations = db.school_board_recognitions;
 
 // Array of allowed files
 const sendsearch = require("../utility/Customsearch");
@@ -99,6 +99,17 @@ exports.create = async (req, res) => {
         results: req.body.results,
         sample_paper: req.body.sample_paper,
       });
+
+      if (req.body.recoginations && schoolboardsDetails.id) {
+        const stream = JSON.parse(req.body.recoginations);
+        _.forEach(stream, async function (value) {
+
+          await Schoolrecoginations.create({
+            recognition_id: value.id,
+            school_board_id: schoolboardsDetails.id,
+          });
+        });
+      }
 
       res.status(200).send({
         status: 1,
@@ -333,6 +344,19 @@ exports.update = async (req, res) => {
     // Update database record
     await schoolboards.update(schoolboardsUpdates, { where: { id: req.body.id } });
 
+
+    if (req.body.recoginations && req.body.id) {
+      await Schoolrecoginations.destroy({
+        where: { school_board_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.recoginations);
+      _.forEach(stream, async function (value) {
+        await Schoolrecoginations.create({
+          school_board_id: req.body.id,
+          recognition_id: value.id,
+        });
+      });
+    }
     res.status(200).send({
       status: 1,
       message: "Data saved successfully",
