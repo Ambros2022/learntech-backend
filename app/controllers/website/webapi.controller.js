@@ -33,6 +33,8 @@ const city = db.city;
 const User = db.users;
 const landing_pages = db.landing_pages;
 const reviews = db.reviews;
+const scholar_levels = db.scholar_levels;
+const scholar_types = db.scholar_types;
 // const schoolboards = db.schoolboards;
 // db.schoolboards
 
@@ -1887,6 +1889,7 @@ exports.schoolboards = async (req, res) => {
         "results",
         "sample_paper",
         "created_at",
+        "result_date",
       ],
       include: [
 
@@ -1952,6 +1955,7 @@ exports.schoolboardfindone = (req, res) => {
       "syllabus",
       "results",
       "sample_paper",
+      "result_date",
     ],
     include: [
 
@@ -3440,3 +3444,106 @@ exports.reviewrating = async (req, res) => {
     });
   }
 };
+
+exports.scholarlevel = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  scholar_levels
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving all scholar levels.",
+      });
+    });
+};
+
+exports.scholartypes = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  scholar_types
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving all scholar types.",
+      });
+    });
+};
+
