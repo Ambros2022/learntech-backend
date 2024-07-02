@@ -19,9 +19,17 @@ async function removeFile(filePath) {
 }
 
 // Array of allowed files
-const array_of_allowed_file_types = fileTypes.Imageformat;
+const array_of_allowed_file_types = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/gif",
+  "image/svg+xml",
+  "image/webp",
+  "application/pdf"  // Added PDF file type
+];
 // Allowed file size in mb
-const allowed_file_size = 2;
+const allowed_file_size = 10;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;

@@ -84,12 +84,41 @@ exports.findAll = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
 
   reviews
-    .findAndCountAll({ where: condition, limit, offset, 
-      
-      order: [orderconfig] })
-    
+    .findAndCountAll({
+      where: condition, limit, offset,
+      include: [
+        {
+          required: false,
+          association: "clgreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "reviewuser",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclbrdreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "coursereview",
+          attributes: ["id", "slug"],
+        },
+      ],
+      order: [orderconfig]
+    })
     .then((data) => {
       const response = getPagingData(data, page, limit);
+
+
 
       res.status(200).send({
         status: 1,
@@ -248,7 +277,7 @@ exports.statusupdate = async (req, res) => {
       { is_approved: updatedIsApproved },
       { where: { id: id } }
     );
-
+    // console.log(reviews, "reviews");
     if (previousIsApproved !== updatedIsApproved) {
       const collegeId = review.college_id;
       const schoolId = review.school_id;
@@ -258,8 +287,7 @@ exports.statusupdate = async (req, res) => {
       });
 
       const totalCollegeRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
-      const avgCollegeRating = collegeReviews.length ? totalCollegeRating / collegeReviews.length : 0;
-
+      const avgCollegeRating = collegeReviews.length ? Math.round(totalCollegeRating / collegeReviews.length) : 0;
       await college.update(
         { avg_rating: avgCollegeRating },
         { where: { id: collegeId } }
@@ -271,7 +299,7 @@ exports.statusupdate = async (req, res) => {
         });
 
         const totalSchoolRating = schoolReviews.reduce((acc, curr) => acc + curr.userrating, 0);
-        const avgSchoolRating = schoolReviews.length ? totalSchoolRating / schoolReviews.length : 0;
+        const avgSchoolRating = schoolReviews.length ? Math.round(totalSchoolRating / schoolReviews.length) : 0;
 
         await school.update(
           { avg_rating: avgSchoolRating },

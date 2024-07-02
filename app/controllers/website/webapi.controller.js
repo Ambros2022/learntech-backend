@@ -732,7 +732,7 @@ exports.exploreCollege = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo","listing_order"],
+      attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
         association: "clgstreamm",
@@ -793,7 +793,7 @@ exports.exploreexam = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo","listing_order"],
+      attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
         association: "exam",
@@ -857,7 +857,7 @@ exports.explorecourses = async (req, res) => {
 
     // Fetch the paginated data
     const data = await stream.findAll({
-      attributes: ["id", "name", "slug", "logo","listing_order"],
+      attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
         association: "general_courses",
@@ -1624,8 +1624,18 @@ exports.news = async (req, res) => {
         "slug",
         "banner_image",
         "meta_description",
+        "pdf_file",
         "created_at",
         "category_id",
+      ],
+      include: [
+        {
+          required: false,
+          association: "newscategories",
+          attributes: ["id", "name"],
+        },
+
+
       ],
       order: [orderconfig]
     })
@@ -1651,11 +1661,62 @@ exports.news = async (req, res) => {
     });
 };
 
+exports.newscategory = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  news_categories
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "created_at",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving news category.",
+      });
+    });
+};
+
 exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'meta_description'],
+      attributes: ['id', 'banner_image', 'meta_title',  'pdf_file', 'meta_description', 'overview'],
       include: [
         {
           required: false,
@@ -1717,6 +1778,7 @@ exports.blogs = async (req, res) => {
         "banner_image",
         "meta_title",
         "meta_description",
+        "created_at",
       ],
       order: [orderconfig]
     })
@@ -1746,7 +1808,7 @@ exports.blogfindone = (req, res) => {
   const id = req.params.id;
   blog
     .findByPk(id, {
-      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description'],
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description',  'created_at'],
 
     })
     .then((data) => {
@@ -1804,10 +1866,46 @@ exports.schoolboards = async (req, res) => {
       attributes: [
         "id",
         "name",
+        "slug",
         "board_type",
+        "country_id",
+        "state_id",
+        "city_id",
+        "gender",
         "logo",
         "established",
         "gender",
+        "info",
+        "time_table",
+        "reg_form",
+        "syllabus",
+        "results",
+        "sample_paper",
+        "created_at",
+      ],
+      include: [
+
+        {
+          required: false,
+          association: "schoolboardfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+
       ],
       order: [orderconfig]
     })
@@ -1843,6 +1941,12 @@ exports.schoolboardfindone = (req, res) => {
       "logo",
       "established",
       "gender",
+      "info",
+      "time_table",
+      "reg_form",
+      "syllabus",
+      "results",
+      "sample_paper",
     ],
     include: [
 
