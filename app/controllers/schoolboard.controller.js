@@ -97,7 +97,8 @@ exports.create = async (req, res) => {
         reg_form: req.body.reg_form,
         syllabus: req.body.syllabus,
         results: req.body.results,
-        sample_paper: req.body.sample_paper,
+        address: req.body.address,
+        map: req.body.map,
       });
 
       if (req.body.recoginations && schoolboardsDetails.id) {
@@ -305,6 +306,8 @@ exports.update = async (req, res) => {
       syllabus: req.body.syllabus || existingRecord.syllabus,
       results: req.body.results || existingRecord.results,
       sample_paper: req.body.sample_paper || existingRecord.sample_paper,
+      address: req.body.address || existingRecord.address,
+      map: req.body.map || existingRecord.map,
     };
 
     // Check if a new logo is provided

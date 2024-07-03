@@ -56,6 +56,12 @@ module.exports = (sequelize, Sequelize) => {
       sample_paper: {
         type: Sequelize.STRING,
       },
+      address: {
+        type: Sequelize.STRING
+      },
+      map: {
+        type: Sequelize.STRING
+      },
     },
     {
       timestamps: true,
