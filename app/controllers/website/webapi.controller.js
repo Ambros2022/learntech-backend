@@ -1913,6 +1913,17 @@ exports.schoolboards = async (req, res) => {
           association: "citys",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "boardrecognitions",
+          attributes: ["id", "recognition_id"],
+          include: [
+            {
+              association: "brdrecognitions",
+              attributes: ["id", "recognition_approval_name"],
+            },
+          ],
+        },
 
       ],
       order: [orderconfig]
