@@ -1914,6 +1914,7 @@ exports.schoolboards = async (req, res) => {
           attributes: ["id", "name"],
         },
 
+
       ],
       order: [orderconfig]
     })
@@ -3292,6 +3293,7 @@ exports.allreview = async (req, res) => {
         "content",
         "is_approved",
         "college_id",
+        "school_id",
       ],
 
       order: [orderconfig],
@@ -3317,49 +3319,56 @@ exports.allreview = async (req, res) => {
 };
 
 exports.reviewrating = async (req, res) => {
-  const { college_id } = req.query;
+  const { college_id, school_id } = req.query;
 
   try {
+    const filterCondition = college_id ? { college_id: college_id } : { school_id: school_id };
+
     const collegeAggregates = await reviews.findAll({
-      where: { college_id: college_id },
+      where: filterCondition,
       attributes: [
-        "college_id",
+        college_id ? "college_id" : "school_id",
         [Sequelize.fn("AVG", Sequelize.col("userrating")), "avgRating"],
         [Sequelize.fn("SUM", Sequelize.col("likes")), "totalLikes"],
         [Sequelize.fn("SUM", Sequelize.col("dislikes")), "totalDislikes"],
         [Sequelize.fn("COUNT", Sequelize.col("id")), "totalReviews"],
+        [Sequelize.fn("SUM", Sequelize.col("userrating")), "overallRatingSum"], // Sum of all ratings
       ],
-      group: ["college_id"],
+      group: [college_id ? "college_id" : "school_id"],
       raw: true,
     });
 
     const ratingCounts = await reviews.findAll({
-      where: { college_id: college_id },
+      where: filterCondition,
       attributes: [
-        "college_id",
+        college_id ? "college_id" : "school_id",
         "userrating",
         [Sequelize.fn("COUNT", Sequelize.col("userrating")), "ratingCount"],
       ],
-      group: ["college_id", "userrating"],
+      group: [college_id ? "college_id" : "school_id", "userrating"],
       raw: true,
     });
 
     const totalLikesDislikes = collegeAggregates.map(item => ({
       college_id: item.college_id,
+      school_id: item.school_id,
       totalLikes: parseInt(item.totalLikes),
       totalDislikes: parseInt(item.totalDislikes),
       avgRating: parseFloat(item.avgRating).toFixed(2),
       totalReviews: parseInt(item.totalReviews),
+      overallRatingCount: parseInt(item.totalReviews), // Overall rating count is same as total reviews
+      overallRating: parseFloat(item.overallRatingSum).toFixed(2), // Overall rating sum
     }));
 
     const ratingsGroupedByCollege = ratingCounts.reduce((acc, item) => {
-      if (!acc[item.college_id]) {
-        acc[item.college_id] = {
-          college_id: item.college_id,
+      const idKey = college_id ? 'college_id' : 'school_id';
+      if (!acc[item[idKey]]) {
+        acc[item[idKey]] = {
+          [idKey]: item[idKey],
           ratings: {}
         };
       }
-      acc[item.college_id].ratings[item.userrating] = parseInt(item.ratingCount);
+      acc[item[idKey]].ratings[item.userrating] = parseInt(item.ratingCount);
       return acc;
     }, {});
 
@@ -3378,7 +3387,7 @@ exports.reviewrating = async (req, res) => {
 };
 
 exports.findreview = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, college_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, school_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3401,6 +3410,10 @@ exports.findreview = async (req, res) => {
     data_array.push({ college_id });
   }
 
+  if (school_id) {
+    data_array.push({ school_id });
+  }
+
   const { limit, offset } = getPagination(page, size);
 
   try {
@@ -3415,6 +3428,7 @@ exports.findreview = async (req, res) => {
         "content",
         "is_approved",
         "college_id",
+        "school_id",
       ],
       order: [orderconfig],
       subQuery: false
