@@ -1292,7 +1292,7 @@ exports.allschools = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "established", "icon"],
+      attributes: ["id", "name", "city_id", "established", "icon", "school_type"],
       include: includearray,
       order: [orderconfig],
       limit,
@@ -1321,7 +1321,7 @@ exports.schoolfindone = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
-      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug'],
+      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established'],
       include: [
         {
           required: false,
@@ -1350,7 +1350,7 @@ exports.schoolfindone = (req, res) => {
           include: [
             {
               association: "schamenities",
-              attributes: ["id", "amenities_name"],
+              attributes: ["id", "amenities_name", "amenities_logo"],
             },
           ],
         },
@@ -1815,7 +1815,7 @@ exports.blogfindone = (req, res) => {
   const id = req.params.id;
   blog
     .findByPk(id, {
-      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at'],
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at' ,'overview'],
 
     })
     .then((data) => {
@@ -1890,6 +1890,8 @@ exports.schoolboards = async (req, res) => {
         "sample_paper",
         "created_at",
         "result_date",
+        "address",
+        "map",
       ],
       include: [
 
@@ -1912,6 +1914,17 @@ exports.schoolboards = async (req, res) => {
           required: false,
           association: "citys",
           attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "boardrecognitions",
+          attributes: ["id", "recognition_id"],
+          include: [
+            {
+              association: "brdrecognitions",
+              attributes: ["id", "recognition_approval_name"],
+            },
+          ],
         },
 
 
@@ -1957,6 +1970,8 @@ exports.schoolboardfindone = (req, res) => {
       "results",
       "sample_paper",
       "result_date",
+      "address",
+      "map",
     ],
     include: [
 
@@ -2044,6 +2059,28 @@ exports.scholarships = async (req, res) => {
         "logo",
         "meta_title",
         "meta_description",
+        "type_id",
+        "level_id",
+        "amount",
+        "total_scholarships",
+      ],
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholarlevels",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholartypes",
+          attributes: ["id", "name"],
+        },
+
       ],
       order: [orderconfig]
     })
@@ -2082,6 +2119,9 @@ exports.scholarshipfindone = (req, res) => {
         "logo",
         "meta_title",
         "meta_description",
+        "overview",
+        "last_date",
+        "amount",
       ],
       include: [
         {
