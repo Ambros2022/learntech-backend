@@ -350,6 +350,11 @@ exports.findOnestream = (req, res) => {
     include: [
       {
         required: false,
+        association: "general_courses",
+        attributes: ["id","name","slug","short_name","duration","course_type"],
+      },
+      {
+        required: false,
         association: "streamfaqs",
         attributes: ["id", "questions", "answers"],
       },
@@ -1815,7 +1820,7 @@ exports.blogfindone = (req, res) => {
   const id = req.params.id;
   blog
     .findByPk(id, {
-      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at' ,'overview'],
+      attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at', 'overview'],
 
     })
     .then((data) => {
