@@ -152,26 +152,30 @@ module.exports = function (app) {
 
   app.get("/api/website/ourteams/get", webapicontroller.ourteams);
 
-  app.post("/api/website/addreview/post", webapicontroller.addreview);
-
   app.get("/api/website/college/review/get", webapicontroller.collegereview);
 
-  app.post("/api/website/addreviewreply/post", webapicontroller.addreviewreply);
-
   app.get("/api/website/sitemap/get", webapicontroller.sitemap);
+
+  
+
+
+
+
+  // review api //
+
+  app.post("/api/website/addreview/post", webapicontroller.addreview);
+
+  app.post("/api/website/addreviewreply/post", webapicontroller.addreviewreply);
 
   app.get("/api/website/allreview/get", webapicontroller.allreview);
 
   app.get("/api/website/reviewrating/get", webapicontroller.reviewrating);
 
-  app.get("/api/website/scholarlevel/get", webapicontroller.scholarlevel);
+  app.get("/api/website/findonereview/get", webapicontroller.findreview);
 
-  app.get("/api/website/scholartypes/get", webapicontroller.scholartypes);
+  app.post("/api/website/review/statusupdate", webapicontroller.statusupdate);
 
-
-
-
-
+  app.post("/api/website/review/likesupdate", webapicontroller.likesupdate);
 
 
 

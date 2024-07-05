@@ -1423,11 +1423,16 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     reviewscontroller.update
   );
-  app.post(
-    "/api/admin/review/statusupdate",
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    reviewscontroller.statusupdate
-  );
+  // app.post(
+  //   "/api/admin/review/statusupdate",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   reviewscontroller.statusupdate
+  // );
+  // app.post(
+  //   "/api/admin/review/likesupdate",
+  //   [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  //   reviewscontroller.likesupdate
+  // );
 
   /** review route end   */
 

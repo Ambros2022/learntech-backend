@@ -24,7 +24,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         meta_keyword: {
             type: Sequelize.TEXT
-        }
+        },
+        status: {
+            type: Sequelize.ENUM("Draft", "Published"),
+        },
     }
         ,
         {
