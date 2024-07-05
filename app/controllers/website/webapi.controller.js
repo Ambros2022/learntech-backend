@@ -3272,7 +3272,8 @@ exports.allreview = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{ is_approved: 1 }];
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   if (condition) {
@@ -3290,10 +3291,60 @@ exports.allreview = async (req, res) => {
         "id",
         "name",
         "userrating",
+        "user_id",
         "content",
         "is_approved",
+        "passing_year",
+        "review_type",
         "college_id",
+        "course_id",
+        "course_type",
         "school_id",
+        "school_board_id",
+        "grade",
+        "likes",
+        "dislikes",
+        "is_reported",
+        "created_at",
+        "updated_at",
+      ],
+      include: [
+        {
+          required: false,
+          association: "clgreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "reviewuser",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclbrdreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "coursereview",
+          attributes: ["id", "slug"],
+        },
+        {
+          required: false,
+          association: "reviewreply",
+          attributes: ["id", "user_id"],
+          include: [
+            {
+              association: "reviewrply",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
       ],
 
       order: [orderconfig],
@@ -3329,10 +3380,7 @@ exports.reviewrating = async (req, res) => {
       attributes: [
         college_id ? "college_id" : "school_id",
         [Sequelize.fn("AVG", Sequelize.col("userrating")), "avgRating"],
-        [Sequelize.fn("SUM", Sequelize.col("likes")), "totalLikes"],
-        [Sequelize.fn("SUM", Sequelize.col("dislikes")), "totalDislikes"],
         [Sequelize.fn("COUNT", Sequelize.col("id")), "totalReviews"],
-        [Sequelize.fn("SUM", Sequelize.col("userrating")), "overallRatingSum"], // Sum of all ratings
       ],
       group: [college_id ? "college_id" : "school_id"],
       raw: true,
@@ -3352,12 +3400,8 @@ exports.reviewrating = async (req, res) => {
     const totalLikesDislikes = collegeAggregates.map(item => ({
       college_id: item.college_id,
       school_id: item.school_id,
-      totalLikes: parseInt(item.totalLikes),
-      totalDislikes: parseInt(item.totalDislikes),
       avgRating: parseFloat(item.avgRating).toFixed(2),
       totalReviews: parseInt(item.totalReviews),
-      overallRatingCount: parseInt(item.totalReviews), // Overall rating count is same as total reviews
-      overallRating: parseFloat(item.overallRatingSum).toFixed(2), // Overall rating sum
     }));
 
     const ratingsGroupedByCollege = ratingCounts.reduce((acc, item) => {
@@ -3429,6 +3473,46 @@ exports.findreview = async (req, res) => {
         "is_approved",
         "college_id",
         "school_id",
+        "likes",
+        "dislikes",
+      ],
+      include: [
+        {
+          required: false,
+          association: "clgreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "reviewuser",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sclbrdreview",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "coursereview",
+          attributes: ["id", "slug"],
+        },
+        {
+          required: false,
+          association: "reviewreply",
+          attributes: ["id", "user_id"],
+          include: [
+            {
+              association: "reviewrply",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
       ],
       order: [orderconfig],
       subQuery: false
@@ -3452,3 +3536,164 @@ exports.findreview = async (req, res) => {
   }
 };
 
+exports.addreview = async (req, res) => {
+  try {
+
+    const reviewsDetails = await reviews.create({
+      name: req.body.name,
+      userrating: req.body.userrating,
+      user_id: req.body.user_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      review_type: req.body.review_type,
+      college_id: req.body.college_id,
+      course_id: req.body.course_id,
+      course_type: req.body.course_type,
+      school_id: req.body.school_id,
+      school_board_id: req.body.school_board_id,
+      grade: req.body.grade,
+      likes: req.body.likes,
+      dislikes: req.body.dislikes,
+    });
+
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: reviewsDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
+  }
+};
+
+exports.statusupdate = async (req, res) => {
+  const { id, is_approved } = req.body;
+
+  if (id === undefined) {
+    return res.status(400).send({
+      status: 0,
+      message: 'ID is a required field'
+    });
+  }
+
+  try {
+    const review = await reviews.findOne({ where: { id: id } });
+
+    if (!review) {
+      return res.status(404).send({
+        status: 0,
+        message: 'Review not found'
+      });
+    }
+
+    const previousIsApproved = review.is_approved;
+    let updatedIsApproved;
+
+    if (is_approved === undefined) {
+      updatedIsApproved = !previousIsApproved;
+    } else {
+      updatedIsApproved = is_approved;
+    }
+
+    await reviews.update(
+      { is_approved: updatedIsApproved },
+      { where: { id: id } }
+    );
+    // console.log(reviews, "reviews");
+    if (previousIsApproved !== updatedIsApproved) {
+      const collegeId = review.college_id;
+      const schoolId = review.school_id;
+
+      const collegeReviews = await reviews.findAll({
+        where: { college_id: collegeId, is_approved: true }
+      });
+
+      const totalCollegeRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
+      const avgCollegeRating = collegeReviews.length ? Math.round(totalCollegeRating / collegeReviews.length) : 0;
+      await college.update(
+        { avg_rating: avgCollegeRating },
+        { where: { id: collegeId } }
+      );
+
+      if (schoolId) {
+        const schoolReviews = await reviews.findAll({
+          where: { school_id: schoolId, is_approved: true }
+        });
+
+        const totalSchoolRating = schoolReviews.reduce((acc, curr) => acc + curr.userrating, 0);
+        const avgSchoolRating = schoolReviews.length ? Math.round(totalSchoolRating / schoolReviews.length) : 0;
+
+        await school.update(
+          { avg_rating: avgSchoolRating },
+          { where: { id: schoolId } }
+        );
+      }
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: 'is_approved field updated successfully and average rating updated'
+    });
+
+  } catch (error) {
+    res.status(500).send({
+      status: 0,
+      message: 'Unable to update data',
+      errors: error.message
+    });
+  }
+};
+
+exports.likesupdate = async (req, res) => {
+  const { id, likes, dislikes } = req.body;
+
+  if (id === undefined) {
+    return res.status(400).send({
+      status: 0,
+      message: 'ID is a required field'
+    });
+  }
+
+  try {
+    const review = await reviews.findOne({ where: { id: id } });
+
+    if (!review) {
+      return res.status(404).send({
+        status: 0,
+        message: 'Review not found'
+      });
+    }
+
+    const updatedReviewData = {};
+
+    if (likes !== undefined) {
+      updatedReviewData.likes = review.likes + 1;
+    }
+
+    if (dislikes !== undefined) {
+      updatedReviewData.dislikes = review.dislikes + 1;
+    }
+
+    await reviews.update(
+      updatedReviewData,
+      { where: { id: id } }
+    );
+
+    res.status(200).send({
+      status: 1,
+      message: 'Review updated successfully'
+    });
+
+  } catch (error) {
+    res.status(500).send({
+      status: 0,
+      message: 'Unable to update data',
+      errors: error.message
+    });
+  }
+};

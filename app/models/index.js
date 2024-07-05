@@ -685,6 +685,22 @@ db.reviews.belongsTo(db.courses, {
 });
 
 
+db.reviews.hasMany(db.review_replies, { as: "reviewreply" });
+db.review_replies.belongsTo(db.reviews, {
+  foreignKey: "review_id",
+  as: "reviewreply",
+});
+
+db.review_replies.belongsTo(db.reviews, {
+  foreignKey: "user_id",
+  as: "reviewrply",
+});
+
+
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@ const reviews = db.reviews;
 const college = db.college;
 const school = db.school;
 const Op = db.Sequelize.Op;
+const reviewreplies = db.review_replies;
 
 const sendsearch = require("../utility/Customsearch");
 
@@ -45,6 +46,35 @@ exports.create = async (req, res) => {
       likes: req.body.likes,
       dislikes: req.body.dislikes,
     });
+
+    // if (req.body.reviewreply && reviewsDetails.id) {
+    //   const stream = JSON.parse(req.body.reviewreply);
+    //   _.forEach(stream, async function (value) {
+
+    //     await reviewreplies.create({
+    //       content: value.content,
+    //       user_id: value.id,
+    //       review_id : reviewsDetails.id,
+    //     });
+    //   });
+    // }
+
+    if (req.body.reviewreply && reviewsDetails.id) {
+      const reply = Array.isArray(req.body.reviewreply) ? req.body.reviewreply : JSON.parse(req.body.reviewreply);
+
+      for (const value of reply) {
+        try {
+          await reviewreplies.create({
+            content: value.content,
+            user_id: value.id,
+            review_id: reviewsDetails.id,
+          });
+        } catch (error) {
+          console.error('Error creating review reply:', error);
+        }
+      }
+    }
+
 
     res.status(200).send({
       status: 1,
@@ -111,6 +141,17 @@ exports.findAll = async (req, res) => {
           required: false,
           association: "coursereview",
           attributes: ["id", "slug"],
+        },
+        {
+          required: false,
+          association: "reviewreply",
+          attributes: ["id", "user_id"],
+          include: [
+            {
+              association: "reviewrply",
+              attributes: ["id", "name"],
+            },
+          ],
         },
       ],
       order: [orderconfig]
@@ -229,6 +270,8 @@ exports.update = (req, res) => {
     });
 
 
+
+
     res.status(200).send({
       status: 1,
       message: 'Data Save Successfully'
@@ -242,82 +285,4 @@ exports.update = (req, res) => {
     });
   }
 
-};
-
-exports.statusupdate = async (req, res) => {
-  const { id, is_approved } = req.body;
-
-  if (id === undefined) {
-    return res.status(400).send({
-      status: 0,
-      message: 'ID is a required field'
-    });
-  }
-
-  try {
-    const review = await reviews.findOne({ where: { id: id } });
-
-    if (!review) {
-      return res.status(404).send({
-        status: 0,
-        message: 'Review not found'
-      });
-    }
-
-    const previousIsApproved = review.is_approved;
-    let updatedIsApproved;
-
-    if (is_approved === undefined) {
-      updatedIsApproved = !previousIsApproved;
-    } else {
-      updatedIsApproved = is_approved;
-    }
-
-    await reviews.update(
-      { is_approved: updatedIsApproved },
-      { where: { id: id } }
-    );
-    // console.log(reviews, "reviews");
-    if (previousIsApproved !== updatedIsApproved) {
-      const collegeId = review.college_id;
-      const schoolId = review.school_id;
-
-      const collegeReviews = await reviews.findAll({
-        where: { college_id: collegeId, is_approved: true }
-      });
-
-      const totalCollegeRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
-      const avgCollegeRating = collegeReviews.length ? Math.round(totalCollegeRating / collegeReviews.length) : 0;
-      await college.update(
-        { avg_rating: avgCollegeRating },
-        { where: { id: collegeId } }
-      );
-
-      if (schoolId) {
-        const schoolReviews = await reviews.findAll({
-          where: { school_id: schoolId, is_approved: true }
-        });
-
-        const totalSchoolRating = schoolReviews.reduce((acc, curr) => acc + curr.userrating, 0);
-        const avgSchoolRating = schoolReviews.length ? Math.round(totalSchoolRating / schoolReviews.length) : 0;
-
-        await school.update(
-          { avg_rating: avgSchoolRating },
-          { where: { id: schoolId } }
-        );
-      }
-    }
-
-    res.status(200).send({
-      status: 1,
-      message: 'is_approved field updated successfully and average rating updated'
-    });
-
-  } catch (error) {
-    res.status(500).send({
-      status: 0,
-      message: 'Unable to update data',
-      errors: error.message
-    });
-  }
 };
