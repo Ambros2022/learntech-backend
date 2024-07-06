@@ -156,6 +156,10 @@ module.exports = function (app) {
 
   app.get("/api/website/sitemap/get", webapicontroller.sitemap);
 
+  app.get("/api/website/allscholarlevel/get", webapicontroller.scholarlevel);
+
+  app.get("/api/website/allscholartype/get", webapicontroller.scholartype);
+
   
 
 
