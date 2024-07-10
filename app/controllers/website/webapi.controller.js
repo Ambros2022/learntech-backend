@@ -350,7 +350,7 @@ exports.findOnestream = (req, res) => {
       {
         required: false,
         association: "general_courses",
-        attributes: ["id","name","slug","short_name","duration","course_type"],
+        attributes: ["id", "name", "slug", "short_name", "duration", "course_type"],
       },
       {
         required: false,
