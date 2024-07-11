@@ -350,7 +350,7 @@ exports.findOnestream = (req, res) => {
       {
         required: false,
         association: "general_courses",
-        attributes: ["id","name","slug","short_name","duration","course_type"],
+        attributes: ["id", "name", "slug", "short_name", "duration", "course_type"],
       },
       {
         required: false,
@@ -2044,7 +2044,7 @@ exports.scholarships = async (req, res) => {
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
-
+ 
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2067,6 +2067,7 @@ exports.scholarships = async (req, res) => {
         "level_id",
         "amount",
         "total_scholarships",
+        "last_date",
       ],
       include: [
         {
