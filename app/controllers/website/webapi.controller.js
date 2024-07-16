@@ -35,6 +35,7 @@ const landing_pages = db.landing_pages;
 const reviews = db.reviews;
 const scholar_levels = db.scholar_levels;
 const scholar_types = db.scholar_types;
+const review_replies = db.review_replies;
 
 
 const getPagination = (page, size) => {
@@ -2044,7 +2045,7 @@ exports.scholarships = async (req, res) => {
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
- 
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2794,8 +2795,8 @@ exports.addreview = async (req, res) => {
       user_id: req.body.user_id,
       content: req.body.content,
       is_approved: req.body.is_approved,
-      review_type: req.body.review_type,
       passing_year: req.body.passing_year,
+      review_type: req.body.review_type,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
       course_type: req.body.course_type,
@@ -2804,6 +2805,7 @@ exports.addreview = async (req, res) => {
       grade: req.body.grade,
       likes: req.body.likes,
       dislikes: req.body.dislikes,
+      is_reported: req.body.is_reported,
     });
 
     res.status(200).send({
@@ -2888,7 +2890,7 @@ exports.collegereview = async (req, res) => {
 exports.addreviewreply = async (req, res) => {
   try {
 
-    const reviewsDetails = await reviews.create({
+    const reviewrepliesDetails = await review_replies.create({
       content: req.body.content,
       user_id: req.body.user_id,
       review_id: req.body.review_id,
@@ -2897,7 +2899,7 @@ exports.addreviewreply = async (req, res) => {
     res.status(200).send({
       status: 1,
       message: 'Data Save Successfully',
-      data: reviewsDetails
+      data: reviewrepliesDetails
     });
   }
   catch (error) {
@@ -3382,7 +3384,7 @@ exports.allreview = async (req, res) => {
         {
           required: false,
           association: "reviewreply",
-          attributes: ["id", "user_id"],
+          attributes: ["id", "user_id", "content"],
           include: [
             {
               association: "reviewrply",
@@ -3513,13 +3515,16 @@ exports.findreview = async (req, res) => {
       attributes: [
         "id",
         "name",
+        "user_id",
         "userrating",
         "content",
         "is_approved",
+        "passing_year",
         "college_id",
         "school_id",
         "likes",
         "dislikes",
+        "created_at",
       ],
       include: [
         {
@@ -3581,40 +3586,40 @@ exports.findreview = async (req, res) => {
   }
 };
 
-exports.addreview = async (req, res) => {
-  try {
+// exports.addreview = async (req, res) => {
+//   try {
 
-    const reviewsDetails = await reviews.create({
-      name: req.body.name,
-      userrating: req.body.userrating,
-      user_id: req.body.user_id,
-      content: req.body.content,
-      is_approved: req.body.is_approved,
-      review_type: req.body.review_type,
-      college_id: req.body.college_id,
-      course_id: req.body.course_id,
-      course_type: req.body.course_type,
-      school_id: req.body.school_id,
-      school_board_id: req.body.school_board_id,
-      grade: req.body.grade,
-      likes: req.body.likes,
-      dislikes: req.body.dislikes,
-    });
+//     const reviewsDetails = await reviews.create({
+//       name: req.body.name,
+//       userrating: req.body.userrating,
+//       user_id: req.body.user_id,
+//       content: req.body.content,
+//       is_approved: req.body.is_approved,
+//       review_type: req.body.review_type,
+//       college_id: req.body.college_id,
+//       course_id: req.body.course_id,
+//       course_type: req.body.course_type,
+//       school_id: req.body.school_id,
+//       school_board_id: req.body.school_board_id,
+//       grade: req.body.grade,
+//       likes: req.body.likes,
+//       dislikes: req.body.dislikes,
+//     });
 
-    res.status(200).send({
-      status: 1,
-      message: 'Data Save Successfully',
-      data: reviewsDetails
-    });
-  }
-  catch (error) {
-    return res.status(400).send({
-      message: 'Unable to insert data',
-      errors: error,
-      status: 0
-    });
-  }
-};
+//     res.status(200).send({
+//       status: 1,
+//       message: 'Data Save Successfully',
+//       data: reviewsDetails
+//     });
+//   }
+//   catch (error) {
+//     return res.status(400).send({
+//       message: 'Unable to insert data',
+//       errors: error,
+//       status: 0
+//     });
+//   }
+// };
 
 exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
