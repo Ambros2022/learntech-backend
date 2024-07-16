@@ -15,6 +15,9 @@ module.exports = (sequelize, Sequelize) => {
       is_approved: {
         type: Sequelize.INTEGER
       },
+      passing_year: {
+        type: Sequelize.INTEGER
+      },
       review_type: {
         type: Sequelize.ENUM('school', 'college'),
       },
