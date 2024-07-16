@@ -433,7 +433,7 @@ exports.genralOnestream = (req, res) => {
 };
 
 exports.allcourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id ,course_type} = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -446,7 +446,12 @@ exports.allcourses = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-
+  if (college_id) {
+    data_array.push({ college_id: college_id });
+  }
+  if (course_type) {
+    data_array.push({ course_type: course_type });
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -458,8 +463,20 @@ exports.allcourses = async (req, res) => {
       attributes: [
         "id",
         "slug",
+        // "college_id",
+        // "course_type"
       ],
-      order: [orderconfig]
+      order: [orderconfig],
+      include: [
+        
+        {
+          required: false,
+          association: "generalcourse",
+          attributes: ["id", "name"],
+        },
+
+
+      ],
     })
     .then((data) => {
       const response = getPagingData(data, page, limit);
@@ -2044,7 +2061,7 @@ exports.scholarships = async (req, res) => {
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
- 
+
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
