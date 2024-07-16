@@ -327,7 +327,7 @@ exports.create = async (req, res) => {
       logo: logos,
       banner_image: bannerimages,
       video_url: req.body.video_url,
-      // avg_rating: req.body.avg_rating,
+      avg_rating: req.body.avg_rating,
       info: req.body.info,
       course_fees: req.body.course_fees,
       admissions: req.body.admissions,

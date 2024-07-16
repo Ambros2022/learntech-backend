@@ -678,11 +678,18 @@ db.reviews.belongsTo(db.schoolboards, {
   as: "sclbrdreview",
 });
 
-db.courses.hasMany(db.reviews, { as: "coursereview" });
+// db.courses.hasMany(db.reviews, { as: "coursereview" });
 db.reviews.belongsTo(db.courses, {
   foreignKey: "course_id",
   as: "coursereview",
 });
+
+// db.courses.hasMany(db.reviews, { as: "coursereview" });
+// db.reviews.belongsTo(db.courses, {
+//   foreignKey: "course_id",
+//   as: "coursereview",
+// });
+
 
 
 db.reviews.hasMany(db.review_replies, { as: "reviewreply" });
@@ -692,7 +699,7 @@ db.review_replies.belongsTo(db.reviews, {
 });
 
 db.review_replies.belongsTo(db.reviews, {
-  foreignKey: "user_id",
+  foreignKey: "review_id",
   as: "reviewrply",
 });
 

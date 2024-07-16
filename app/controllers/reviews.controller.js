@@ -36,6 +36,7 @@ exports.create = async (req, res) => {
       user_id: req.body.user_id,
       content: req.body.content,
       is_approved: req.body.is_approved,
+      passing_year: req.body.passing_year,
       review_type: req.body.review_type,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
@@ -45,6 +46,7 @@ exports.create = async (req, res) => {
       grade: req.body.grade,
       likes: req.body.likes,
       dislikes: req.body.dislikes,
+      is_reported: req.body.is_reported,
     });
 
     // if (req.body.reviewreply && reviewsDetails.id) {
@@ -256,6 +258,7 @@ exports.update = (req, res) => {
       user_id: req.body.user_id,
       content: req.body.content,
       is_approved: req.body.is_approved,
+      passing_year: req.body.passing_year,
       review_type: req.body.review_type,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
@@ -265,6 +268,7 @@ exports.update = (req, res) => {
       grade: req.body.grade,
       likes: req.body.likes,
       dislikes: req.body.dislikes,
+      is_reported: req.body.is_reported,
     }, {
       where: { id: req.body.id }
     });
