@@ -41,7 +41,7 @@ exports.signup = (req, res) => {
       password: bcrypt.hashSync(req.body.password, 8),
     }).then((data) => {
 
-      // sendemails.Regesteredmail(req.body.email);
+      sendemails.Regesteredmail(req.body.email);
       var request = { email: req.body.email };
       User.findOne({
         where: request,

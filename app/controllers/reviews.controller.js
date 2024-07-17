@@ -36,6 +36,7 @@ exports.create = async (req, res) => {
       user_id: req.body.user_id,
       content: req.body.content,
       is_approved: req.body.is_approved,
+      passing_year: req.body.passing_year,
       review_type: req.body.review_type,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
@@ -45,6 +46,7 @@ exports.create = async (req, res) => {
       grade: req.body.grade,
       likes: req.body.likes,
       dislikes: req.body.dislikes,
+      is_reported: req.body.is_reported,
     });
 
     // if (req.body.reviewreply && reviewsDetails.id) {
@@ -92,7 +94,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, course_id } = req.query;
 
   var column = columnname ? columnname : 'id';
   var order = orderby ? orderby : 'ASC';
@@ -107,6 +109,16 @@ exports.findAll = async (req, res) => {
   }
   let data_array = [];
 
+  if (college_id) {
+    data_array.push({ college_id: college_id });
+  }
+  if (course_id) {
+    data_array.push({ course_id: course_id });
+  }
+  if (course_type) {
+    data_array.push({ course_type: course_type });
+  }
+
 
   let condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -115,7 +127,7 @@ exports.findAll = async (req, res) => {
 
   reviews
     .findAndCountAll({
-      where: condition, limit, offset,
+      where: data_array, condition, limit, offset,
       include: [
         {
           required: false,
@@ -256,6 +268,7 @@ exports.update = (req, res) => {
       user_id: req.body.user_id,
       content: req.body.content,
       is_approved: req.body.is_approved,
+      passing_year: req.body.passing_year,
       review_type: req.body.review_type,
       college_id: req.body.college_id,
       course_id: req.body.course_id,
@@ -265,6 +278,7 @@ exports.update = (req, res) => {
       grade: req.body.grade,
       likes: req.body.likes,
       dislikes: req.body.dislikes,
+      is_reported: req.body.is_reported,
     }, {
       where: { id: req.body.id }
     });
