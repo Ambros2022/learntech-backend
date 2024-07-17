@@ -3572,7 +3572,7 @@ exports.findreview = async (req, res) => {
         {
           required: false,
           association: "reviewreply",
-          attributes: ["id", "user_id"],
+          attributes: ["id", "user_id", "content"],
           include: [
             {
               association: "reviewrply",
