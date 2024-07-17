@@ -94,7 +94,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, course_id } = req.query;
 
   var column = columnname ? columnname : 'id';
   var order = orderby ? orderby : 'ASC';
@@ -109,6 +109,16 @@ exports.findAll = async (req, res) => {
   }
   let data_array = [];
 
+  if (college_id) {
+    data_array.push({ college_id: college_id });
+  }
+  if (course_id) {
+    data_array.push({ course_id: course_id });
+  }
+  if (course_type) {
+    data_array.push({ course_type: course_type });
+  }
+
 
   let condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -117,7 +127,7 @@ exports.findAll = async (req, res) => {
 
   reviews
     .findAndCountAll({
-      where: condition, limit, offset,
+      where: data_array, condition, limit, offset,
       include: [
         {
           required: false,
