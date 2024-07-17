@@ -3464,7 +3464,7 @@ exports.reviewrating = async (req, res) => {
     const totalLikesDislikes = collegeAggregates.map(item => ({
       college_id: item.college_id,
       school_id: item.school_id,
-      avgRating: parseFloat(item.avgRating).toFixed(2),
+      avgRating: Math.round(parseFloat(item.avgRating)),
       totalReviews: parseInt(item.totalReviews),
     }));
 
@@ -3602,41 +3602,6 @@ exports.findreview = async (req, res) => {
     });
   }
 };
-
-// exports.addreview = async (req, res) => {
-//   try {
-
-//     const reviewsDetails = await reviews.create({
-//       name: req.body.name,
-//       userrating: req.body.userrating,
-//       user_id: req.body.user_id,
-//       content: req.body.content,
-//       is_approved: req.body.is_approved,
-//       review_type: req.body.review_type,
-//       college_id: req.body.college_id,
-//       course_id: req.body.course_id,
-//       course_type: req.body.course_type,
-//       school_id: req.body.school_id,
-//       school_board_id: req.body.school_board_id,
-//       grade: req.body.grade,
-//       likes: req.body.likes,
-//       dislikes: req.body.dislikes,
-//     });
-
-//     res.status(200).send({
-//       status: 1,
-//       message: 'Data Save Successfully',
-//       data: reviewsDetails
-//     });
-//   }
-//   catch (error) {
-//     return res.status(400).send({
-//       message: 'Unable to insert data',
-//       errors: error,
-//       status: 0
-//     });
-//   }
-// };
 
 exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
@@ -3870,4 +3835,60 @@ exports.scholartype = async (req, res) => {
     });
   }
 };
+
+exports.findenquiry = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, created_at } = req.query;
+
+  let column = columnname ? columnname : 'id';
+  let order = orderby ? orderby : 'ASC';
+  let orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    let table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  let data_array = [];
+
+  const date24HoursAgo = new Date();
+  date24HoursAgo.setHours(date24HoursAgo.getHours() - 24);
+
+  data_array.push({ created_at: { [Op.gte]: date24HoursAgo } });
+
+  if (created_at) {
+    data_array.push({ created_at: created_at });
+  }
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+  const { limit, offset } = getPagination(page, size);
+  try {
+    const data = await enquiry.findAndCountAll({
+      where: { [Op.and]: data_array, ...condition },
+      limit,
+      offset,
+      order: [orderconfig]
+    });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+      totalDataCount: data.count
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving enquiry."
+    });
+  }
+};
+
 
