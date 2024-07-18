@@ -1,7 +1,9 @@
 require("dotenv").config();
 const { where } = require("sequelize");
 const db = require("../../models");
+const path = require('path');
 const sendsearch = require("../../utility/Customsearch");
+const fileTypes = require("../../config/fileTypes");
 const state = db.state;
 const news_categories = db.news_categories;
 const news_and_events = db.news_and_events;
@@ -37,6 +39,10 @@ const scholar_levels = db.scholar_levels;
 const scholar_types = db.scholar_types;
 const review_replies = db.review_replies;
 
+// Array of allowed files
+const array_of_allowed_file_types = fileTypes.Imageformat;
+// Allowed file size in mb
+const allowed_file_size = 2;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -2505,36 +2511,62 @@ exports.alljoblocations = async (req, res) => {
 };
 
 exports.addjobenquires = async (req, res) => {
-
   try {
-    const jobsenquiresDetails = await jobsenquires.create({
-      jobs_position_id: req.body.jobs_position_id,
-      job_location_id: req.body.job_location_id,
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      d_o_b: req.body.d_o_b,
-      current_location: req.body.current_location,
-      total_exp: req.body.total_exp,
-      resume: req.body.resume,
-      status: req.body.status,
+      let resumes = "";
 
-    });
+      if (req.files && req.files.resume) {
+          let avatar = req.files.resume;
 
-    res.status(200).send({
-      status: 1,
-      message: 'Data Save Successfully',
-      data: jobsenquiresDetails
-    });
+          if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+              return res.status(400).send({
+                  message: "Invalid File type ",
+                  errors: {},
+                  status: 0,
+              });
+          }
+
+          if (avatar.size / (1024 * 1024) > allowed_file_size) {
+              return res.status(400).send({
+                  message: "File too large ",
+                  errors: {},
+                  status: 0,
+              });
+          }
+
+          let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+          let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+          if (IsUpload) {
+              resumes = "jobenquiry_image/" + logoname;
+          }
+      }
+
+      const jobsenquiresDetails = await jobsenquires.create({
+          jobs_position_id: req.body.jobs_position_id,
+          job_location_id: req.body.job_location_id,
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          d_o_b: req.body.d_o_b,
+          current_location: req.body.current_location,
+          total_exp: req.body.total_exp,
+          resume: resumes,
+          status: req.body.status,
+      });
+      res.status(200).send({
+          status: 1,
+          message: "Data Save Successfully",
+          data: jobsenquiresDetails,
+      });
+  } catch (error) {
+      return res.status(400).send({
+          message: "Unable to insert data",
+          errors: error,
+          status: 0,
+      });
   }
-  catch (error) {
-    return res.status(400).send({
-      message: 'Unable to insert data',
-      errors: error,
-      status: 0
-    });
-  }
-}
+};
 
 exports.ourteams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
