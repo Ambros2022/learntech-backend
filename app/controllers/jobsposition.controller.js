@@ -86,6 +86,20 @@ exports.findAll = async (req, res) => {
 
     jobspositions.findAndCountAll({
         where: data_array, limit, offset,
+        include: [
+            {
+                required: false,
+                association: "jobpositionlocation",
+                attributes: ["id", "job_location_id"],
+                include: [
+                    {
+                        required: false,
+                        association: "jobposition&location",
+                        attributes: ["id", "name"],
+                    },
+                ],
+            },
+        ],
 
 
         order: [orderconfig]
@@ -157,6 +171,20 @@ exports.update = (req, res) => {
                 {
                     where: { id: req.body.id }
                 });
+
+
+        if (req.body.joblocations && req.body.id) {
+            alljoblocation.destroy({
+                where: { jobs_position_id: req.body.id },
+            });
+            const stream = JSON.parse(req.body.joblocations);
+            _.forEach(stream, async function (value) {
+                await alljoblocation.create({
+                    job_location_id: value.id,
+                    jobs_position_id: req.body.id,
+                });
+            });
+        }
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully'
