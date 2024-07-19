@@ -3713,8 +3713,8 @@ exports.statusupdate = async (req, res) => {
   }
 };
 
-exports.likesupdate = async (req, res) => {
-  const { id, likes, dislikes } = req.body;
+exports.likesUpdate = async (req, res) => {
+  const { id, like, dislike } = req.body;
 
   if (id === undefined) {
     return res.status(400).send({
@@ -3733,14 +3733,21 @@ exports.likesupdate = async (req, res) => {
       });
     }
 
-    const updatedReviewData = {};
+    const updatedReviewData = {
+      likes: review.likes,
+      dislikes: review.dislikes
+    };
 
-    if (likes !== undefined) {
-      updatedReviewData.likes = review.likes + 1;
+    if (like !== undefined) {
+      updatedReviewData.likes += like ? 1 : -1;
+
+      if (updatedReviewData.likes < 0) updatedReviewData.likes = 0;
     }
 
-    if (dislikes !== undefined) {
-      updatedReviewData.dislikes = review.dislikes + 1;
+    if (dislike !== undefined) {
+      updatedReviewData.dislikes += dislike ? 1 : -1;
+      
+      if (updatedReviewData.dislikes < 0) updatedReviewData.dislikes = 0;
     }
 
     await reviews.update(
@@ -3750,7 +3757,8 @@ exports.likesupdate = async (req, res) => {
 
     res.status(200).send({
       status: 1,
-      message: 'Review updated successfully'
+      message: 'Review updated successfully',
+      updatedReview: updatedReviewData
     });
 
   } catch (error) {

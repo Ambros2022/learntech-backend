@@ -181,7 +181,7 @@ module.exports = function (app) {
 
   app.post("/api/website/review/statusupdate", webapicontroller.statusupdate);
 
-  app.post("/api/website/review/likesupdate", webapicontroller.likesupdate);
+  app.post("/api/website/review/likesupdate", webapicontroller.likesUpdate);
 
 
 
