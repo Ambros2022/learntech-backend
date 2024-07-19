@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require('path');
 const jobspositions = db.jobs_positions;
+const alljoblocation = db.job_locations;
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
 const Op = db.Sequelize.Op;
@@ -32,6 +33,19 @@ exports.create = async (req, res) => {
 
         });
 
+        if (req.body.joblocations && jobspositionsDetails.id) {
+            const joblocation = JSON.parse(req.body.joblocations);
+            _.forEach(joblocation, async function (value) {
+
+                await alljoblocation.create({
+                    job_location_id: value.id,
+                    jobs_position_id: jobspositionsDetails.id,
+                });
+            });
+        }
+
+
+
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
@@ -45,7 +59,8 @@ exports.create = async (req, res) => {
             status: 0
         });
     }
-}
+};
+
 
 exports.findAll = async (req, res) => {
     const { page, size, searchtext, searchfrom, columnname, orderby, state_id } = req.query;
@@ -160,6 +175,8 @@ exports.update = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
+    // console.log("Searching for job position with id:", id);
+
     jobspositions
         .findOne({
             where: {
@@ -171,20 +188,39 @@ exports.findOne = (req, res) => {
                     },
                 ],
             },
-
+            include: [
+                {
+                    required: false,
+                    association: "jobpositionlocation",
+                    attributes: ["id", "job_location_id"],
+                    include: [
+                        {
+                            association: "jobposition&location",
+                            attributes: ["id", "name"],
+                        },
+                    ],
+                },
+            ],
         })
         .then(async (data) => {
+            if (data) {
+                // console.log("Successfully retrieved job position:", data);
+            } else {
+                // console.log("No job position found with id:", id);
+            }
+
             res.status(200).send({
                 status: 1,
-                message: "successfully retrieved",
+                message: "Successfully retrieved",
                 data: data,
-
             });
         })
         .catch((err) => {
+            // console.error("Error retrieving job position with id:", id, err);
+
             res.status(500).send({
                 status: 0,
-                message: "Error retrieving jobs positions with id=" + id,
+                message: "Error retrieving job position with id=" + id,
             });
         });
 };

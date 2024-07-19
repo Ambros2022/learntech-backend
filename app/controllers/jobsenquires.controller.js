@@ -1,6 +1,8 @@
 const db = require("../models");
 const path = require('path');
 const jobsenquires = db.jobs_enquires;
+const joblocation = db.job_locations;
+
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
 const Op = db.Sequelize.Op;
@@ -70,6 +72,8 @@ exports.create = async (req, res) => {
             resume: resumes,
             status: req.body.status,
         });
+
+
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",

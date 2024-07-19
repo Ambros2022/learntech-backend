@@ -1,9 +1,9 @@
 module.exports = (sequelize, Sequelize) => {
     const joblocations = sequelize.define("job_locations", {
-        job_location_id : {
+        job_location_id: {
             type: Sequelize.STRING
         },
-        jobs_position_id  : {
+        jobs_position_id: {
             type: Sequelize.STRING
         }
     } ,
