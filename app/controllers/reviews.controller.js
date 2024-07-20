@@ -115,9 +115,6 @@ exports.findAll = async (req, res) => {
   if (course_id) {
     data_array.push({ course_id: course_id });
   }
-  if (course_type) {
-    data_array.push({ course_type: course_type });
-  }
 
 
   let condition = sendsearch.customseacrh(searchtext, searchfrom);

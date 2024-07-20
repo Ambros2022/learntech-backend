@@ -548,13 +548,26 @@ db.scholarships.belongsTo(db.scholar_types, {
 
 /***  Relation ship  job location */
 
-db.job_locations.belongsTo(db.all_job_locations, {
-  foreignKey: "job_location_id",
-  as: "alljoblocations",
-});
+// db.job_locations.belongsTo(db.all_job_locations, {
+//   foreignKey: "job_location_id",
+//   as: "alljoblocations",
+// });
+// db.job_locations.belongsTo(db.jobs_positions, {
+//   foreignKey: "jobs_position_id",
+//   as: "jobspositions",
+// });
+
+
+db.jobs_positions.hasMany(db.job_locations, { as: "jobpositionlocation" });
 db.job_locations.belongsTo(db.jobs_positions, {
   foreignKey: "jobs_position_id",
-  as: "jobspositions",
+  as: "jobpositionlocation",
+});
+
+
+db.job_locations.belongsTo(db.all_job_locations, {
+  foreignKey: "job_location_id",
+  as: "jobposition&location",
 });
 
 

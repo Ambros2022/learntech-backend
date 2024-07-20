@@ -1,7 +1,9 @@
 require("dotenv").config();
 const { where } = require("sequelize");
 const db = require("../../models");
+const path = require('path');
 const sendsearch = require("../../utility/Customsearch");
+const fileTypes = require("../../config/fileTypes");
 const state = db.state;
 const news_categories = db.news_categories;
 const news_and_events = db.news_and_events;
@@ -36,7 +38,14 @@ const reviews = db.reviews;
 const scholar_levels = db.scholar_levels;
 const scholar_types = db.scholar_types;
 const review_replies = db.review_replies;
+// const jobs_positions = db.jobs_positions;
+const alljoblocation = db.job_locations;
+const _ = require('lodash');
 
+// Array of allowed files
+const array_of_allowed_file_types = fileTypes.Imageformat;
+// Allowed file size in mb
+const allowed_file_size = 2;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -2428,6 +2437,21 @@ exports.jobpositions = async (req, res) => {
         "exp_required",
         "total_positions",
       ],
+      include: [
+        {
+            required: false,
+            association: "jobpositionlocation",
+            attributes: ["id", "job_location_id"],
+            include: [
+                {
+                    required: false,
+                    association: "jobposition&location",
+                    attributes: ["id", "name"],
+                },
+            ],
+        },
+    ],
+
       order: [orderconfig]
     })
     .then((data) => {
@@ -2505,36 +2529,62 @@ exports.alljoblocations = async (req, res) => {
 };
 
 exports.addjobenquires = async (req, res) => {
-
   try {
-    const jobsenquiresDetails = await jobsenquires.create({
-      jobs_position_id: req.body.jobs_position_id,
-      job_location_id: req.body.job_location_id,
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      d_o_b: req.body.d_o_b,
-      current_location: req.body.current_location,
-      total_exp: req.body.total_exp,
-      resume: req.body.resume,
-      status: req.body.status,
+      let resumes = "";
 
-    });
+      if (req.files && req.files.resume) {
+          let avatar = req.files.resume;
 
-    res.status(200).send({
-      status: 1,
-      message: 'Data Save Successfully',
-      data: jobsenquiresDetails
-    });
+          if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+              return res.status(400).send({
+                  message: "Invalid File type ",
+                  errors: {},
+                  status: 0,
+              });
+          }
+
+          if (avatar.size / (1024 * 1024) > allowed_file_size) {
+              return res.status(400).send({
+                  message: "File too large ",
+                  errors: {},
+                  status: 0,
+              });
+          }
+
+          let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+          let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+          if (IsUpload) {
+              resumes = "jobenquiry_image/" + logoname;
+          }
+      }
+
+      const jobsenquiresDetails = await jobsenquires.create({
+          jobs_position_id: req.body.jobs_position_id,
+          job_location_id: req.body.job_location_id,
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          d_o_b: req.body.d_o_b,
+          current_location: req.body.current_location,
+          total_exp: req.body.total_exp,
+          resume: resumes,
+          status: req.body.status,
+      });
+      res.status(200).send({
+          status: 1,
+          message: "Data Save Successfully",
+          data: jobsenquiresDetails,
+      });
+  } catch (error) {
+      return res.status(400).send({
+          message: "Unable to insert data",
+          errors: error,
+          status: 0,
+      });
   }
-  catch (error) {
-    return res.status(400).send({
-      message: 'Unable to insert data',
-      errors: error,
-      status: 0
-    });
-  }
-}
+};
 
 exports.ourteams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
@@ -3681,8 +3731,8 @@ exports.statusupdate = async (req, res) => {
   }
 };
 
-exports.likesupdate = async (req, res) => {
-  const { id, likes, dislikes } = req.body;
+exports.likesUpdate = async (req, res) => {
+  const { id, like, dislike } = req.body;
 
   if (id === undefined) {
     return res.status(400).send({
@@ -3701,14 +3751,21 @@ exports.likesupdate = async (req, res) => {
       });
     }
 
-    const updatedReviewData = {};
+    const updatedReviewData = {
+      likes: review.likes,
+      dislikes: review.dislikes
+    };
 
-    if (likes !== undefined) {
-      updatedReviewData.likes = review.likes + 1;
+    if (like !== undefined) {
+      updatedReviewData.likes += like ? 1 : -1;
+
+      if (updatedReviewData.likes < 0) updatedReviewData.likes = 0;
     }
 
-    if (dislikes !== undefined) {
-      updatedReviewData.dislikes = review.dislikes + 1;
+    if (dislike !== undefined) {
+      updatedReviewData.dislikes += dislike ? 1 : -1;
+      
+      if (updatedReviewData.dislikes < 0) updatedReviewData.dislikes = 0;
     }
 
     await reviews.update(
@@ -3718,7 +3775,8 @@ exports.likesupdate = async (req, res) => {
 
     res.status(200).send({
       status: 1,
-      message: 'Review updated successfully'
+      message: 'Review updated successfully',
+      updatedReview: updatedReviewData
     });
 
   } catch (error) {
@@ -3888,6 +3946,46 @@ exports.findenquiry = async (req, res) => {
       status: 0,
       message: err.message || "Some error occurred while retrieving enquiry."
     });
+  }
+};
+
+exports.addjobposition = async (req, res) => {
+
+  try {
+      const jobspositionsDetails = await jobs_positions.create({
+          name: req.body.name,
+          job_description: req.body.job_description,
+          exp_required: req.body.exp_required,
+          total_positions: req.body.total_positions,
+          status: req.body.status,
+
+      });
+
+      if (req.body.joblocations && jobspositionsDetails.id) {
+          const joblocation = JSON.parse(req.body.joblocations);
+          _.forEach(joblocation, async function (value) {
+
+              await alljoblocation.create({
+                  job_location_id: value.id,
+                  jobs_position_id: jobspositionsDetails.id,
+              });
+          });
+      }
+
+
+
+      res.status(200).send({
+          status: 1,
+          message: 'Data Save Successfully',
+          data: jobspositionsDetails
+      });
+  }
+  catch (error) {
+      return res.status(400).send({
+          message: 'Unable to insert data',
+          errors: error,
+          status: 0
+      });
   }
 };
 

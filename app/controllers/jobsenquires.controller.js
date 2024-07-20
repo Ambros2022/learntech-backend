@@ -1,9 +1,17 @@
 const db = require("../models");
 const path = require('path');
 const jobsenquires = db.jobs_enquires;
+const joblocation = db.job_locations;
+
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
 const Op = db.Sequelize.Op;
+const fileTypes = require("../config/fileTypes");
+
+// Array of allowed files
+const array_of_allowed_file_types = fileTypes.Imageformat;
+// Allowed file size in mb
+const allowed_file_size = 2;
 
 const getPagination = (page, size) => {
 
@@ -21,8 +29,37 @@ const getPagingData = (data, page, limit) => {
 };
 
 exports.create = async (req, res) => {
-
     try {
+        let resumes = "";
+
+        if (req.files && req.files.resume) {
+            let avatar = req.files.resume;
+
+            if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+                return res.status(400).send({
+                    message: "Invalid File type ",
+                    errors: {},
+                    status: 0,
+                });
+            }
+
+            if (avatar.size / (1024 * 1024) > allowed_file_size) {
+                return res.status(400).send({
+                    message: "File too large ",
+                    errors: {},
+                    status: 0,
+                });
+            }
+
+            let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+            let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+            if (IsUpload) {
+                resumes = "jobenquiry_image/" + logoname;
+            }
+        }
+
         const jobsenquiresDetails = await jobsenquires.create({
             jobs_position_id: req.body.jobs_position_id,
             job_location_id: req.body.job_location_id,
@@ -32,25 +69,24 @@ exports.create = async (req, res) => {
             d_o_b: req.body.d_o_b,
             current_location: req.body.current_location,
             total_exp: req.body.total_exp,
-            resume: req.body.resume,
+            resume: resumes,
             status: req.body.status,
-
         });
+
 
         res.status(200).send({
             status: 1,
-            message: 'Data Save Successfully',
-            data: jobsenquiresDetails
+            message: "Data Save Successfully",
+            data: jobsenquiresDetails,
         });
-    }
-    catch (error) {
+    } catch (error) {
         return res.status(400).send({
-            message: 'Unable to insert data',
+            message: "Unable to insert data",
             errors: error,
-            status: 0
+            status: 0,
         });
     }
-}
+};
 
 exports.findAll = async (req, res) => {
     const { page, size, searchtext, searchfrom, columnname, orderby, state_id } = req.query;

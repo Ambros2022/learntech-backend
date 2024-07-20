@@ -162,6 +162,8 @@ module.exports = function (app) {
 
   app.get("/api/website/findenquiry/get", webapicontroller.findenquiry);
 
+  app.post("/api/website/addjobposition/post", webapicontroller.addjobposition);
+
   
 
 
@@ -181,7 +183,7 @@ module.exports = function (app) {
 
   app.post("/api/website/review/statusupdate", webapicontroller.statusupdate);
 
-  app.post("/api/website/review/likesupdate", webapicontroller.likesupdate);
+  app.post("/api/website/review/likesupdate", webapicontroller.likesUpdate);
 
 
 
