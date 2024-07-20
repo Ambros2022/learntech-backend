@@ -38,6 +38,9 @@ const reviews = db.reviews;
 const scholar_levels = db.scholar_levels;
 const scholar_types = db.scholar_types;
 const review_replies = db.review_replies;
+// const jobs_positions = db.jobs_positions;
+const alljoblocation = db.job_locations;
+const _ = require('lodash');
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
@@ -2434,6 +2437,21 @@ exports.jobpositions = async (req, res) => {
         "exp_required",
         "total_positions",
       ],
+      include: [
+        {
+            required: false,
+            association: "jobpositionlocation",
+            attributes: ["id", "job_location_id"],
+            include: [
+                {
+                    required: false,
+                    association: "jobposition&location",
+                    attributes: ["id", "name"],
+                },
+            ],
+        },
+    ],
+
       order: [orderconfig]
     })
     .then((data) => {
@@ -3928,6 +3946,46 @@ exports.findenquiry = async (req, res) => {
       status: 0,
       message: err.message || "Some error occurred while retrieving enquiry."
     });
+  }
+};
+
+exports.addjobposition = async (req, res) => {
+
+  try {
+      const jobspositionsDetails = await jobs_positions.create({
+          name: req.body.name,
+          job_description: req.body.job_description,
+          exp_required: req.body.exp_required,
+          total_positions: req.body.total_positions,
+          status: req.body.status,
+
+      });
+
+      if (req.body.joblocations && jobspositionsDetails.id) {
+          const joblocation = JSON.parse(req.body.joblocations);
+          _.forEach(joblocation, async function (value) {
+
+              await alljoblocation.create({
+                  job_location_id: value.id,
+                  jobs_position_id: jobspositionsDetails.id,
+              });
+          });
+      }
+
+
+
+      res.status(200).send({
+          status: 1,
+          message: 'Data Save Successfully',
+          data: jobspositionsDetails
+      });
+  }
+  catch (error) {
+      return res.status(400).send({
+          message: 'Unable to insert data',
+          errors: error,
+          status: 0
+      });
   }
 };
 
