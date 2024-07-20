@@ -1,6 +1,6 @@
 const db = require("../models");
 const path = require('path');
-const jobspositions = db.jobs_positions;
+const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
@@ -15,16 +15,16 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    const { count: totalItems, rows: jobspositions } = data;
+    const { count: totalItems, rows: jobs_positions } = data;
     const currentPage = page ? +page : 1;
     const totalPages = Math.ceil(totalItems / limit);
-    return { totalItems, jobspositions, totalPages, currentPage };
+    return { totalItems, jobs_positions, totalPages, currentPage };
 };
 
 exports.create = async (req, res) => {
 
     try {
-        const jobspositionsDetails = await jobspositions.create({
+        const jobspositionsDetails = await jobs_positions.create({
             name: req.body.name,
             job_description: req.body.job_description,
             exp_required: req.body.exp_required,
@@ -63,7 +63,7 @@ exports.create = async (req, res) => {
 
 
 exports.findAll = async (req, res) => {
-    const { page, size, searchtext, searchfrom, columnname, orderby, state_id } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
     var column = columnname ? columnname : 'name';
     var order = orderby ? orderby : 'ASC';
@@ -84,7 +84,7 @@ exports.findAll = async (req, res) => {
 
     const { limit, offset } = getPagination(page, size);
 
-    jobspositions.findAndCountAll({
+    jobs_positions.findAndCountAll({
         where: data_array, limit, offset,
         include: [
             {
@@ -112,7 +112,7 @@ exports.findAll = async (req, res) => {
                 totalItems: response.totalItems,
                 currentPage: response.currentPage,
                 totalPages: response.totalPages,
-                data: response.jobspositions
+                data: response.jobs_positions
             });
         })
         .catch(err => {
@@ -125,9 +125,11 @@ exports.findAll = async (req, res) => {
         });
 };
 
+
+
 exports.delete = (req, res) => {
     const id = req.params.id;
-    jobspositions.destroy({
+    jobs_positions.destroy({
         where: { id: id }
     })
         .then(num => {
@@ -160,7 +162,7 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
     const id = req.body.id;
     try {
-        jobspositions.update
+        jobs_positions.update
             ({
                 name: req.body.name,
                 job_description: req.body.job_description,
@@ -205,7 +207,7 @@ exports.findOne = (req, res) => {
 
     // console.log("Searching for job position with id:", id);
 
-    jobspositions
+    jobs_positions
         .findOne({
             where: {
                 [Op.or]: [
