@@ -46,6 +46,7 @@ exports.create = async (req, res) => {
     let logonames = "";
     // let iconnames = "";
     // let promo_banner_names = "";
+    let banners = "";
 
     if (req.files && req.files.promo_banner) {
       let avatar = req.files.promo_banner;
@@ -134,6 +135,35 @@ exports.create = async (req, res) => {
       }
     }
 
+    if (req.files && req.files.banner) {
+      let avatar = req.files.banner;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "banner" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/stream_banner/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        logonames = "stream_banner/" + logoname;
+      }
+    }
+
     const streamDetails = await stream.create({
       name: req.body.name,
       slug: req.body.slug,
@@ -146,6 +176,7 @@ exports.create = async (req, res) => {
       listing_order: req.body.listing_order,
       top_college: req.body.top_college,
       logo: logonames,
+      banner: banners,
 
     });
 
@@ -392,6 +423,40 @@ exports.update = async (req, res) => {
       // If there's an old logo associated with the record, remove it
       if (existingRecord.logo) {
         const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    if (req.files && req.files.banner) {
+      const avatar = req.files.banner;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "banner" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/stream_banner/" + logoname;
+
+      await avatar.mv(UploadPath);
+
+      streamUpdates.banner = "stream_banner/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner) {
+        const oldLogoPath = "./storage/" + existingRecord.banner;
         await removeFile(oldLogoPath);
       }
     }

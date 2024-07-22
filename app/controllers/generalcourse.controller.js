@@ -42,6 +42,7 @@ const getPagingData = (data, page, limit) => {
 exports.create = async (req, res) => {
   try {
     let logos = "";
+    let banners = "";
 
 
     if (req.files && req.files.logo) {
@@ -73,6 +74,35 @@ exports.create = async (req, res) => {
       }
     }
 
+    if (req.files && req.files.banner) {
+      let avatar = req.files.banner;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "banner" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/course_banner/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        banners = "course_banner/" + logoname;
+      }
+    }
+
     const generalcoursesDetails = await generalcourse.create({
       stream_id: req.body.stream_id,
       sub_streams_id: req.body.sub_streams_id,
@@ -93,6 +123,7 @@ exports.create = async (req, res) => {
       is_trending: req.body.is_trending,
       is_top_rank: req.body.is_top_rank,
       status: req.body.status,
+      banner: banners,
     });
 
     res.status(200).send({

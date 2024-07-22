@@ -30,6 +30,9 @@ module.exports = (sequelize, Sequelize) => {
     listing_order: {
       type: Sequelize.INTEGER
     },
+    banner: {
+      type: Sequelize.STRING
+    },
   }
     ,
     {
