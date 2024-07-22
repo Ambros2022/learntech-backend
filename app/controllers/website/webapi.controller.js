@@ -2445,7 +2445,7 @@ exports.jobpositions = async (req, res) => {
             include: [
                 {
                     required: false,
-                    association: "jobposition&location",
+                    association: "jobpositionslocation",
                     attributes: ["id", "name"],
                 },
             ],
@@ -3757,15 +3757,21 @@ exports.likesUpdate = async (req, res) => {
     };
 
     if (like !== undefined) {
-      updatedReviewData.likes += like ? 1 : -1;
-
-      if (updatedReviewData.likes < 0) updatedReviewData.likes = 0;
+      if (like) {
+        updatedReviewData.likes += 1;
+        updatedReviewData.dislikes = Math.max(0, updatedReviewData.dislikes - 1);
+      } else {
+        updatedReviewData.likes = Math.max(0, updatedReviewData.likes - 1);
+      }
     }
 
     if (dislike !== undefined) {
-      updatedReviewData.dislikes += dislike ? 1 : -1;
-      
-      if (updatedReviewData.dislikes < 0) updatedReviewData.dislikes = 0;
+      if (dislike) {
+        updatedReviewData.dislikes += 1;
+        updatedReviewData.likes = Math.max(0, updatedReviewData.likes - 1);
+      } else {
+        updatedReviewData.dislikes = Math.max(0, updatedReviewData.dislikes - 1);
+      }
     }
 
     await reviews.update(
