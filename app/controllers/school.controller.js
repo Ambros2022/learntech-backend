@@ -327,6 +327,8 @@ exports.findAll = async (req, res) => {
     searchfrom,
     columnname,
     orderby,
+    school_board_id,
+    status,
   } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -344,6 +346,14 @@ exports.findAll = async (req, res) => {
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
+
+  if (school_board_id) {
+    data_array.push({ school_board_id: school_board_id });
+  }
+
+  if (status) {
+    data_array.push({ status: status });
+  }
 
   condition ? data_array.push(condition) : null;
 

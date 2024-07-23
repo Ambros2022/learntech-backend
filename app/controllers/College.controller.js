@@ -49,6 +49,9 @@ exports.findAll = async (req, res) => {
     searchfrom,
     columnname,
     orderby,
+    country_id,
+    type,
+    status,
   } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -65,6 +68,18 @@ exports.findAll = async (req, res) => {
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
+
+  if (country_id) {
+    data_array.push({ country_id: country_id });
+  }
+
+  if (type) {
+    data_array.push({ type: type });
+  }
+
+  if (status) {
+    data_array.push({ status: status });
+  }
 
   condition ? data_array.push(condition) : null;
 

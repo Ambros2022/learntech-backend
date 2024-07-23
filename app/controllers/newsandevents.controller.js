@@ -246,7 +246,7 @@ exports.update = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, columnname, searchfrom, orderby } = req.query;
+  const { page, size, searchtext, columnname, searchfrom, orderby, category_id  } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -258,10 +258,19 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+  let data_array = [];
+
+  if (category_id  ) {
+    data_array.push({ category_id  : category_id   });
+  }
+
+  condition ? data_array.push(condition) : null;
+
   const { limit, offset } = getPagination(page, size);
   newsandevents
     .findAndCountAll({
-      where: condition, limit, offset,
+      where: data_array, condition, limit, offset,
       include: [
         {
           required: false,

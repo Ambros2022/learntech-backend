@@ -111,11 +111,13 @@ exports.findAll = async (req, res) => {
     page,
     size,
     searchtext,
-    // college_id,
-    // course_id,
     searchfrom,
     columnname,
     orderby,
+    college_id,
+    general_course_id,
+    status,
+    course_type,
   } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -131,6 +133,23 @@ exports.findAll = async (req, res) => {
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
+
+  if (college_id) {
+    data_array.push({ college_id: college_id });
+  }
+
+  if (general_course_id) {
+    data_array.push({ general_course_id: general_course_id });
+  }
+
+  if (status) {
+    data_array.push({ status: status });
+  }
+
+  if (course_type) {
+    data_array.push({ course_type: course_type });
+  }
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -170,7 +189,7 @@ exports.findAll = async (req, res) => {
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: err.message || "Some error occurred while retrieving city.",
+        message: err.message || "Some error occurred while retrieving courses.",
       });
     });
 };

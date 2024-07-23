@@ -442,6 +442,7 @@ exports.findAll = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : 'id';
+  // var column = columnname ? [columnname, 'name', 'email'] : ['id', 'name', 'email'];
   var order = orderby ? orderby : 'ASC';
   var orderconfig = [column, order];
 

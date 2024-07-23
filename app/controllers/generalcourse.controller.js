@@ -177,7 +177,7 @@ exports.update = async (req, res) => {
       // logo: logos,
     };
 
-    // Check if a new logo is provided
+
     if (req.files && req.files.logo) {
       const avatar = req.files.logo;
 
@@ -236,15 +236,18 @@ exports.update = async (req, res) => {
 
       await avatar.mv(uploadPath);
 
-      generalcourseupdates.banner = "course_logo/" + logoname;
+      generalcourseupdates.banner = "course_banner/" + logoname;
 
       // If there's an old logo associated with the record, remove it
-      if (existingRecord.logo) {
+      if (existingRecord.banner) {
 
         const oldLogoPath = "./storage/" + existingRecord.banner;
         await removeFile(oldLogoPath);
       }
     }
+
+
+
 
     // Update database record
     await generalcourse.update(generalcourseupdates, { where: { id: req.body.id } });
@@ -277,18 +280,24 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  // var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
-  // let data_array = [];
-  // conditionStreamId ? data_array.push(conditionStreamId) : null;
-  // condition ? data_array.push(condition) : null;
-  // data_array.push({ is_deleted: 0 });
+  let data_array = [];
+
+  if (stream_id) {
+    data_array.push({ stream_id: stream_id });
+  }
+
+  condition ? data_array.push(condition) : null;
+
+
+
   const { limit, offset } = getPagination(page, size);
   generalcourse
     .findAndCountAll({
-      where: condition,
+      where: data_array, condition,
       limit,
       offset,
       include: [
