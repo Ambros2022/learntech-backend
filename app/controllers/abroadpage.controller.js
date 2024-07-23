@@ -106,7 +106,7 @@ exports.create = async (req, res) => {
 
 exports.findAll = async (req, res) => {
 
-    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby, country_id } = req.query;
 
     var column = columnname ? columnname : "id";
     var order = orderby ? orderby : "ASC";
@@ -120,9 +120,19 @@ exports.findAll = async (req, res) => {
     }
     var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
+    let data_array = [];
+
+  if (country_id) {
+    data_array.push({country_id: country_id});
+  }
+
+  condition ? data_array.push(condition) : null;
+
+
+
     const { limit, offset } = getPagination(page, size);
     abroadpage
-        .findAndCountAll({ where: condition, limit, offset, 
+        .findAndCountAll({ where: data_array, condition, limit, offset, 
             include: [
                 {
                     required: false,

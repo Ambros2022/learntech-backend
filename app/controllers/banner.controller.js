@@ -101,7 +101,7 @@ exports.create = async (req, res) => {
 
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, status } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -113,9 +113,18 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+  let data_array = [];
+
+  if (status ) {
+    data_array.push({ status : status });
+  }
+
+  condition ? data_array.push(condition) : null;
+
   const { limit, offset } = getPagination(page, size);
   banner
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({ where: data_array, condition, limit, offset, order: [orderconfig] })
     .then((data) => {
       const response = getPagingData(data, page, limit);
       res.status(200).send({
@@ -134,6 +143,7 @@ exports.findAll = async (req, res) => {
       });
     });
 };
+
 exports.delete = (req, res) => {
   const id = req.params.id;
   banner

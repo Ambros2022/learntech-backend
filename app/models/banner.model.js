@@ -16,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING
     },
     status: {
-      type: Sequelize.ENUM('draft', 'published')
+      type: Sequelize.ENUM('Draft', 'Published')
     },
     promo_banner: {
       type: Sequelize.ENUM('Draft','All_Exams_page','All_News_page','All_Scholarship_page','Nri_page','Study_Abroad_page','All_college_page','All_courses_page','All_university_page','All_school_page','Services_Page','All_about_page','All_our_teams')

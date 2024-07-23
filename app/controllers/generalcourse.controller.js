@@ -212,6 +212,7 @@ exports.update = async (req, res) => {
       }
     }
 
+    
     if (req.files && req.files.banner) {
       const avatar = req.files.banner;
 
@@ -236,15 +237,24 @@ exports.update = async (req, res) => {
 
       await avatar.mv(uploadPath);
 
-      generalcourseupdates.banner = "course_logo/" + logoname;
+      generalcourseupdates.banner = "course_banner/" + logoname;
 
       // If there's an old logo associated with the record, remove it
-      if (existingRecord.logo) {
+    //   if (existingRecord.banner) {
 
-        const oldLogoPath = "./storage/" + existingRecord.banner;
-        await removeFile(oldLogoPath);
-      }
+    //     const oldLogoPath = "./storage/" + existingRecord.logo;
+    //     await removeFile(oldLogoPath);
+    //   }
+    // }
+
+    if (existingRecord.course_banner) {
+
+      const oldLogoPath = "./storage/" + existingRecord.course_banner;
+      await removeFile(oldLogoPath);
     }
+  }
+
+   
 
     // Update database record
     await generalcourse.update(generalcourseupdates, { where: { id: req.body.id } });
@@ -277,18 +287,24 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  // var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
+  
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
-  // let data_array = [];
-  // conditionStreamId ? data_array.push(conditionStreamId) : null;
-  // condition ? data_array.push(condition) : null;
-  // data_array.push({ is_deleted: 0 });
+  let data_array = [];
+
+  if (stream_id ) {
+    data_array.push({ stream_id : stream_id  });
+  }
+
+  condition ? data_array.push(condition) : null;
+
+
+  
   const { limit, offset } = getPagination(page, size);
   generalcourse
     .findAndCountAll({
-      where: condition,
+      where: data_array, condition,
       limit,
       offset,
       include: [
