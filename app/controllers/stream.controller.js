@@ -44,68 +44,8 @@ exports.create = async (req, res) => {
 
   try {
     let logonames = "";
-    // let iconnames = "";
-    // let promo_banner_names = "";
     let banners = "";
 
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/stream_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "stream_promo_banner/" + logoname;
-      }
-    }
-    if (req.files && req.files.icon) {
-      let avatar = req.files.icon;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "icon" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/stream_icon/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        iconnames = "stream_icon/" + logoname;
-      }
-    }
     if (req.files && req.files.logo) {
       let avatar = req.files.logo;
 
@@ -160,7 +100,7 @@ exports.create = async (req, res) => {
       let IsUpload = avatar.mv("./storage/stream_banner/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "stream_banner/" + logoname;
+        banners = "stream_banner/" + logoname;
       }
     }
 
@@ -215,17 +155,19 @@ exports.findAll = async (req, res) => {
 
   const { limit, offset } = getPagination(page, size);
   stream
-    .findAndCountAll({ where: condition, limit, offset, 
+    .findAndCountAll({
+      where: condition, limit, offset,
       include: [
-       
-        {
-            required: false,
-            association: "streamfaqs",
-            attributes: ["id", "questions", "answers"],
-          },
 
-    ],
-      order: [orderconfig] })
+        {
+          required: false,
+          association: "streamfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+
+      ],
+      order: [orderconfig]
+    })
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
@@ -282,8 +224,8 @@ exports.findOne = (req, res) => {
         association: "streamfaqs",
         attributes: ["id", "questions", "answers"],
       },
-      
-      ],
+
+    ],
   })
     .then((data) => {
       if (data) {
