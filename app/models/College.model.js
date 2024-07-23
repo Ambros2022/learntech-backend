@@ -26,7 +26,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.ENUM("top_college", "default"),
     },
     college_type: {
-      type: Sequelize.ENUM("Public", "Deemed", "Private", "Government"),
+      type: Sequelize.ENUM("Public", "Deemed", "Private", "Government", "Autonomous"),
     },
     listing_order: {
       type: Sequelize.INTEGER

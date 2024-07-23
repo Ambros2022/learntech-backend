@@ -94,7 +94,7 @@ exports.findAll = async (req, res) => {
                 include: [
                     {
                         required: false,
-                        association: "jobposition&location",
+                        association: "jobpositionslocation",
                         attributes: ["id", "name"],
                     },
                 ],
@@ -225,7 +225,7 @@ exports.findOne = (req, res) => {
                     attributes: ["id", "job_location_id"],
                     include: [
                         {
-                            association: "jobposition&location",
+                            association: "jobpositionslocation",
                             attributes: ["id", "name"],
                         },
                     ],

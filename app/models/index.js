@@ -567,7 +567,7 @@ db.job_locations.belongsTo(db.jobs_positions, {
 
 db.job_locations.belongsTo(db.all_job_locations, {
   foreignKey: "job_location_id",
-  as: "jobposition&location",
+  as: "jobpositionslocation",
 });
 
 
