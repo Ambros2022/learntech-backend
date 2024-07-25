@@ -644,7 +644,7 @@ exports.allbanners = async (req, res) => {
       where: {
         [Op.and]: data_array.concat(conditionarray)
       },
-      attributes: ["id", "title", "link", "image"],
+      attributes: ["id", "title", "link", "image", "description"],
       order: [orderconfig],
       limit,
       offset

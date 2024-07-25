@@ -33,6 +33,9 @@ module.exports = (sequelize, Sequelize) => {
     status: {
       type: Sequelize.ENUM("Draft", "Published"),
     },
+    course_short_name: {
+      type: Sequelize.STRING
+    },
   }
     ,
     {
