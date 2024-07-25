@@ -160,8 +160,6 @@ module.exports = function (app) {
 
   app.get("/api/website/allscholartype/get", webapicontroller.scholartype);
 
-  app.get("/api/website/findenquiry/get", webapicontroller.findenquiry);
-
   app.post("/api/website/addjobposition/post", webapicontroller.addjobposition);
 
   
