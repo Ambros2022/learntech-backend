@@ -54,6 +54,7 @@ exports.create = async (req, res) => {
         eligibility: req.body.eligibility,
         fee_structure: req.body.fee_structure,
         status: req.body.status,
+        course_short_name: req.body.course_short_name,
       });
 
       res.status(200).send({
@@ -88,6 +89,7 @@ exports.update = (req, res) => {
       eligibility: req.body.eligibility,
       fee_structure: req.body.fee_structure,
       status: req.body.status,
+      course_short_name: req.body.course_short_name,
     }, {
       where: { id: req.body.id }
     });

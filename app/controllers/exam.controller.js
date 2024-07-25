@@ -45,6 +45,7 @@ exports.create = async (req, res) => {
   try {
     let cover_images = " ";
     let promo_banners = "";
+    let logos = "";
 
     if (req.files && req.files.cover_image) {
       let avatar = req.files.cover_image;
@@ -104,6 +105,36 @@ exports.create = async (req, res) => {
         promo_banners = "exam_promo_banner/" + image;
       }
     }
+    if (req.files && req.files.logo) {
+      let avatar = req.files.logo;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/exam_logo/" + logoname)
+        ? 1
+        : 0;
+
+      if (IsUpload) {
+        logos = "exam_logo/" + logoname;
+      }
+    }
     {
 
 
@@ -131,6 +162,7 @@ exports.create = async (req, res) => {
         status: req.body.status,
         cover_image: cover_images,
         promo_banner: promo_banners,
+        logo: logos,
       });
 
       res.status(200).send({
@@ -256,6 +288,41 @@ exports.update = async (req, res) => {
       if (existingRecord.promo_banner) {
         // console.log("existingRecord.icon",existingRecord.amenities_logo);
         const oldLogoPath = "./storage/" + existingRecord.promo_banner;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+     // Check if a new logo is provided
+     if (req.files && req.files.logo) {
+      const avatar = req.files.logo;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/exam_logo/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      examsUpdates.logo = "exam_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.logo) {
+        // console.log("existingRecord.icon",existingRecord.amenities_logo);
+        const oldLogoPath = "./storage/" + existingRecord.logo;
         await removeFile(oldLogoPath);
       }
     }
