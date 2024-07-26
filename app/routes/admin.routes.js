@@ -151,7 +151,13 @@ module.exports = function (app) {
     enquirycontroller.findOne
   );
 
+  app.get(
+    "/api/admin/findenquiry/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    enquirycontroller.findenquiry
+  );
 
+  // app.get("/api/website/findenquiry/get", webapicontroller.findenquiry);
 
   app.post(
     "/api/admin/enquiry/delete/:id",
