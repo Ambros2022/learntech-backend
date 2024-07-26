@@ -46,6 +46,8 @@ module.exports = function (app) {
 
   app.get("/api/website/states/get", webapicontroller.allstates);
 
+  app.get("/api/website/cities/get", webapicontroller.allcities);
+
 
   //End  Loction apis //
 
