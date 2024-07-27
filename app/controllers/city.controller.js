@@ -24,10 +24,10 @@ exports.create = async (req, res) => {
 
     try {
         const cityDetails = await city.create({
-            city_name: req.body.city_name,
-            city_slug: req.body.city_slug,
-			state_id: 1,
-            city_description: req.body.city_description,
+            name: req.body.name,
+            // city_slug: req.body.city_slug,
+            state_id: req.body.state_id,
+            // city_description: req.body.city_description,
 
         });
 
@@ -47,9 +47,9 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-    const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby,state_id } = req.query;
 
-    var column = columnname ? columnname : 'city_name';
+    var column = columnname ? columnname : 'name';
     var order = orderby ? orderby : 'ASC';
     var orderconfig = [column, order];
 
@@ -60,11 +60,34 @@ exports.findAll = async (req, res) => {
         column = myArray[1];
         orderconfig = [table, column, order];
     }
-    var condition = sendsearch.customseacrh(searchText, searchfrom);
+    let data_array = [];
+    let conditionstate_id= state_id ? { state_id: state_id } : null;
+
+
+    let condition = sendsearch.customseacrh(searchtext, searchfrom);
+    condition ? data_array.push(condition) : null;
+    
+    conditionstate_id ? data_array.push(conditionstate_id) : null;
+
     const { limit, offset } = getPagination(page, size);
-    city.findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
-        .then(data =>
-        {
+
+    city.findAndCountAll({
+        where: data_array, limit, offset, 
+
+        include: [
+            {
+                required: false,
+                association: "state",
+                attributes: ["id", "name"],
+            },
+           
+
+        ],
+        
+        
+        order: [orderconfig]
+    })
+        .then(data => {
             const response = getPagingData(data, page, limit);
             res.status(200).send({
                 status: 1,
@@ -75,8 +98,7 @@ exports.findAll = async (req, res) => {
                 data: response.city
             });
         })
-        .catch(err =>
-        {
+        .catch(err => {
             res.status(500).send({
                 status: 0,
                 message:
@@ -86,34 +108,30 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) =>
- {
+exports.delete = (req, res) => {
     const id = req.params.id;
     city.destroy({
         where: { id: id }
     })
         .then(num => {
-            if (num == 1) 
-            {
+            if (num == 1) {
 
-                    res.status(200).send({
+                res.status(200).send({
                     status: 1,
                     message: 'city deleted successfully',
 
                 });
 
-            } else
-            {
-                   res.status(400).send({
+            } else {
+                res.status(400).send({
                     status: 0,
                     message: `city  with id=${id}. Maybe city id  was not found!`
 
                 });
             }
         })
-        .catch(err =>
-             {
-                res.status(500).send({
+        .catch(err => {
+            res.status(500).send({
                 status: 0,
                 message: "Could not delete city with id=" + id
 
@@ -125,16 +143,13 @@ exports.update = (req, res) => {
     const id = req.body.id;
     try {
         city.update
-        ({
-            city_name: req.body.city_name,
-            city_slug: req.body.city_slug,
-            city_description: req.body.city_description,
-			state_id: 1,
-            //state_id: req.body.state_id ? req.body.state_id : null,
-        }, 
-        {
-            where: { id: req.body.id }
-        });
+            ({
+                name: req.body.name,
+                state_id: req.body.state_id,
+            },
+                {
+                    where: { id: req.body.id }
+                });
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully'
@@ -149,31 +164,48 @@ exports.update = (req, res) => {
     }
 
 };
+
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    city.findByPk(id)
-        .then(data => {
-            if (data) {
-                res.status(200).send({
-                    status: 1,
-                    message: 'successfully retrieved',
-                    data: data
 
-                });
+    city
+        .findOne({
+            where: {
+                [Op.or]: [
+                    {
+                        id: {
+                            [Op.eq]: id,
+                        },
+                    },
+                ],
+            },
+            include: [
+                {
 
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `Cannot find city with id=${id}.`
-                });
-            }
+                    required: false,
+                    association: "state",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
+                }
+
+            ],
+
         })
-        .catch(err => {
+        .then(async (data) => {
+            res.status(200).send({
+                status: 1,
+                message: "successfully retrieved",
+                data: data,
+
+            });
+        })
+        .catch((err) => {
             res.status(500).send({
                 status: 0,
-                message: "Error retrieving city with id=" + id
-
+                message: "Error retrieving stream with id=" + id,
             });
         });
 };
-

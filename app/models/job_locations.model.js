@@ -1,6 +1,9 @@
 module.exports = (sequelize, Sequelize) => {
-    const schooltype = sequelize.define("school_types", {
-        type: {
+    const joblocations = sequelize.define("job_locations", {
+        job_location_id: {
+            type: Sequelize.STRING
+        },
+        jobs_position_id: {
             type: Sequelize.STRING
         }
     } ,
@@ -16,5 +19,5 @@ module.exports = (sequelize, Sequelize) => {
   );
 
 
-  return schooltype;
+  return joblocations;
 };

@@ -6,16 +6,22 @@ const streamfaq = db.stream_faq;
 const Op = db.Sequelize.Op;
 
 const groups = db.groups;
+const fileTypes = require("../config/fileTypes");
+// / Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 
 // Array of allowed files
 const sendsearch = require("../utility/Customsearch");
-const array_of_allowed_file_types = [
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-  "image/gif",
-  "image/svg+xml",
-];
+const array_of_allowed_file_types = fileTypes.Imageformat;
 
 // Allowed file size in mb
 const allowed_file_size = 2;
@@ -35,73 +41,11 @@ const getPagingData = (data, page, limit) => {
 };
 
 exports.create = async (req, res) => {
-  //  const obj = JSON.parse(req.body.mac);
-  // var messages = Array.prototype.slice.call(req.body.mac);
-  //req.body['mac[]'].length
-  console.log(req.body);
+
   try {
     let logonames = "";
-    let iconnames = "";
-    let promo_banner_names = "";
+    let banners = "";
 
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/stream_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "stream_promo_banner/" + logoname;
-      }
-    }
-    if (req.files && req.files.icon) {
-      let avatar = req.files.icon;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "icon" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/stream_icon/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        iconnames = "stream_icon/" + logoname;
-      }
-    }
     if (req.files && req.files.logo) {
       let avatar = req.files.logo;
 
@@ -130,58 +74,53 @@ exports.create = async (req, res) => {
         logonames = "stream_logo/" + logoname;
       }
     }
-    let listingvalue =
-    (req.body.listing_order == 0 || req.body.listing_order=='') ? null : req.body.listing_order;
+
+    if (req.files && req.files.banner) {
+      let avatar = req.files.banner;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "banner" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/stream_banner/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        banners = "stream_banner/" + logoname;
+      }
+    }
 
     const streamDetails = await stream.create({
-      stream_name: req.body.stream_name,
-      stream_slug: req.body.stream_slug,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
+      name: req.body.name,
+      slug: req.body.slug,
       h1_title: req.body.h1_title ? req.body.h1_title : null,
-      title_description: req.body.title_description
-        ? req.body.title_description
-        : null,
-      keywords:
-        req.body.keywords && req.body.keywords != "null"
-          ? req.body.keywords
-          : null,
-      ug_box: req.body.ug_box ? req.body.ug_box : null,
-      pg_box: req.body.pg_box ? req.body.pg_box : null,
-      doctorate_box: req.body.doctorate_box ? req.body.doctorate_box : null,
-      diploma_box: req.body.diploma_box ? req.body.diploma_box : null,
-      description_box: req.body.description_box
-        ? req.body.description_box
-        : null,
-      eligibility_criteria: req.body.eligibility_criteria
-        ? req.body.eligibility_criteria
-        : null,
-      placement_career: req.body.placement_career
-        ? req.body.placement_career
-        : null,
-      top_recruiters: req.body.top_recruiters ? req.body.top_recruiters : null,
-      job_analysis: req.body.job_analysis ? req.body.job_analysis : null,
-      stream_description: req.body.stream_description
-        ? req.body.stream_description
-        : null,
-      home_view_status: req.body.home_view_status,
-
-      listing_order: listingvalue,
+      description: req.body.description ? req.body.description : null,
+      top_college: req.body.top_college,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keyword: req.body.meta_keyword,
+      listing_order: req.body.listing_order,
+      top_college: req.body.top_college,
       logo: logonames,
-      icon: iconnames,
-      promo_banner: promo_banner_names,
-      promo_banner_status: req.body.promo_banner_status,
+      banner: banners,
+
     });
 
-    if (req.body.faqs && streamDetails.id) {
-      const faqss = JSON.parse(req.body.faqs);
-      await _.forEach(faqss, function (value) {
-        streamfaq.create({
-          stream_id: streamDetails.id,
-          questions: value.question ? value.question : null,
-          answers: value.answer ? value.answer : null,
-        });
-      });
-    }
+
 
     res.status(200).send({
       status: 1,
@@ -197,10 +136,10 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.findAll = async (req, res) => {
-  // console.log(req.query);
 
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+exports.findAll = async (req, res) => {
+
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -212,11 +151,23 @@ exports.findAll = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   stream
-    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .findAndCountAll({
+      where: condition, limit, offset,
+      include: [
+
+        {
+          required: false,
+          association: "streamfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+
+      ],
+      order: [orderconfig]
+    })
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
@@ -266,227 +217,37 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-
-  stream
-    .findOne({
-      where: {
-        [Op.or]: [
-          {
-            id: {
-              [Op.eq]: id,
-            },
-          },
-          {
-            stream_slug: {
-              [Op.eq]: id,
-            },
-          },
-        ],
+  stream.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "streamfaqs",
+        attributes: ["id", "questions", "answers"],
       },
-      include: [
-        {
-          // limit:10,
-          // required: false,
-          separate: true,
-          association: "str",
-          attributes: [
-            "id",
-            "course_stream_name",
-            "course_short_name",
-            "course_stream_slug",
-            "course_type",
-            "description",
-            "logo",
-          ],
 
-          // subquery:false,
-          include: [
-            {
-              required: false,
-              association: "streams",
-              attributes: ["id", "stream_name"],
-            },
-          ],
-          include: [
-            {
-              required: false,
-              association: "course",
-              attributes: [
-                "id",
-                "course_type",
-                "brochure",
-                "duration",
-                "status",
-              ],
-              include: [
-                {
-                  required: false,
-                  association: "coursemodes",
-                  attributes: ["id", "modes_id"],
-                  include: [
-                    {
-                      required: false,
-                      association: "modess",
-                      attributes: ["id", "mode"],
-                    },
-                  ],
-                },
-                {
-                  required: false,
-                  association: "cousrsefees",
-                  attributes: ["id", "type", "title", "note", "total_amount"],
-                  include: [
-                    {
-                      required: false,
-                      association: "feedetail",
-                      attributes: ["sub_title", "amount"],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-          // limit:10,
-
-          // include: [
-          //   {
-          //     association: "course",
-          //     attributes: ["id", "course_type", "status"],
-          //     // where: {
-          //     //   course_type: "UG",
-          //     // },
-          //   },
-
-          // ],
-        },
-        // {
-        //   required:false,
-        //   association: "ugcourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "UG",
-        //       },
-
-        // },
-        // {
-        //   required:false,
-        //   association: "pgcourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "PG",
-        //       },
-
-        // },
-        // {
-        //   required:false,
-        //   association: "diplomacourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "Diploma",
-        //       },
-
-        // },
-        // {
-        //   required:false,
-        //   association: "doctratecourse",
-        //   attributes: [
-        //     "id",
-        //     "course_stream_name",
-        //     "course_short_name",
-        //     "course_stream_slug",
-        //     "course_type",
-        //     "logo",
-        //   ],
-        //       where: {
-        //         course_type: "PhD",
-        //       },
-
-        // },
-
-        {
-          required: false,
-          association: "faqs",
-          attributes: ["id", "questions", "answers"],
-        },
-      ],
-      // limit:10
-      // subquery:true,
-    })
-    .then(async (data) => {
+    ],
+  })
+    .then((data) => {
       if (data) {
-        let grpname = data.stream_name ? data.stream_name : null;
-        console.log(grpname);
-        let collegewithgroups = await groups.findOne({
-          where: {
-            [Op.or]: [
-              {
-                group: {
-                  [Op.eq]: grpname,
-                },
-              },
-            ],
-          },
-          attributes: ["id", "title","slug","group"],
-          include: [
-            {
-              required: false,
-              association: "colllegegroup",
-              attributes: ["id", "college_and_university_id", "group_id"],
-              include: [
-                {
-                  required: false,
-                  association: "college_groupss",
-                  attributes: ["id", "type", "name", "slug","avg_rating", "logo","status"],
-                  where: {
-                    type: "college",
-                    status: "Published",
-                  },
-                },
-              ],
-            },
-          ],
-          limit:30,
-          subQuery:false,
-        });
+
+
 
         res.status(200).send({
           status: 1,
           message: "successfully retrieved",
           data: data,
-          data1: collegewithgroups,
         });
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find Stream with id=${id}.`,
+          message: `Cannot find streams with id=${id}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving stream with id=" + id,
+        message: "Error retrieving streams with id=" + id,
       });
     });
 };
@@ -545,148 +306,106 @@ exports.findOneWebView = (req, res) => {
     });
 };
 
-exports.update =async (req, res) => {
-  const id = req.body.id;
-  console.log(req.body);
+exports.update = async (req, res) => {
 
   try {
-    let logonames = "";
-    let iconnames = "";
-    let promo_banner_names = "";
-    let listingvalue =
-      (req.body.listing_order == 0 || req.body.listing_order=='') ? null : req.body.listing_order;
-    let STREAD = {
-      stream_name: req.body.stream_name,
-      stream_slug: req.body.stream_slug,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      h1_title: req.body.h1_title,
-      title_description: req.body.title_description
-        ? req.body.title_description
-        : null,
-      keywords:
-        req.body.keywords ,
-      ug_box: req.body.ug_box ,
-      pg_box: req.body.pg_box ,
-      doctorate_box: req.body.doctorate_box ,
-      diploma_box: req.body.diploma_box,
-      description_box: req.body.description_box,
-      eligibility_criteria: req.body.eligibility_criteria,
-      placement_career: req.body.placement_career,
-      top_recruiters: req.body.top_recruiters ? req.body.top_recruiters : null,
-      job_analysis: req.body.job_analysis ? req.body.job_analysis : null,
-      stream_description: req.body.stream_description,
-      home_view_status: req.body.home_view_status,
-      promo_banner_status: req.body.promo_banner_status,
-      listing_order: listingvalue,
-    };
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
 
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/stream_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "stream_promo_banner/" + logoname;
-        STREAD["promo_banner"] = promo_banner_names;
-      }
-    }
-    if (req.files && req.files.icon) {
-      let avatar = req.files.icon;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-      if (req.icon != "") {
-        let logoname = "icon" + Date.now() + path.extname(avatar.name);
-
-        let IsUpload = avatar.mv("./storage/stream_icon/" + logoname) ? 1 : 0;
-
-        if (IsUpload) {
-          iconnames = "stream_icon/" + logoname;
-          STREAD["icon"] = iconnames;
-        }
-      }
-    }
-    if (req.files && req.files.logo) {
-      let avatar = req.files.logo;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/stream_logo/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        logonames = "stream_logo/" + logoname;
-        STREAD["logo"] = logonames;
-      }
-    }
-
-  await  stream.update(STREAD, {
+    const existingRecord = await stream.findOne({
       where: { id: req.body.id },
     });
 
-    if (req.body.faqs && req.body.id) {
-      await streamfaq.destroy({
-        where: { stream_id: req.body.id },
-      });
-      const faqss = JSON.parse(req.body.faqs);
-      _.forEach(faqss,async function (value) {
-        await  streamfaq.create({
-          stream_id: req.body.id,
-          questions: value.questions ? value.questions : null,
-          answers: value.answers ? value.answers : null,
-        });
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
       });
     }
+
+
+    const streamUpdates = {
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      h1_title: req.body.h1_title || existingRecord.h1_title,
+      description: req.body.description || existingRecord.description,
+      top_college: req.body.top_college || existingRecord.top_college,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
+      listing_order: req.body.listing_order || existingRecord.listing_order,
+      top_college: req.body.top_college || existingRecord.top_college,
+      // logo: logonames,
+    };
+    if (req.files && req.files.logo) {
+      const avatar = req.files.logo;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/stream_logo/" + logoname;
+
+      await avatar.mv(UploadPath);
+
+      streamUpdates.logo = "stream_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.logo) {
+        const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    if (req.files && req.files.banner) {
+      const avatar = req.files.banner;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "banner" + Date.now() + path.extname(avatar.name);
+      const UploadPath = "./storage/stream_banner/" + logoname;
+
+      await avatar.mv(UploadPath);
+
+      streamUpdates.banner = "stream_banner/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner) {
+        const oldLogoPath = "./storage/" + existingRecord.banner;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Update database record
+    await stream.update(streamUpdates, { where: { id: req.body.id } });
+
 
     res.status(200).send({
       status: 1,
@@ -701,8 +420,8 @@ exports.update =async (req, res) => {
   }
 };
 
-exports.updatefaq = async (req, res) => {
-  const id = req.body.id;
+
+exports.updatefaqs = async (req, res) => {
 
   try {
     if (req.body.faqs && req.body.id) {
@@ -730,4 +449,53 @@ exports.updatefaq = async (req, res) => {
       status: 0,
     });
   }
+};
+
+exports.schoollevelfindAll = async (req, res) => {
+  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  var condition = sendsearch.customseacrh(searchText, searchfrom);
+
+  let data_array = [];
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  level
+    .findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+
+      order: [orderconfig],
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.school,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message || "Some error occurred while retrieving schooltype",
+      });
+    });
 };

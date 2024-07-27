@@ -5,7 +5,18 @@ const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
 
 const Op = db.Sequelize.Op;
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
+// Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -28,7 +39,7 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let logonames = "";
+    let logos = "";
 
     if (req.files && req.files.logo) {
       let avatar = req.files.logo;
@@ -57,19 +68,27 @@ exports.create = async (req, res) => {
         : 0;
 
       if (IsUpload) {
-        logonames = "scholarships_logo/" + logoname;
+        logos = "scholarships_logo/" + logoname;
       }
     }
 
     const scholarshipsDetails = await scholarships.create({
+      level_id: req.body.level_id,
+      type_id: req.body.type_id,
+      country_id: req.body.country_id,
       name: req.body.name,
       slug: req.body.slug,
-      conducted_by: req.body.conducted_by ? req.body.conducted_by : null,
-      region: req.body.region ? req.body.region : null,
-      rewards: req.body.rewards ? req.body.rewards : null,
-      last_date: req.body.last_date ? req.body.last_date : null,
-      status: req.body.status ? req.body.status : null,
-      logo: logonames,
+      gender: req.body.gender,
+      amount: req.body.amount,
+      last_date: req.body.last_date,
+      total_scholarships: req.body.total_scholarships,
+      is_eligible: req.body.is_eligible,
+      logo: logos,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keywords: req.body.meta_keywords,
+      overview: req.body.overview,
+      status: req.body.status,
     });
 
     res.status(200).send({
@@ -86,72 +105,91 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.update = (req, res) => {
-  const id = req.body.id;
-
+exports.update = async (req, res) => {
   try {
-    let logonames = "";
-    let STREAD = {
-      name: req.body.name,
-      slug: req.body.slug,
-      conducted_by: req.body.conducted_by,
-      region: req.body.region ,
-      rewards: req.body.rewards ,
-      last_date: req.body.last_date && req.body.last_date !="null" ? req.body.last_date : null,
-      status: req.body.status ? req.body.status : null,
-    };
+    // Check if the record exists in the database
+    const existingRecord = await scholarships.findOne({
+      where: { id: req.body.id },
+    });
 
-    if (req.files && req.files.logo) {
-      let avatar = req.files.logo;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/scholarships_logo/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        logonames = "scholarships_logo/" + logoname;
-      }
-      STREAD["logo"] = logonames;
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
     }
 
-    scholarships.update(STREAD, {
-      where: { id },
-    });
+    const scholarshipsUpdates = {
+      level_id: req.body.level_id || existingRecord.level_id,
+      type_id: req.body.type_id || existingRecord.type_id,
+      country_id: req.body.country_id || existingRecord.country_id,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      gender: req.body.gender || existingRecord.gender,
+      amount: req.body.amount || existingRecord.amount,
+      last_date: req.body.last_date || existingRecord.last_date,
+      total_scholarships: req.body.total_scholarships || existingRecord.total_scholarships,
+      is_eligible: req.body.is_eligible || existingRecord.is_eligible,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      overview: req.body.overview || existingRecord.overview,
+      status: req.body.status || existingRecord.status,
+    };
+
+    // Check if a new logo is provided
+    if (req.files && req.files.logo) {
+      const avatar = req.files.logo;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/scholarships_logo/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      scholarshipsUpdates.logo = "scholarships_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.logo) {
+        // console.log("existingRecord.icon",existingRecord.logo);
+        const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    // Update database record
+    await scholarships.update(scholarshipsUpdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
-      message: "Data Save Successfully",
+      message: "Data saved successfully",
     });
   } catch (error) {
     return res.status(400).send({
       message: "Unable to update data",
-      errors: error,
+      errors: error.message,
       status: 0,
     });
   }
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -164,7 +202,7 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
 
@@ -177,6 +215,24 @@ exports.findAll = async (req, res) => {
       limit,
       offset,
       subQuery: false,
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholarlevels",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholartypes",
+          attributes: ["id", "name"],
+        },
+
+      ],
       order: [orderconfig],
     })
     .then((data) => {
@@ -203,7 +259,26 @@ exports.findAll = async (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
   scholarships
-    .findByPk(id, {})
+    .findByPk(id, {
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholarlevels",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholartypes",
+          attributes: ["id", "name"],
+        },
+
+      ],
+    })
     .then((data) => {
       if (data) {
         res.status(200).send({

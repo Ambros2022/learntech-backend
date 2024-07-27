@@ -1,5 +1,5 @@
 const db = require("../models");
-const CollegeAndUniversity = db.CollegeAndUniversity;
+const CollegeAndUniversity = db.collegeAndUniversity;
 const school = db.school;
 const Op = db.Sequelize.Op;
 const PUBLISHED = 'Published';
@@ -12,7 +12,7 @@ const enquiry = db.enquiry;
 const city = db.city;
 const area = db.area;
 const blog = db.blog;
-const user = db.user;
+const user = db.users;
 const exam = db.exam;
 
 exports.adminBoard = async  (req, res) => {

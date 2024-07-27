@@ -1,14 +1,26 @@
 const db = require("../models");
 const path = require("path");
-const generalcourse = db.generalcourse;
-const generalcourse_faqs = db.generalcourse_faqs;
+const generalcourse = db.general_course;
+const generalcourse_faq = db.general_course_faqs;
 const _ = require("lodash");
 const Op = db.Sequelize.Op;
 // Array of allowed files
 const sendsearch = require("../utility/Customsearch");
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
+
+// / Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 
 // // Allowed file size in mb
 const allowed_file_size = 2;
@@ -29,39 +41,10 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let logonames = "";
-    let promo_banner_names = "";
+    let logos = "";
+    let banners = "";
 
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
 
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/courses_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "courses_promo_banner/" + logoname;
-      }
-    }
     if (req.files && req.files.logo) {
       let avatar = req.files.logo;
 
@@ -84,46 +67,65 @@ exports.create = async (req, res) => {
 
       let logoname = "logo" + Date.now() + path.extname(avatar.name);
 
-      let IsUpload = avatar.mv("./storage/course_images/" + logoname) ? 1 : 0;
+      let IsUpload = avatar.mv("./storage/course_logo/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "course_images/" + logoname;
+        logos = "course_logo/" + logoname;
+      }
+    }
+
+    if (req.files && req.files.banner) {
+      let avatar = req.files.banner;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "banner" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/course_banner/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        banners = "course_banner/" + logoname;
       }
     }
 
     const generalcoursesDetails = await generalcourse.create({
-      course_stream_name: req.body.course_stream_name,
-      course_stream_slug: req.body.course_stream_slug,
-      course_short_name: req.body.course_short_name
-        ? req.body.course_short_name
-        : null,
-      description: req.body.description ? req.body.description : null,
-      admission: req.body.admission ? req.body.admission : null,
-      carrier_opportunities: req.body.carrier_opportunities
-        ? req.body.carrier_opportunities
-        : null,
-      course_type: req.body.course_type ? req.body.course_type : null,
-      meta_description: req.body.meta_description
-        ? req.body.meta_description
-        : null,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
       stream_id: req.body.stream_id,
-      sub_stream_id: req.body.sub_stream_id ? req.body.sub_stream_id : null,
-      logo: logonames,
-      promo_banner: promo_banner_names,
-      promo_banner_status: req.body.promo_banner_status,
+      sub_streams_id: req.body.sub_streams_id,
+      course_type: req.body.course_type,
+      name: req.body.name,
+      slug: req.body.slug,
+      short_name: req.body.short_name,
+      duration: req.body.duration,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keywords: req.body.meta_keywords,
+      description: req.body.description,
+      syllabus: req.body.syllabus,
+      admissions: req.body.admissions,
+      career_opportunities: req.body.career_opportunities,
+      top_college: req.body.top_college,
+      logo: logos,
+      is_trending: req.body.is_trending,
+      is_top_rank: req.body.is_top_rank,
+      status: req.body.status,
+      banner: banners,
     });
 
-    if (req.body.faqs && generalcoursesDetails.id) {
-      const faqss = JSON.parse(req.body.faqs);
-      await _.forEach(faqss, async function (value) {
-        await generalcourse_faqs.create({
-          generalcourse_id: generalcoursesDetails.id,
-          questions: value.question ? value.question : null,
-          answers: value.answer ? value.answer : null,
-        });
-      });
-    }
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -139,124 +141,116 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  const id = req.body.id;
-  console.log(req.body.meta_title);
-
   try {
-    let logonames = "";
-    let promo_banner_names = "";
-    let STREAD = {
-      course_stream_name: req.body.course_stream_name,
-      course_stream_slug: req.body.course_stream_slug,
-      course_short_name:
-        req.body.course_short_name && req.body.course_short_name !== "null"
-          ? req.body.course_short_name
-          : null,
-      description:
-        req.body.description && req.body.description !== "null"
-          ? req.body.description
-          : null,
-      admission:
-        req.body.admission && req.body.admission !== "null"
-          ? req.body.admission
-          : null,
-      carrier_opportunities:
-        req.body.carrier_opportunities &&
-        req.body.carrier_opportunities !== "null"
-          ? req.body.carrier_opportunities
-          : null,
-      course_type: req.body.course_type ? req.body.course_type : null,
-      meta_description:
-        req.body.meta_description && req.body.meta_description !== "null"
-          ? req.body.meta_description
-          : null,
-      meta_title:
-        req.body.meta_title && req.body.meta_title !== "null"
-          ? req.body.meta_title
-          : null,
-      stream_id: req.body.stream_id,
-      sub_stream_id: req.body.sub_stream_id ? req.body.sub_stream_id : null,
-      promo_banner_status: req.body.promo_banner_status,
-    };
 
-    if (req.files && req.files.promo_banner) {
-      let avatar = req.files.promo_banner;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "promo_banner" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/courses_promo_banner/" + logoname)
-        ? 1
-        : 0;
-
-      if (IsUpload) {
-        promo_banner_names = "courses_promo_banner/" + logoname;
-        STREAD["promo_banner"] = promo_banner_names;
-      }
-    }
-    if (req.files && req.files.logo) {
-      let avatar = req.files.logo;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/course_images/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        logonames = "course_images/" + logoname;
-      }
-      STREAD["logo"] = logonames;
-    }
-
-    generalcourse.update(STREAD, {
+    const existingRecord = await generalcourse.findOne({
       where: { id: req.body.id },
     });
 
-    if (req.body.faqs && req.body.id) {
-      await generalcourse_faqs.destroy({
-        where: { generalcourse_id: req.body.id },
-      });
-      const faqss = JSON.parse(req.body.faqs);
-      await _.forEach(faqss, async function (value) {
-        await generalcourse_faqs.create({
-          generalcourse_id: req.body.id,
-          questions: value.questions ? value.questions : null,
-          answers: value.answers ? value.answers : null,
-        });
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
       });
     }
+
+
+    let generalcourseupdates = {
+      stream_id: req.body.stream_id || existingRecord.stream_id,
+      sub_streams_id: req.body.sub_streams_id || existingRecord.sub_streams_id,
+      course_type: req.body.course_type || existingRecord.course_type,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      short_name: req.body.short_name || existingRecord.short_name,
+      duration: req.body.duration || existingRecord.duration,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
+      description: req.body.description || existingRecord.description,
+      syllabus: req.body.syllabus || existingRecord.syllabus,
+      admissions: req.body.admissions || existingRecord.admissions,
+      career_opportunities: req.body.career_opportunities || existingRecord.career_opportunities,
+      top_college: req.body.top_college || existingRecord.top_college,
+      is_trending: req.body.is_trending || existingRecord.is_trending,
+      is_top_rank: req.body.is_top_rank || existingRecord.is_top_rank,
+      status: req.body.status || existingRecord.status,
+      // logo: logos,
+    };
+
+
+    if (req.files && req.files.logo) {
+      const avatar = req.files.logo;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/course_logo/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      generalcourseupdates.logo = "course_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.logo) {
+
+        const oldLogoPath = "./storage/" + existingRecord.logo;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+    if (req.files && req.files.banner) {
+      const avatar = req.files.banner;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "banner" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/course_banner/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      generalcourseupdates.banner = "course_banner/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner) {
+
+        const oldLogoPath = "./storage/" + existingRecord.banner;
+        await removeFile(oldLogoPath);
+      }
+    }
+
+
+
+
+    // Update database record
+    await generalcourse.update(generalcourseupdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
@@ -272,7 +266,7 @@ exports.update = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, stream_id, searchfrom, columnname, orderby } =
+  const { page, size, searchtext, stream_id, searchfrom, columnname, orderby } =
     req.query;
 
   var column = columnname ? columnname : "id";
@@ -286,23 +280,43 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var conditionStreamId = stream_id ? { stream_id: stream_id } : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
-  conditionStreamId ? data_array.push(conditionStreamId) : null;
+
+  if (stream_id) {
+    data_array.push({ stream_id: stream_id });
+  }
+
   condition ? data_array.push(condition) : null;
-  data_array.push({ is_deleted: 0 });
+
+
+
   const { limit, offset } = getPagination(page, size);
   generalcourse
     .findAndCountAll({
-      where: data_array,
+      where: data_array, condition,
       limit,
       offset,
       include: [
-        { association: "sub_stream", attributes: ["id", "sub_stream_name"] },
-        { association: "streams", attributes: ["id", "stream_name"] },
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "sub_streams",
+          attributes: ["id", "sub_stream_name"],
+        },
+        {
+          required: false,
+          association: "generalcoursefaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+
       ],
       order: [orderconfig],
     })
@@ -327,41 +341,34 @@ exports.findAll = async (req, res) => {
     });
 };
 
+
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  /*generalcourse.findByPk(id, { include: [{ association: 'sub_stream', attributes: ['id', 'sub_stream_name'] },
-    { association: 'streams', attributes: ['id', 'stream_name'] }] })
-*/
-
-  generalcourse
-    .findOne({
-      where: {
-        [Op.or]: [
-          {
-            id: {
-              [Op.eq]: id,
-            },
-          },
-          {
-            course_stream_slug: {
-              [Op.eq]: id,
-            },
-          },
-        ],
+  generalcourse.findByPk(id, {
+    include: [
+      {
+        required: false,
+        association: "streams",
+        attributes: ["id", "name"],
       },
-      include: [
-        { association: "sub_stream", attributes: ["id", "sub_stream_name"] },
-        { association: "streams", attributes: ["id", "stream_name"] },
-        {
-          required: false,
-          association: "faqs",
-          attributes: ["id", "questions", "answers"],
-        },
-      ],
-    })
+      {
+        required: false,
+        association: "sub_streams",
+        attributes: ["id", "sub_stream_name"],
+      },
+      {
+        required: false,
+        association: "generalcoursefaqs",
+        attributes: ["id", "questions", "answers"],
+      },
 
+    ],
+  })
     .then((data) => {
       if (data) {
+
+
+
         res.status(200).send({
           status: 1,
           message: "successfully retrieved",
@@ -370,105 +377,65 @@ exports.findOne = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find generalcourse with id=${id}.`,
+          message: `Cannot find general courses with id=${id}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving generalcourse with id=" + id,
+        message: "Error retrieving general courses with id=" + id,
       });
     });
 };
 
-exports.delete = async (req, res) => {
-
+exports.delete = (req, res) => {
   const id = req.params.id;
-
-
-  try {
-    const item =  await generalcourse.update({ is_deleted: 1},{
-      where: { id: id},
-    });
-
-    // console.log(item);
-    // return 
-    if (!item) {
-      res.status(400).send({
+  generalcourse
+    .destroy({
+      where: { id: id },
+    })
+    .then((num) => {
+      if (num == 1) {
+        res.status(200).send({
+          status: 1,
+          message: "general course  deleted successfully",
+        });
+      } else {
+        res.status(400).send({
+          status: 0,
+          message: `delete general course with id=${id}. Maybe general course was not found!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
         status: 0,
-        message: ` delete generalcourse with id=${id}. Maybe generalcourse was not found!`,
+        message: "Could not delete general course with id=" + id,
       });
-    }
-   
-   return res.status(200).send({
-      status: 1,
-      message: "generalcourse  deleted successfully",
-   
     });
-    // res.json(item);
-  } catch (err) {
-    res.status(500).send({
-      status: 0,
-      message: "Could not delete generalcourse with id=" + id,
-    });
-  }
-
- 
 };
-// exports.delete = (req, res) => {
-//   const id = req.params.id;
-//   generalcourse
-//     .destroy({
-//       where: { id: id },
-//     })
-//     .then((num) => {
-//       if (num == 1) {
-//         res.status(200).send({
-//           status: 1,
-//           message: "generalcourse  deleted successfully",
-//         });
-//       } else {
-//         res.status(400).send({
-//           status: 0,
-//           message: ` delete generalcourse with id=${id}. Maybe generalcourse was not found!`,
-//         });
-//       }
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         status: 0,
-//         message: "Could not delete Stream with id=" + id,
-//       });
-//     });
-// };
+
 
 exports.updatefaq = async (req, res) => {
-  // return console.log(req.body);
 
   try {
     if (req.body.faqs && req.body.id) {
-      await generalcourse_faqs.destroy({
-        where: { generalcourse_id: req.body.id },
+      await generalcourse_faq.destroy({
+        where: { general_course_id: req.body.id },
       });
-      //  let data=  generalcourse_faqs.create({
-      //     generalcourse_id : 2708,
-      //     questions: "value.questions ? value.questions : null",
-      //     answers: "value.answers ? value.answers : null",
-      //   });
-
       const faqss = JSON.parse(req.body.faqs);
-      await _.forEach(faqss, async function (value) {
-        await generalcourse_faqs.create({
-          generalcourse_id: req.body.id,
+      await _.forEach(faqss, function (value) {
+        generalcourse_faq.create({
+          general_course_id: req.body.id,
           questions: value.questions ? value.questions : null,
           answers: value.answers ? value.answers : null,
         });
       });
     }
+
     res.status(200).send({
       status: 1,
-
       message: "Data Save Successfully",
     });
   } catch (error) {

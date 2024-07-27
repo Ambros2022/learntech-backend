@@ -31,58 +31,58 @@ function makeid(length) {
 
 
 const updateFile = () => {
+
+  const htaccessContent = makeid(6);
+
+  fs.writeFile("test.htaccess", htaccessContent, (err) => {
+    if (err) {
+      return res.status(500).send({ error: "Failed to update .htaccess file" });
+    }
+
+  });
+};
+
+
+
+exports.getFile = async (req, res) => {
+
+  let filename = "test.htaccess";
+  fs.readFile(filename, 'utf8', function (err, data) {
+    if (err) {
+      return res.status(500).send({ error: "No data" });
+    }
+    // console.log('OK: ' + filename);
+    // console.log(data)
  
-  const htaccessContent =makeid(6);
-
-  fs.writeFile("test.htaccess", htaccessContent, (err) => {
-    if (err) {
-      return res.status(500).send({ error: "Failed to update .htaccess file" });
-    }
-  
+    return res.status(200).send({
+      status: 1,
+      data: data,
+    });
   });
+
+  // fs.writeFile("test.htaccess", htaccessContent, (err) => {
+  //   if (err) {
+  //     return res.status(500).send({ error: "Failed to update .htaccess file" });
+  //   }
+
+  // });
 };
 
 
+// exports.overwite = async (req, res) => {
+//   const statuscode = req.body.status_code;
+//   const old_url = req.body.old_url;
+//   const new_url = "http://example.com" + req.body.new_url;
+//   const htaccessContent =
+//     " " + "Redirect" + " " + statuscode + " " + old_url + " " + new_url;
 
-  exports.getFile = async (req, res) => {
- 
-let filename="test.htaccess";
-fs.readFile(filename, 'utf8', function(err, data) {
-  if (err) {
-    return res.status(500).send({ error: "No data" });
-  }
-  console.log('OK: ' + filename);
-  console.log(data)
-
-  return res.status(200).send({
-    status:1,
-    data:data,
-  });
-});
-
-  fs.writeFile("test.htaccess", htaccessContent, (err) => {
-    if (err) {
-      return res.status(500).send({ error: "Failed to update .htaccess file" });
-    }
-  
-  });
-};
-
-
-exports.overwite = async (req, res) => {
-  const statuscode = req.body.status_code;
-  const old_url = req.body.old_url;
-  const new_url = "http://example.com" + req.body.new_url;
-  const htaccessContent =
-    " " + "Redirect" + " " + statuscode + " " + old_url + " " + new_url;
-
-  fs.writeFile("test.htaccess", htaccessContent, (err) => {
-    if (err) {
-      return res.status(500).send({ error: "Failed to update .htaccess file" });
-    }
-    res.send({ message: "Successfully updated .htaccess file" });
-  });
-};
+//   fs.writeFile("test.htaccess", htaccessContent, (err) => {
+//     if (err) {
+//       return res.status(500).send({ error: "Failed to update .htaccess file" });
+//     }
+//     res.send({ message: "Successfully updated .htaccess file" });
+//   });
+// };
 
 exports.create = async (req, res) => {
   try {
@@ -101,22 +101,22 @@ exports.create = async (req, res) => {
         data: redirecturlDetails,
         message2: "Successfully updated .htaccess file",
       });
-    /*  let old_url = redirecturlDetails.old_url;
-      let new_url = "http://example.com" + redirecturlDetails.new_url;
-      let statuscode = redirecturlDetails.status_code;
-
-      const htaccessContent =
-        " " + "Redirect" + " " + statuscode + " " + old_url + " " + new_url;
-
-       fs.writeFile("test.htaccess", htaccessContent,(err) => {
-        if (err) {
-          return res
-            .status(500)
-            .send({ error: "Failed to update .htaccess file" });
-        }
-   
-        // res.send({ message: "Successfully updated .htaccess file" });
-      });*/
+      /*  let old_url = redirecturlDetails.old_url;
+        let new_url = "http://example.com" + redirecturlDetails.new_url;
+        let statuscode = redirecturlDetails.status_code;
+  
+        const htaccessContent =
+          " " + "Redirect" + " " + statuscode + " " + old_url + " " + new_url;
+  
+         fs.writeFile("test.htaccess", htaccessContent,(err) => {
+          if (err) {
+            return res
+              .status(500)
+              .send({ error: "Failed to update .htaccess file" });
+          }
+     
+          // res.send({ message: "Successfully updated .htaccess file" });
+        });*/
     }
   } catch (error) {
     return res.status(400).send({
@@ -128,21 +128,21 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
   var orderconfig = [column, order];
- // updateFile();
+  // updateFile();
   const myArray = column.split(".");
   if (typeof myArray[1] !== "undefined") {
     var table = myArray[0];
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
-  let sizes=size=='300'?1500:size;
+  let sizes = size == '300' ? 1500 : size;
 
   const { limit, offset } = getPagination(page, sizes);
   redirecturl
@@ -176,6 +176,7 @@ exports.delete = (req, res) => {
     })
     .then((num) => {
       if (num == 1) {
+
         res.status(200).send({
           status: 1,
           message: "redirecturl  deleted successfully",
@@ -236,7 +237,7 @@ exports.update = (req, res) => {
 
 
 
-      updateFile();
+    updateFile();
 
     res.status(200).send({
       status: 1,

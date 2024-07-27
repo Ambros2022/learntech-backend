@@ -2,21 +2,26 @@ const db = require("../models");
 const path = require("path");
 const school = db.school;
 const _ = require("lodash");
-const schoolaccreditations = db.schoolaccreditations;
 const schoollevels = db.schoollevels;
-const schooltype = db.schooltype;
 const level = db.level;
 const schoolamenities = db.schoolamenities;
-const schoolmanagment = db.schoolmanagment;
-const schoolaffiliations = db.schoolaffiliations;
-const schoolrecognition = db.schoolrecognition;
 const school_faqs = db.school_faqs;
 const sendsearch = require("../utility/Customsearch");
-const boardschools = db.boardschools;
 const schoolgallery = db.schoolgallery;
 const Op = db.Sequelize.Op;
 // Array of allowed files
-const fileTypes  = require("../config/fileTypes");
+const fileTypes = require("../config/fileTypes");
+// Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 
@@ -36,13 +41,15 @@ const getPagingData = (data, page, limit) => {
   const totalPages = Math.ceil(totalItems / limit);
   return { totalItems, school, totalPages, currentPage };
 };
+// Function to remove a file
 
 exports.create = async (req, res) => {
   try {
-    let logonames = "";
+    let icons = "";
+    let bannerimages = "";
 
-    if (req.files && req.files.school_logo) {
-      let avatar = req.files.school_logo;
+    if (req.files && req.files.icon) {
+      let avatar = req.files.icon;
 
       // Check if the uploaded file is allowed
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
@@ -66,108 +73,87 @@ exports.create = async (req, res) => {
       let IsUpload = avatar.mv("./storage/school_logo/" + logoname) ? 1 : 0;
 
       if (IsUpload) {
-        logonames = "school_logo/" + logoname;
+        icons = "school_logo/" + logoname;
       }
     }
 
-    let total_seats =
-      req.body.total_seats == "null" || req.body.total_seats == ""
-        ? null
-        : req.body.total_seats;
-    let listingvalue =
-      req.body.listing_order == 0 || req.body.listing_order == ""
-        ? null
-        : req.body.listing_order;
+    if (req.files && req.files.banner_image) {
+      let avatar = req.files.banner_image;
+
+      // Check if the uploaded file is allowed
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/school_banner_image/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        bannerimages = "school_banner_image/" + logoname;
+      }
+    }
+
     const schoolDetails = await school.create({
-      school_name: req.body.school_name,
-      school_slug: req.body.school_slug,
-      video_url: req.body.video_url ? req.body.video_url : null,
-      meta_title: req.body.meta_title ? req.body.meta_title : null,
-      meta_description: req.body.meta_description
-        ? req.body.meta_description
-        : null,
-      area_id: req.body.area_id,
-      // school_board_id: req.body.school_board_id,
+      country_id: req.body.country_id,
+      state_id: req.body.state_id,
       city_id: req.body.city_id,
-      school_type_id: req.body.school_type_id,
-      // school_level_id: req.body.school_level_id,
-      genders_accepted: req.body.genders_accepted,
-      established: req.body.established ? req.body.established : null,
-      status: req.body.status ? req.body.status : null,
-      address: req.body.address ? req.body.address : null,
-      map: req.body.map ? req.body.map : null,
-      total_seats: total_seats,
-      listing_order: listingvalue,
-      about: req.body.about ? req.body.about : null,
-      extra_curricular: req.body.extra_curricular
-        ? req.body.extra_curricular
-        : null,
-      school_logo: logonames,
+      school_board_id: req.body.school_board_id,
+      name: req.body.name,
+      slug: req.body.slug,
+      status: req.body.status,
+      home_view_status: req.body.home_view_status,
+      school_type: req.body.school_type,
+      listing_order: req.body.listing_order,
+      established: req.body.established,
+      meta_title: req.body.meta_title,
+      meta_description: req.body.meta_description,
+      meta_keyword: req.body.meta_keyword,
+      address: req.body.address,
+      map: req.body.map,
+      icon: icons,
+      banner_image: bannerimages,
+      video_url: req.body.video_url,
+      avg_rating: req.body.avg_rating,
+      info: req.body.info,
+      admissions_process: req.body.admissions_process,
+      extracurriculars: req.body.extracurriculars,
     });
 
-    if (req.body.board_id && schoolDetails.id) {
-      const boards = JSON.parse(req.body.board_id);
-      _.forEach(boards, async function (value) {
-        await boardschools.create({
+
+    if (req.body.amenities && schoolDetails.id) {
+      const amndata = JSON.parse(req.body.amenities);
+      _.forEach(amndata, async function (value) {
+
+        await schoolamenities.create({
           school_id: schoolDetails.id,
-          board_id: value.board_id,
+          amenitie_id: value.id,
         });
       });
     }
-    if (req.body.level_id && schoolDetails.id) {
-      const levels = JSON.parse(req.body.level_id);
-      _.forEach(levels, async function (value) {
+
+    if (req.body.levels && schoolDetails.id) {
+      const amndata = JSON.parse(req.body.levels);
+      _.forEach(amndata, async function (value) {
         await schoollevels.create({
           school_id: schoolDetails.id,
-          level_id: value.level_id,
+          level_id: value.id,
         });
       });
     }
-    if (req.body.accreditation_id && schoolDetails.id) {
-      const acccredations = JSON.parse(req.body.accreditation_id);
-      _.forEach(acccredations, function (value) {
-        schoolaccreditations.create({
-          school_id: schoolDetails.id,
-          accreditation_id: value.accreditation_id,
-        });
-      });
-    }
-    if (req.body.amenities_id && schoolDetails.id) {
-      const amenities = JSON.parse(req.body.amenities_id);
-      _.forEach(amenities, function (value) {
-        schoolamenities.create({
-          school_id: schoolDetails.id,
-          amenities_id: value.amenities_id ? value.amenities_id : null,
-        });
-      });
-    }
-    if (req.body.management_id && schoolDetails.id) {
-      const management = JSON.parse(req.body.management_id);
-      _.forEach(management, function (value) {
-        schoolmanagment.create({
-          school_id: schoolDetails.id,
-          management_id: value.management_id,
-        });
-      });
-    }
-    if (req.body.recognition_id && schoolDetails.id) {
-      const recognition = JSON.parse(req.body.recognition_id);
-      _.forEach(recognition, function (value) {
-        schoolrecognition.create({
-          school_id: schoolDetails.id,
-          recognition_id: value.recognition_id,
-        });
-      });
-    }
-    if (req.body.affiliations_id && schoolDetails.id) {
-      const affiliations = JSON.parse(req.body.affiliations_id);
-      _.forEach(affiliations, function (value) {
-        schoolaffiliations.create({
-          school_id: schoolDetails.id,
-          affiliations_id: value.affiliations_id,
-        });
-      });
-    }
+
 
     res.status(200).send({
       status: 1,
@@ -184,178 +170,141 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-  const id = req.body.id;
-  // console.log(id);
-  // console.log(req.body);
 
   try {
-    let logonames = "";
-    let total_seats =
-      req.body.total_seats == "null" || req.body.total_seats == ""
-        ? null
-        : req.body.total_seats;
-    let listingvalue =
-      req.body.listing_order == 0 || req.body.listing_order == ""
-        ? null
-        : req.body.listing_order;
-    // console.log(total_seats);
-    // console.log("total_seats");
-    let STREAD = {
-      school_name: req.body.school_name,
-      school_slug: req.body.school_slug,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      // school_board_id: req.body.school_board_id,
-      area_id: req.body.area_id,
-      city_id: req.body.city_id,
-      school_type_id: req.body.school_type_id,
-      // school_level_id: req.body.school_level_id,
-      genders_accepted: req.body.genders_accepted,
-      established:
-        req.body.established && req.body.established != "null"
-          ? req.body.established
-          : null,
-      status: req.body.status ? req.body.status : null,
-      address:
-        req.body.address && req.body.address != "null"
-          ? req.body.address
-          : null,
-      video_url:
-        req.body.video_url && req.body.video_url != "null"
-          ? req.body.video_url
-          : null,
-      map: req.body.map && req.body.map != "null" ? req.body.map : null,
-      total_seats: total_seats,
-      listing_order: listingvalue,
-      about: req.body.about && req.body.about != "null" ? req.body.about : null,
-      extra_curricular:
-        req.body.extra_curricular && req.body.extra_curricular != "null"
-          ? req.body.extra_curricular
-          : null,
-    };
 
-    if (req.files && req.files.school_logo) {
-      let avatar = req.files.school_logo;
-
-      // Check if the uploaded file is allowed
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/school_logo/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        logonames = "school_logo/" + logoname;
-      }
-      STREAD["school_logo"] = logonames;
-    }
-
-    await school.update(STREAD, {
-      where: { id },
+    const existingRecord = await school.findOne({
+      where: { id: req.body.id },
     });
 
-    if (req.body.board_id && id) {
-      await boardschools.destroy({
-        where: { school_id: id },
-      });
-      const boards = JSON.parse(req.body.board_id);
-      await _.forEach(boards, async function (value) {
-        await boardschools.create({
-          school_id: id,
-          board_id: value.board_id,
-        });
-      });
-    }
-    if (req.body.level_id && id) {
-      await schoollevels.destroy({
-        where: { school_id: id },
-      });
-      const levels = JSON.parse(req.body.level_id);
-      await _.forEach(levels, async function (value) {
-        await schoollevels.create({
-          school_id: id,
-          level_id: value.level_id,
-        });
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
       });
     }
 
-    if (req.body.accreditation_id && id) {
-      await schoolaccreditations.destroy({
-        where: { school_id: id },
-      });
-      const acccredations = JSON.parse(req.body.accreditation_id);
-      await _.forEach(acccredations, async function (value) {
-        await schoolaccreditations.create({
-          school_id: id,
-          accreditation_id: value.accreditation_id,
+    let Schoolupdates = {
+      country_id: req.body.country_id || existingRecord.country_id,
+      state_id: req.body.state_id || existingRecord.state_id,
+      city_id: req.body.city_id || existingRecord.city_id,
+      school_board_id: req.body.school_board_id || existingRecord.school_board_id,
+      name: req.body.name || existingRecord.name,
+      slug: req.body.slug || existingRecord.slug,
+      status: req.body.status || existingRecord.status,
+      home_view_status: req.body.home_view_status || existingRecord.home_view_status,
+      school_type: req.body.school_type || existingRecord.school_type,
+      listing_order: req.body.listing_order || existingRecord.listing_order,
+      established: req.body.established || existingRecord.established,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
+      address: req.body.address || existingRecord.address,
+      map: req.body.map || existingRecord.map,
+      video_url: req.body.video_url || existingRecord.video_url,
+      avg_rating: req.body.avg_rating || existingRecord.avg_rating,
+      info: req.body.info || existingRecord.info,
+      admissions_process: req.body.admissions_process || existingRecord.admissions_process,
+      extracurriculars: req.body.extracurriculars || existingRecord.extracurriculars,
+
+    };
+
+    // Check if a new logo is provided
+    if (req.files && req.files.icon) {
+      const avatar = req.files.icon;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
         });
-      });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/school_logo/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      Schoolupdates.icon = "school_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.icon) {
+
+        const oldLogoPath = "./storage/" + existingRecord.icon;
+        await removeFile(oldLogoPath);
+      }
+    }
+    if (req.files && req.files.banner_image) {
+      const avatar = req.files.banner_image;
+
+      // Check file type and size
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid file type",
+          errors: {},
+          status: 0,
+        });
+      }
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large",
+          errors: {},
+          status: 0,
+        });
+      }
+
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/school_banner_image/" + logoname;
+
+      await avatar.mv(uploadPath);
+
+      Schoolupdates.banner_image = "school_banner_image/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.banner_image) {
+
+        const oldLogoPath = "./storage/" + existingRecord.banner_image;
+        await removeFile(oldLogoPath);
+      }
     }
 
-    if (req.body.amenities_id && id) {
+    // Update database record
+    await school.update(Schoolupdates, { where: { id: req.body.id } });
+
+    if (req.body.amenities && req.body.id) {
       await schoolamenities.destroy({
-        where: { school_id: id },
+        where: { school_id: req.body.id },
       });
-      const acccredations = JSON.parse(req.body.amenities_id);
-      await _.forEach(acccredations, async function (value) {
+      const amndata = JSON.parse(req.body.amenities);
+      _.forEach(amndata, async function (value) {
         await schoolamenities.create({
-          school_id: id,
-          amenities_id: value.amenities_id,
+          school_id: req.body.id,
+          amenitie_id: value.id,
+        });
+      });
+    }
+    if (req.body.levels && req.body.id) {
+      await schoollevels.destroy({
+        where: { school_id: req.body.id },
+      });
+      const amndata = JSON.parse(req.body.levels);
+      _.forEach(amndata, async function (value) {
+        await schoollevels.create({
+          school_id: req.body.id,
+          level_id: value.id,
         });
       });
     }
 
-    if (req.body.management_id && id) {
-      await schoolmanagment.destroy({
-        where: { school_id: id },
-      });
-      const acccredations = JSON.parse(req.body.management_id);
-      await _.forEach(acccredations, async function (value) {
-        await schoolmanagment.create({
-          school_id: id,
-          management_id: value.management_id,
-        });
-      });
-    }
-
-    if (req.body.recognition_id && id) {
-      await schoolrecognition.destroy({
-        where: { school_id: id },
-      });
-      const recognition = JSON.parse(req.body.recognition_id);
-      await _.forEach(recognition, async function (value) {
-        await schoolrecognition.create({
-          school_id: id,
-          recognition_id: value.recognition_id,
-        });
-      });
-    }
-    if (req.body.affiliations_id && id) {
-      await schoolaffiliations.destroy({
-        where: { school_id: id },
-      });
-      const affiliations = JSON.parse(req.body.affiliations_id);
-      await _.forEach(affiliations, async function (value) {
-        await schoolaffiliations.create({
-          school_id: id,
-          affiliations_id: value.affiliations_id,
-        });
-      });
-    }
 
     res.status(200).send({
       status: 1,
@@ -374,13 +323,12 @@ exports.findAll = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
-    city_id,
-    area_id,
-    school_type_id,
     columnname,
     orderby,
+    school_board_id,
+    status,
   } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -394,18 +342,19 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
 
-  var conditioncityid = city_id ? { city_id: city_id } : null;
-  var conditionarea_id = area_id ? { area_id: area_id } : null;
-  var conditionschool_type_id = school_type_id
-    ? { school_type_id: school_type_id }
-    : null;
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
-  conditioncityid ? data_array.push(conditioncityid) : null;
-  conditionarea_id ? data_array.push(conditionarea_id) : null;
-  conditionschool_type_id ? data_array.push(conditionschool_type_id) : null;
+
+  if (school_board_id) {
+    data_array.push({ school_board_id: school_board_id });
+  }
+
+  if (status) {
+    data_array.push({ status: status });
+  }
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -415,75 +364,31 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
-      // subQuery: false,
       include: [
         {
           required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
           association: "citys",
-          attributes: ["id", "city_name"],
-        },
-        // {  required: false,association: "schoolboard", attributes: ["id", "name"] },
-        {
-          required: false,
-          association: "areas",
-          attributes: ["id", "area_name"],
+          attributes: ["id", "name"],
         },
         {
           required: false,
-          association: "schooltype",
-          attributes: ["id", "type"],
+          association: "schoolboard",
+          attributes: ["id", "name"],
         },
-        // { association: "schoollevel", attributes: ["id", "level"] },
-        {
-          required: false,
-          association: "boardschools",
-          attributes: ["id", "board_id"],
-          include: [
-            {
-              required: false,
-              association: "schbrdname",
-              attributes: ["id", "name"],
-            },
-          ],
-        },
-        {
-          required: false,
-          association: "schoollevels",
-          attributes: ["id", "level_id"],
-          include: [
-            {
-              required: false,
-              association: "schlevelname",
-              attributes: ["id", "level_name"],
-            },
-          ],
-        },
-        {
-          required: false,
-          association: "schoolaccreditations",
-          attributes: ["id", "accreditation_id"],
-        },
-        {
-          required: false,
-          association: "schoolamenities",
-          attributes: ["id", "amenities_id"],
-        },
-        {
-          required: false,
-          association: "schoolmanagment",
-          attributes: ["id", "management_id"],
-        },
-        {
-          required: false,
-          association: "schoolrecognition",
-          attributes: ["id", "recognition_id"],
-        },
-        {
-          required: false,
-          association: "schoolaffiliations",
-          attributes: ["id", "affiliations_id"],
-        },
+
       ],
+      subQuery: false,
+
       order: [orderconfig],
     })
     .then((data) => {
@@ -492,7 +397,6 @@ exports.findAll = async (req, res) => {
       res.status(200).send({
         status: 1,
         message: "success",
-        // data: response,
         totalItems: response.totalItems,
         currentPage: response.currentPage,
         totalPages: response.totalPages,
@@ -512,99 +416,77 @@ exports.findOne = (req, res) => {
   school
     .findByPk(id, {
       include: [
-        { association: "citys", attributes: ["id", "city_name"] },
-        // { association: "schoolboard", attributes: ["id", "name"] },
-        { association: "areas", attributes: ["id", "area_name"] },
-        { association: "schooltype", attributes: ["id", "type"] },
         {
-          association: "schfaqs",
-          attributes: ["id", "questions", "answers"],
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
         },
         {
           required: false,
-          association: "boardschools",
-          attributes: ["id", "board_id"],
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schoolboard",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schoolamenities",
+          attributes: ["id", "amenitie_id"],
           include: [
             {
-              required: false,
-              association: "schbrdname",
+              association: "schamenities",
+              attributes: ["id", "amenities_name"],
+            },
+          ],
+        },
+        {
+          required: false,
+          association: "schoollevels",
+          attributes: ["id"],
+          include: [
+            {
+              association: "schlevelname",
               attributes: ["id", "name"],
             },
           ],
         },
+
         {
-          association: "schoollevels",
-          attributes: ["id", "level_id"],
-          include: [
-            {
-              association: "schlevelname",
-              attributes: ["id", "level_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolaccreditations",
-          attributes: ["id", "accreditation_id"],
-          include: [
-            {
-              association: "schaccreditationname",
-              attributes: ["id", "accreditation_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolamenities",
-          attributes: ["id", "amenities_id"],
-          include: [
-            {
-              association: "schamenitiename",
-              attributes: ["id", "amenities_name", "amenities_logo"],
-            },
-          ],
-        },
-        {
-          association: "schoolmanagment",
-          attributes: ["id", "management_id"],
-          include: [
-            {
-              association: "schmanagementname",
-              attributes: ["id", "management_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolrecognition",
-          attributes: ["id", "recognition_id"],
-          include: [
-            {
-              association: "schrecognitionname",
-              attributes: ["id", "recognition_approval_name"],
-            },
-          ],
-        },
-        {
-          association: "schoolaffiliations",
-          attributes: ["id", "affiliations_id"],
-          include: [
-            {
-              association: "schaffiliationname",
-              attributes: ["id", "other_affiliations_name"],
-            },
-          ],
+          required: false,
+          association: "schgallery",
+          attributes: ["id", "image"],
         },
         {
           required: false,
-          association: "schoolgallery",
-          attributes: ["id", "image"],
+          association: "schfaqs",
+          attributes: ["id", "questions","answers"],
         },
+
       ],
+
     })
     .then((data) => {
+      // Extracting only the necessary information from schoolamenities
+      // console.log(data.schoolamenities);
+      // const amenities = data.schoolamenities.map((item) => ({
+      //   id: item.id,
+      //   amenities_name: item.schamenities.amenities_name,
+      // }));
       if (data) {
+
         res.status(200).send({
           status: 1,
-          message: "successfully retrieved",
+          message: "Successfully retrieved",
           data: data,
+          // data: [{ schoolamenities: amenities }, ...data],
         });
       } else {
         res.status(400).send({
@@ -648,54 +530,159 @@ exports.delete = (req, res) => {
     });
 };
 
-exports.schooltypefindAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
+exports.updatefaqs = async (req, res) => {
 
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
-
-  let data_array = [];
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  schooltype
-    .findAndCountAll({
-      where: data_array,
-      limit,
-      offset,
-
-      order: [orderconfig],
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.school,
+  try {
+    if (req.body.faqs && req.body.id) {
+      await school_faqs.destroy({
+        where: { school_id: req.body.id },
       });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message || "Some error occurred while retrieving schooltype",
+      const faqss = JSON.parse(req.body.faqs);
+      await _.forEach(faqss, function (value) {
+        school_faqs.create({
+          school_id: req.body.id,
+          questions: value.questions ? value.questions : null,
+          answers: value.answers ? value.answers : null,
+        });
       });
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: "Data Save Successfully",
     });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to update data",
+      errors: error,
+      status: 0,
+    });
+  }
 };
+
+
+
+
+exports.updategallery = async (req, res) => {
+  try {
+    // Check if old images are provided
+    if (req.body.oldimages) {
+      const oldImages = JSON.parse(req.body.oldimages);
+
+      if (Array.isArray(oldImages) && oldImages.length > 0) {
+        let finaloldimage = [];
+
+        await Promise.all(oldImages.map(async (obj) => {
+          const parts = obj.dataURL.split('/');
+          const desiredPart = parts[parts.length - 2] + '/' + parts.pop();
+          finaloldimage.push(desiredPart);
+        }));
+
+        let oldRecordsToDelete = await schoolgallery.findAll({
+          where: {
+            school_id: req.body.id,
+            image: {
+              [Op.notIn]: finaloldimage
+            }
+          }
+        });
+
+
+
+        if (oldRecordsToDelete.length > 0) {
+          let deletedRecords = await schoolgallery.destroy({
+            where: {
+              school_id: req.body.id,
+              image: {
+                [Op.notIn]: finaloldimage
+              }
+            },
+          });
+          oldRecordsToDelete.map(async (value) => {
+
+            const oldLogoPath = "./storage/" + value.image;
+            await removeFile(oldLogoPath);
+
+
+          });
+        }
+
+
+      } else {
+
+        let oldRecordsToDelete = await schoolgallery.findAll({
+          where: {
+            school_id: req.body.id,
+
+          }
+        });
+
+
+
+        if (oldRecordsToDelete.length > 0) {
+          let deletedRecords = await schoolgallery.destroy({
+            where: {
+              school_id: req.body.id,
+            },
+          });
+          oldRecordsToDelete.map(async (value) => {
+            const oldLogoPath = "./storage/" + value.image;
+            await removeFile(oldLogoPath);
+
+
+          });
+        }
+
+      }
+
+      // Check if new images are uploaded
+      if (req.files) {
+        const images = Object.values(req.files);
+
+        // Process uploaded images
+        await Promise.all(images.map(async (imageData) => {
+          const imgname = "image" + Date.now() + Math.random() + path.extname(imageData.name);
+          const destination = "./storage/school_galleries/" + imgname;
+
+          try {
+            // Move the uploaded image to the server
+            await imageData.mv(destination);
+
+            // Save the image path to the database
+            await schoolgallery.create({
+              school_id: req.body.id,
+              image: "school_galleries/" + imgname,
+            });
+          } catch (error) {
+            // Handle error during file operations
+            console.error("Error processing image:", error);
+            throw error; // Re-throw the error to trigger the catch block
+          }
+        }));
+      }
+
+      // Send success response
+      return res.status(200).send({
+        status: 1,
+        message: "Data saved successfully",
+      });
+    }
+  } catch (error) {
+    console.error("Error updating gallery:", error);
+    return res.status(500).send({
+      message: "Unable to process the request",
+      status: 0,
+    });
+  }
+};
+
+
+
+
+
+
+
+
 exports.schoollevelfindAll = async (req, res) => {
   const { page, size, searchText, searchfrom, columnname, orderby } = req.query;
 
@@ -743,169 +730,4 @@ exports.schoollevelfindAll = async (req, res) => {
           err.message || "Some error occurred while retrieving schooltype",
       });
     });
-};
-exports.updatefaqs = async (req, res) => {
-  try {
-    if (req.body.schfaqs && req.body.id) {
-      await school_faqs.destroy({
-        where: { school_id: req.body.id },
-      });
-      const faqss = JSON.parse(req.body.schfaqs);
-      await _.forEach(faqss, function (value) {
-        school_faqs.create({
-          school_id: req.body.id,
-          questions: value.questions ? value.questions : null,
-          answers: value.answers ? value.answers : null,
-        });
-      });
-    }
-
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-    });
-  } catch (error) {
-    return res.status(400).send({
-      message: "Unable to update data",
-      errors: error,
-      status: 0,
-    });
-  }
-};
-
-exports.updategallery = async (req, res) => {
-  try {
-    let oldimageids = [];
-    if (req.body.oldimage) {
-      let dataArray = JSON.parse(req.body.oldimage);
-      if (dataArray && dataArray.length > 0) {
-        oldimageids = dataArray.map((item) => item.id);
-      }
-    }
-
-    let images = [];
-
-    if (!req.files) {
-      await schoolgallery.destroy({
-        where: {
-          school_id: req.body.id,
-          id: {
-            [Op.notIn]: oldimageids,
-          },
-        },
-      });
-      return res.status(200).send({
-        status: 1,
-        message: "olf files removed successfully",
-      });
-    }
-    if (!req.body.id) {
-      return res.status(400).send({
-        message: "Invalid request, please provide gallery ID and image",
-        status: 0,
-      });
-    }
-
-    const avatar = req.files.image;
-
-    if (Array.isArray(avatar)) {
-      for (const element of avatar) {
-        if (!array_of_allowed_file_types.includes(element.mimetype)) {
-          return res.status(400).send({
-            message: "Invalid file type",
-            status: 0,
-          });
-        }
-
-        if (element.size / (1024 * 1024) > allowed_file_size) {
-          return res.status(400).send({
-            message: "File too large",
-            status: 0,
-          });
-        }
-
-        const imgname =
-          "image" + Date.now() + Math.random() + path.extname(element.name);
-        // console.log("imgname",imgname);
-
-        let isUploaded;
-        try {
-          await element.mv("./storage/schoolgallery/" + imgname);
-          isUploaded = true;
-        } catch (error) {
-          isUploaded = false;
-          console.error("File upload error: ", error);
-        }
-        if (isUploaded) {
-          images.push("schoolgallery/" + imgname);
-        }
-      }
-    } else {
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid file type",
-          status: 0,
-        });
-      }
-
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large",
-          status: 0,
-        });
-      }
-
-      const imgname = "image" + Date.now() + path.extname(avatar.name);
-
-      let isUploaded;
-      try {
-        await avatar.mv("./storage/schoolgallery/" + imgname);
-        isUploaded = true;
-      } catch (error) {
-        isUploaded = false;
-        console.error("File upload error: ", error);
-      }
-      if (isUploaded) {
-        images.push("schoolgallery/" + imgname);
-      }
-    }
-
-    if (images.length === 0) {
-      return res.status(400).send({
-        message: "Please insert images",
-        status: 0,
-      });
-    }
-
-    // await schoolgallery.destroy({
-    //   where: { school_id: req.body.id },
-    //   id: { [Op.notIn]: [16,19] }
-    // });
-    await schoolgallery.destroy({
-      where: {
-        school_id: req.body.id,
-        id: {
-          [Op.notIn]: oldimageids,
-        },
-      },
-    });
-    for (const value of images) {
-      await schoolgallery.create({
-        school_id: req.body.id,
-        image: value,
-        // status: "featured",
-      });
-    }
-
-    return res.status(200).send({
-      status: 1,
-      message: "Data saved successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({
-      message: "Unable to process the request",
-      status: 0,
-    });
-  }
 };

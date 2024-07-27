@@ -1,5 +1,5 @@
 +
-
+eegit 
 
 preproddatabase = bstudynode
 live database name = bangalore_study_react
@@ -120,3 +120,5 @@ npm install
 ```
 node server.js
 ```
+
+

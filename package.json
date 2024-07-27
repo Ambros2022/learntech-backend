@@ -4,11 +4,10 @@
   "description": "learntechww is a eduction portal",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "test": "nodemon index.js",
+    "dev": "node index.js"
   },
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "ambrostech",
   "license": "ISC",
   "dependencies": {
@@ -17,8 +16,8 @@
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "dotenv": "^16.0.1",
-    "express": "^4.18.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.3",
     "express-fileupload": "^1.4.0",
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
@@ -30,7 +29,9 @@
     "mysqldump": "^3.2.0",
     "node": "^18.7.0",
     "node-mailer": "^0.1.1",
-    "nodemailer": "^6.7.8",
+    "nodemailer": "^6.9.12",
+    "pg": "^8.11.5",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^5.22.5",
     "sequelize-cli": "^6.4.1",
     "sequelize-constants": "^1.0.0",

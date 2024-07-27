@@ -1,15 +1,24 @@
 const db = require("../models");
 const path = require("path");
-const Amenities = db.amenities;
-const _ = require("lodash");
-const sendsearch = require("../utility/Customsearch");
-const Op = db.Sequelize.Op;
-const fileTypes  = require("../config/fileTypes");
-// Array of allowed files
-const array_of_allowed_file_types = fileTypes.Imageformat;
 
-// Allowed file size in mb
+const Amenities = db.amenities;
+const sendsearch = require("../utility/Customsearch");
+const fileTypes = require("../config/fileTypes");
+
+const array_of_allowed_file_types = fileTypes.Imageformat;
 const allowed_file_size = 2;
+// Function to remove a file
+const fs = require("fs").promises;
+async function removeFile(filePath) {
+  try {
+    await fs.unlink(filePath);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -86,7 +95,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, columnname, searchfrom, orderby } = req.query;
+  const { page, size, searchtext, columnname, searchfrom, orderby } = req.query;
 
   var column = columnname ? columnname : "amenities_name";
   var order = orderby ? orderby : "ASC";
@@ -98,7 +107,7 @@ exports.findAll = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   const { limit, offset } = getPagination(page, size);
   Amenities.findAndCountAll({
@@ -122,7 +131,8 @@ exports.findAll = async (req, res) => {
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: err.message || "Some error occurred while retrieving Streams.",
+        message:
+          err.message || "Some error occurred while retrieving amenities.",
       });
     });
 };
@@ -136,19 +146,19 @@ exports.delete = (req, res) => {
       if (num == 1) {
         res.status(200).send({
           status: 1,
-          message: "Stream  deleted successfully",
+          message: "amenities  deleted successfully",
         });
       } else {
         res.status(400).send({
           status: 0,
-          message: `delete Sub Stream with id=${id}. Maybe Stream was not found!`,
+          message: `delete Sub amenities with id=${id}. Maybe amenities was not found!`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Could not delete Stream with id=" + id,
+        message: "Could not delete amenities with id=" + id,
       });
     });
 };
@@ -166,74 +176,85 @@ exports.findOne = (req, res) => {
       } else {
         res.status(400).send({
           status: 0,
-          message: `Cannot find Stream with id=${id}.`,
+          message: `Cannot find amenities with id=${id}.`,
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
         status: 0,
-        message: "Error retrieving stream with id=" + id,
+        message: "Error retrieving amenities with id=" + id,
       });
     });
 };
 
-exports.update = (req, res) => {
-  const id = req.body.id;
-
+exports.update = async (req, res) => {
   try {
-    let logonames = "";
+    // Check if the record exists in the database
+    const existingRecord = await Amenities.findOne({
+      where: { id: req.body.id },
+    });
 
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: "Record not found",
+        status: 0,
+      });
+    }
+
+    let amenitiesUpdates = {
+      amenities_name: req.body.amenities_name || existingRecord.amenities_name,
+      amenities_slug: req.body.amenities_slug || existingRecord.amenities_slug,
+    };
+
+    // Check if a new logo is provided
     if (req.files && req.files.amenities_logo) {
-      let avatar = req.files.amenities_logo;
+      const avatar = req.files.amenities_logo;
 
-      // Check if the uploaded file is allowed
+      // Check file type and size
       if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
         return res.status(400).send({
-          message: "Invalid File type ",
+          message: "Invalid file type",
           errors: {},
           status: 0,
         });
       }
-
       if (avatar.size / (1024 * 1024) > allowed_file_size) {
         return res.status(400).send({
-          message: "File too large ",
+          message: "File too large",
           errors: {},
           status: 0,
         });
       }
 
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const logoname = "logo" + Date.now() + path.extname(avatar.name);
+      const uploadPath = "./storage/amenities_logo/" + logoname;
 
-      let IsUpload = avatar.mv("./storage/amenities_logo/" + logoname) ? 1 : 0;
+      await avatar.mv(uploadPath);
 
-      if (IsUpload) {
-        logonames = "amenities_logo/" + logoname;
+      amenitiesUpdates.amenities_logo = "amenities_logo/" + logoname;
+
+      // If there's an old logo associated with the record, remove it
+      if (existingRecord.amenities_logo) {
+        console.log("existingRecord.icon",existingRecord.amenities_logo);
+        const oldLogoPath = "./storage/" + existingRecord.amenities_logo;
+        await removeFile(oldLogoPath);
       }
     }
 
-    Amenities.update(
-      {
-        amenities_name: req.body.amenities_name,
-        amenities_slug: req.body.amenities_slug,
-
-        amenities_logo: logonames,
-      },
-      {
-        where: { id: req.body.id },
-      }
-    );
+    // Update database record
+    await Amenities.update(amenitiesUpdates, { where: { id: req.body.id } });
 
     res.status(200).send({
       status: 1,
-      message: "Data Save Successfully",
+      message: "Data saved successfully",
     });
   } catch (error) {
     return res.status(400).send({
       message: "Unable to update data",
-      errors: error,
+      errors: error.message,
       status: 0,
     });
   }
 };
+

@@ -1,11 +1,12 @@
 const db = require("../models");
 const config = require("../config/auth.config");
-const User = db.user;
+const User = db.users;
 const Role = db.role;
 const Admin = db.admin;
 const Op = db.Sequelize.Op;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const Accesstoken = db.accesstokens;
 
 exports.signinadmin = (req, res) => {
   Admin.findOne({
@@ -31,7 +32,7 @@ exports.signinadmin = (req, res) => {
       }
 
       var token = jwt.sign({ id: admin.id }, config.secret, {
-        expiresIn: 86400, // 24 hours
+        expiresIn: 100000000000000000000, // 24 hours
       });
 
       res.status(200).send({
@@ -45,13 +46,46 @@ exports.signinadmin = (req, res) => {
           accessToken: token,
         },
       });
-
+      Accesstoken.create({
+        name: admin.name,
+        token: token,
+        expires_at: jwt.decode(token).exp * 1000,
+      })
     })
     .catch((err) => {
       res.status(500).send({ message: err.message });
     });
 };
 
+exports.checkAccessTokenAdmin = async (req, res, next) => {
+  try {
+    const accessToken = req.headers["x-access-token"];
+    // console.log("accessToken", accessToken);
+    if (!accessToken) {
+      return res.status(401).json({ error: "Access token not provided" });
+    }
+    const tokenDoc = await Accesstoken.findOne({ where: { token: accessToken, status: 'active' } });
+
+    if (!tokenDoc) {
+      return res.status(401).json({ error: "Invalid access token" });
+    }
+    const currentTime = new Date().getTime();
+    const tokenExpireTime = tokenDoc.expires_at;
+
+    if (currentTime > tokenExpireTime) {
+      return res.status(401).json({ error: "Access token has expired" });
+    }
+    return res.status(200).json({
+      status: 1,
+      message: "Authorized",
+
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Authentication failed: " + error.message });
+  }
+};
 exports.adminchangepassword = async (req, res) => {
   await Admin.findByPk(req.userId)
     .then(async (admin) => {

@@ -487,7 +487,7 @@ exports.findOne = (req, res) => {
     });
 };
 exports.findAll = async (req, res) => {
-  const { page, size, searchText, searchfrom, columnname, orderby, course_id } =
+  const { page, size, searchtext, searchfrom, columnname, orderby, course_id } =
     req.query;
 
   var column = columnname ? columnname : "id";
@@ -501,7 +501,7 @@ exports.findAll = async (req, res) => {
     orderconfig = [table, column, order];
   }
   var conditioncourse_id = course_id ? { course_id: course_id } : null;
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
   var data_array = [];
   conditioncourse_id ? data_array.push(conditioncourse_id) : null;
   condition ? data_array.push(condition) : null;

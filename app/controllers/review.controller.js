@@ -2,7 +2,7 @@ const db = require("../models");
 const review = db.review;
 const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
-const CollegeAndUniversity = db.CollegeAndUniversity;
+const CollegeAndUniversity = db.collegeAndUniversity;
 const school = db.school;
 const Op = db.Sequelize.Op;
 // Array of allowed files
@@ -135,7 +135,7 @@ exports.findAll = async (req, res) => {
   const {
     page,
     size,
-    searchText,
+    searchtext,
     searchfrom,
     user_id,
     item_id,
@@ -182,7 +182,7 @@ exports.findAll = async (req, res) => {
     : null;
     
 
-  var condition = sendsearch.customseacrh(searchText, searchfrom);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
   let data_array = [];
   conditionuser_id ? data_array.push(conditionuser_id) : null;

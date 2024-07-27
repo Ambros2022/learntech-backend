@@ -1,10 +1,10 @@
 module.exports = (sequelize, Sequelize) => {
     const  college_amenities = sequelize.define("college_amenities", {
-      amenities_id: {
+      amenitie_id: {
         type: Sequelize.INTEGER
       },
   
-      college_and_university_id: {
+      college_id: {
         type: Sequelize.INTEGER
       },
       

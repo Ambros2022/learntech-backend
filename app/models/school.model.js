@@ -1,77 +1,85 @@
 module.exports = (sequelize, Sequelize) => {
   const school = sequelize.define("schools", {
-    school_name: {
+    country_id: {
+      type: Sequelize.INTEGER
+    },
+    state_id: {
+      type: Sequelize.INTEGER
+    },
+    city_id: {
+      type: Sequelize.INTEGER
+    },
+    school_board_id: {
+      type: Sequelize.INTEGER
+    },
+    name: {
       type: Sequelize.STRING
     },
-    school_logo: {
+    slug: {
       type: Sequelize.STRING
     },
-    school_slug : {
-      type: Sequelize.STRING
+    status: {
+      type: Sequelize.ENUM("Draft", "Published"),
     },
-    meta_title: {
-      type: Sequelize.STRING
+    home_view_status: {
+      type: Sequelize.ENUM("top_school", "default"),
     },
-  	meta_description: {
+    school_type: {
+      type: Sequelize.ENUM("Public", "Deemed", "Private", "Government"),
+    },
+    listing_order: {
       type: Sequelize.STRING
     },
     established: {
       type: Sequelize.STRING
     },
-    address : {
+    meta_title: {
       type: Sequelize.STRING
+    },
+    meta_description: {
+      type: Sequelize.INTEGER
+    },
+    meta_keyword: {
+      type: Sequelize.INTEGER
+    },
+    address: {
+      type: Sequelize.INTEGER
     },
     map: {
       type: Sequelize.STRING
     },
-    about: {
+    icon: {
       type: Sequelize.STRING
     },
-    extra_curricular: {
+    banner_image: {
       type: Sequelize.STRING
     },
-    // school_board_id: {
-    //   type: Sequelize.INTEGER
-    // },
-    city_id: {
+    video_url: {
       type: Sequelize.INTEGER
-    },
-    area_id : {
-      type: Sequelize.INTEGER
-    },
-    school_type_id : {
-      type: Sequelize.INTEGER
-    },
-    genders_accepted: {
-      type: Sequelize.STRING
-    },
-    total_seats  : {
-      type: Sequelize.INTEGER
-    },
-    status  : {
-      type: Sequelize.TEXT
     },
     avg_rating: {
       type: Sequelize.FLOAT
     },
-    listing_order: {
-      type: Sequelize.INTEGER
-    },
-    video_url: {
+    info: {
       type: Sequelize.STRING
-  },
-    
+    },
+    admissions_process: {
+      type: Sequelize.STRING
+    },
+    extracurriculars: {
+      type: Sequelize.STRING
+    },
   }
-  ,
-  {
-    
-    timestamps: true,
-    underscored: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at"
-  }
-  
-  
+    ,
+    {
+
+      timestamps: true,
+      underscored: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at"
+    }
+
+
   );
 
   return school;

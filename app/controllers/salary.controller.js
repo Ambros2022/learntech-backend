@@ -18,10 +18,10 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    const { count: totalItems, rows: salary_trends} = data;
+    const { count: totalItems, rows: salary_trends } = data;
     const currentPage = page ? +page : 1;
     const totalPages = Math.ceil(totalItems / limit);
-    return { totalItems,salary_trends, totalPages, currentPage };
+    return { totalItems, salary_trends, totalPages, currentPage };
 };
 
 exports.create = async (req, res) => {
@@ -31,33 +31,33 @@ exports.create = async (req, res) => {
 
 
     try {
-       const id=req.body.course_id;
-            if (req.body.salary && id) {
+        const id = req.body.course_id;
+        if (req.body.salary && id) {
 
-                const salary = JSON.parse(req.body.salary);
-          
-                _.forEach(salary, function (value) {
-                    salary_trends.create({
-                        course_id:id,
-                        salary_year:value.salary_year,
-                        amount:value.amount,
-                  });
-          
-          
+            const salary = JSON.parse(req.body.salary);
+
+            _.forEach(salary, function (value) {
+                salary_trends.create({
+                    course_id: id,
+                    salary_year: value.salary_year,
+                    amount: value.amount,
                 });
-          
-          
-          
-              }
 
 
-            res.status(200).send({
-                status: 1,
-                message: 'Data Save Successfully',
-                data: salary_trends
             });
+
+
+
         }
-    
+
+
+        res.status(200).send({
+            status: 1,
+            message: 'Data Save Successfully',
+            data: salary_trends
+        });
+    }
+
     catch (error) {
         return res.status(400).send({
             message: 'Unable to insert data',
@@ -78,27 +78,27 @@ exports.update = (req, res) => {
 
     try {
 
-        const id=req.body.course_id;
+        const id = req.body.course_id;
 
-          if (req.body.salary && id) {
-           salary_trends.destroy({
-                where: {id:id}
-              })
+        if (req.body.salary && id) {
+            salary_trends.destroy({
+                where: { id: id }
+            })
             const salary = JSON.parse(req.body.salary);
-      
+
             _.forEach(salary, function (value) {
                 salary_trends.create({
-                    course_id:id,
-                    salary_year:value.salary_year,
-                    amount:value.amount,
-              });
-      
-      
+                    course_id: id,
+                    salary_year: value.salary_year,
+                    amount: value.amount,
+                });
+
+
             });
-      
-      
-      
-          }
+
+
+
+        }
 
         res.status(200).send({
             status: 1,
@@ -121,7 +121,7 @@ exports.findAll = async (req, res) => {
 
 
 
-    const { page, size, searchText,searchfrom, columnname, orderby } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
     var column = columnname ? columnname : 'id';
     var order = orderby ? orderby : 'ASC';
@@ -134,12 +134,12 @@ exports.findAll = async (req, res) => {
         column = myArray[1];
         orderconfig = [table, column, order];
     }
-    
 
-    var condition = sendsearch.customseacrh(searchText, searchfrom);
+
+    var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
     const { limit, offset } = getPagination(page, size);
-    salary_trends.findAndCountAll({ where: condition, limit, offset,order:[orderconfig]  }) 
+    salary_trends.findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
         .then(data => {
             const response = getPagingData(data, page, limit);
 
