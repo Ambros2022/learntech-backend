@@ -3997,4 +3997,8 @@ exports.allcities = async (req, res) => {
       });
     });
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/dev
 
