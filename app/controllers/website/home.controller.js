@@ -777,8 +777,8 @@ async function doPostRequest(leadData) {
     "Content-Type": "application/json",
   };
   const params = {
-    accessKey: "u$r217f8cfce2ad9404cf4b09ef03115be4",
-    secretKey: "6a5934c49b30fc13078fd8dd023cda37c8640e6d",
+    accessKey: process.env.CRM_Access_Key,
+    secretKey: process.env.CRM_Secret_Key,
   };
   const captureUrl =
     "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
@@ -854,8 +854,8 @@ async function doPostRequestlanding(leadData) {
     "Content-Type": "application/json",
   };
   const params = {
-    accessKey: "u$r217f8cfce2ad9404cf4b09ef03115be4",
-    secretKey: "6a5934c49b30fc13078fd8dd023cda37c8640e6d",
+    accessKey: process.env.CRM_Access_Key,
+    secretKey: process.env.CRM_Secret_Key,
   };
   const captureUrl =
     "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
@@ -980,28 +980,7 @@ exports.enquiry = async (req, res) => {
   }
 };
 
-async function mohanbabuunivercitylandingpageCRM(mohanbabulead) {
-  // console.log(mohanbabulead);
-  // console.log(JSON.stringify(mohanbabulead));
-  // return;
-  let data = JSON.stringify(mohanbabulead);
-  const headers = {
-    "Content-Type": "application/json",
-    "secret-key": "5ebc58fd1de3c795c21cf152f19dbf77",
-    "access-key": "74b62d6b539847fe99d6d9febd0f8850",
-    source: "Bangalorestudy.com",
-  };
-  const params = {
-    source: "Bangalorestudy.com",
-  };
-  const captureUrl =
-    "https://api.nopaperforms.io/lead/v1/create?source=Bangalorestudy.com";
-  let response = await axios.post(captureUrl, data, {
-    headers: headers,
-    params: params,
-  });
-  console.log(response, "respons embu")
-}
+
 
 async function mohanbabuunivercitydoPostRequestlanding(mohanbabulead, message) {
   let dataobj = [
@@ -1055,8 +1034,8 @@ async function mohanbabuunivercitydoPostRequestlanding(mohanbabulead, message) {
     "Content-Type": "application/json",
   };
   const params = {
-    accessKey: "u$r217f8cfce2ad9404cf4b09ef03115be4",
-    secretKey: "6a5934c49b30fc13078fd8dd023cda37c8640e6d",
+    accessKey: process.env.CRM_Access_Key,
+    secretKey: process.env.CRM_Secret_Key,
   };
   const captureUrl =
     "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
@@ -1175,7 +1154,7 @@ exports.landingpageenquiry = async (req, res) => {
       };
 
       mohanbabuunivercitydoPostRequestlanding(mohanbabulead, message);
-      mohanbabuunivercitylandingpageCRM(mohanbabulead);
+   
     }
 
     res.status(200).send({
@@ -1302,8 +1281,8 @@ async function CRM_LEARNTECH_SCHOOL(leadData) {
     "Content-Type": "application/json",
   };
   const params = {
-    accessKey: "u$r217f8cfce2ad9404cf4b09ef03115be4",
-    secretKey: "6a5934c49b30fc13078fd8dd023cda37c8640e6d",
+    accessKey: process.env.CRM_Access_Key,
+    secretKey: process.env.CRM_Secret_Key,
   };
   const captureUrl =
     "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
