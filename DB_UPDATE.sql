@@ -709,3 +709,11 @@ ALTER TABLE school_boards ADD address VARCHAR(150) NULL DEFAULT NULL AFTER sampl
 ALTER TABLE abroadpages ADD status ENUM('Draft','Published') NULL DEFAULT 'Published' AFTER meta_keyword;
 
 ALTER TABLE banners CHANGE promo_banner promo_banner ENUM('Draft','All_Exams_page','All_News_page','All_Scholarship_page','Nri_page','Study_Abroad_page','All_college_page','All_courses_page','All_university_page','All_school_page','Services_Page','All_about_page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft';
+
+ALTER TABLE banners CHANGE promo_banner promo_banner ENUM('Draft','All_Exams_page','All_News_page','All_Scholarship_page','Nri_page','Study_Abroad_page','All_college_page','All_courses_page','All_university_page','All_school_page','Services_Page','All_about_page','All_our_teams','Home_news_page', 'Advertise_page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft';
+
+ALTER TABLE exams ADD logo VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER status;
+
+ALTER TABLE courses ADD course_short_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AFTER status;
+
+ALTER TABLE enquiries ADD bank_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER current_url, ADD city VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER bank_name;
