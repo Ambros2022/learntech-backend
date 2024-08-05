@@ -27,6 +27,12 @@ module.exports = (sequelize, Sequelize) => {
     current_url: {
       type: Sequelize.STRING
     },
+    bank_name: {
+      type: Sequelize.STRING
+    },
+    city: {
+      type: Sequelize.STRING
+    },
 
 
   }
