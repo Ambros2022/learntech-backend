@@ -581,7 +581,7 @@ exports.searchbarhome = async (req, res) => {
 exports.enquiry = async (req, res) => {
   try {
     // Validate input data
-    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url } = req.body;
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url, bank_name, city } = req.body;
 
 
 
@@ -596,6 +596,8 @@ exports.enquiry = async (req, res) => {
       school_name: school_name || null,
       description: description || null,
       current_url: current_url || null,
+      bank_name: bank_name || null,
+      city: city || null,
     });
 
     res.status(200).send({
