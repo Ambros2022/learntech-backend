@@ -1820,6 +1820,15 @@ exports.blogs = async (req, res) => {
         "meta_description",
         "created_at",
       ],
+      include: [
+
+        {
+          required: false,
+          association: "blogcomment",
+          attributes: ["id", "blog_id"],
+        },
+
+      ],
       order: [orderconfig]
     })
     .then((data) => {
