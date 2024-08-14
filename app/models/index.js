@@ -85,6 +85,7 @@ db.school_board_recognitions = require("./school_board_recognitions.model.js")(s
 db.reviews = require("./reviews.model.js")(sequelize, Sequelize);
 db.review_replies = require("./review_reply.model.js")(sequelize, Sequelize);
 db.users = require("../models/user.model.js")(sequelize, Sequelize);
+db.blog_comment = require("./blog_comment.model.js")(sequelize, Sequelize);
 
 
 
@@ -581,6 +582,19 @@ db.jobs_enquires.belongsTo(db.jobs_positions, {
   foreignKey: "jobs_position_id",
   as: "jobspositions",
 });
+
+
+/***  Relation ship  blog comment */
+
+db.blog_comment.belongsTo(db.blog, {
+  foreignKey: "blog_id",
+  as: "blogcomment",
+});
+// db.jobs_enquires.belongsTo(db.jobs_positions, {
+//   foreignKey: "jobs_position_id",
+//   as: "jobspositions",
+// });
+
 
 
 

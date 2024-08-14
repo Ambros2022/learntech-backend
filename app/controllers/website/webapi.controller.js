@@ -45,7 +45,7 @@ const _ = require('lodash');
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
-const allowed_file_size = 2;
+const allowed_file_size = 10;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -1516,7 +1516,7 @@ exports.abroadpages = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{status:"Published"}];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
