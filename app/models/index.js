@@ -586,6 +586,12 @@ db.jobs_enquires.belongsTo(db.jobs_positions, {
 
 /***  Relation ship  blog comment */
 
+// db.blog_comment.belongsTo(db.blog, {
+//   foreignKey: "blog_id",
+//   as: "blogcomment",
+// });
+
+db.blog.hasMany(db.blog_comment, { as: "blogcomment" });
 db.blog_comment.belongsTo(db.blog, {
   foreignKey: "blog_id",
   as: "blogcomment",
