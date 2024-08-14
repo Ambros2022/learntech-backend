@@ -33,6 +33,7 @@ const schoolboardrecognitionscontroller = require("../controllers/schoolboardrec
 const webapicontroller = require("../controllers/website/webapi.controller");
 const reviewscontroller = require("../controllers/reviews.controller");
 const reviewsrepliescontroller = require("../controllers/review_reply.controller");
+const blogcommentcontroller = require("../controllers/blog_comment.controller");
 
 
 
@@ -1471,6 +1472,38 @@ module.exports = function (app) {
     globalvalidation.reviewrepliesUpdateSchema,
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     reviewsrepliescontroller.update
+  );
+
+  /** review replies route end   */
+
+
+
+   /** blog comment route  start*/
+
+   app.get(
+    "/api/admin/blogcomment/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.findAll
+  );
+  app.get(
+    "/api/admin/blogcomment/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.findOne
+  );
+  app.post(
+    "/api/admin/blogcomment/add",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.create
+  );
+  app.post(
+    "/api/admin/blogcomment/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.delete
+  );
+  app.post(
+    "/api/admin/blogcomment/update",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.update
   );
 
   /** review replies route end   */
