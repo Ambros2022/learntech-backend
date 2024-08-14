@@ -729,3 +729,59 @@ CREATE TABLE blog_comments (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (blog_id) REFERENCES blogs(id) ON DELETE CASCADE
 );
+
+
+ALTER TABLE `abroadpages`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+
+
+ALTER TABLE `blogs`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `colleges`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `courses`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `exams`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+
+ALTER TABLE `general_courses`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `news_and_events`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `pages`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `scholarships`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `schools`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+	
+ALTER TABLE `streams`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+
+CREATE TABLE genders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL
+);
+INSERT INTO genders (name) VALUES ('Male');
+INSERT INTO genders (name) VALUES ('Female');
+INSERT INTO genders (name) VALUES ('Others');
+
+CREATE TABLE scholar_genders (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  gender_id INT,
+  scholar_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (gender_id) REFERENCES genders(id),
+  FOREIGN KEY (scholar_id) REFERENCES scholarships(id) ON DELETE CASCADE
+);
