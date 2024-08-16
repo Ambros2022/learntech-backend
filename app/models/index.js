@@ -86,6 +86,7 @@ db.reviews = require("./reviews.model.js")(sequelize, Sequelize);
 db.review_replies = require("./review_reply.model.js")(sequelize, Sequelize);
 db.users = require("../models/user.model.js")(sequelize, Sequelize);
 db.blog_comment = require("./blog_comment.model.js")(sequelize, Sequelize);
+db.blog_categories = require("./blog_categories.model.js")(sequelize, Sequelize);
 
 
 

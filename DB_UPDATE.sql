@@ -503,6 +503,7 @@ CREATE TABLE news_and_events (
 
 CREATE TABLE blogs (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  category_id INT,
   name VARCHAR(150) NOT NULL,
   slug VARCHAR(150) NOT NULL,
   banner_image VARCHAR(150) DEFAULT NULL,
@@ -513,6 +514,7 @@ CREATE TABLE blogs (
   status ENUM('Draft', 'Published') DEFAULT 'Published',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  FOREIGN KEY (category_id) REFERENCES blog_categories(id)
 );
 
 CREATE TABLE scholar_levels (

@@ -40,6 +40,7 @@ const scholar_types = db.scholar_types;
 const review_replies = db.review_replies;
 // const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
+const blogcomment = db.blog_comment;
 const _ = require('lodash');
 
 // Array of allowed files
@@ -4072,4 +4073,58 @@ exports.allcities = async (req, res) => {
           "Some error occurred while retrieving cities.",
       });
     });
+};
+
+exports.addblogcomment = async (req, res) => {
+  try {
+
+    const blogcommentDetails = await blogcomment.create({
+      name: req.body.name,
+      blog_id: req.body.blog_id,
+      content: req.body.content,
+    });
+
+
+
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: blogcommentDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
+  }
+};
+
+exports.updateApprovalStatus = async (req, res) => {
+  try {
+    
+    const { id, is_approved } = req.body;
+
+    // Find the blog comment by ID
+    const blogComment = await blogComment.findByPk(id);
+
+    if (!blogComment) {
+      return res.status(404).send({ message: "Blog comment not found" });
+    }
+
+    // Update the `is_approved` status
+    blogComment.is_approved = is_approved;
+    await blogComment.save();
+
+    res.status(200).send({
+      message: "Approval status updated successfully",
+      blogComment
+    });
+  } catch (error) {
+    res.status(500).send({
+      message: "Error updating approval status",
+      error: error.message
+    });
+  }
 };

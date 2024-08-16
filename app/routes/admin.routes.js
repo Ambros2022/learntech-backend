@@ -34,6 +34,7 @@ const webapicontroller = require("../controllers/website/webapi.controller");
 const reviewscontroller = require("../controllers/reviews.controller");
 const reviewsrepliescontroller = require("../controllers/review_reply.controller");
 const blogcommentcontroller = require("../controllers/blog_comment.controller");
+const blogcategoriescontroller = require("../controllers/blogcategories.controller");
 
 
 
@@ -1506,7 +1507,37 @@ module.exports = function (app) {
     blogcommentcontroller.update
   );
 
-  /** review replies route end   */
+  /** blog comment route end   */
+
+  /** blog categories route  start*/
+
+  app.get(
+    "/api/admin/blogcategories/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.findAll
+  );
+  app.get(
+    "/api/admin/blogcategories/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.findOne
+  );
+  app.post(
+    "/api/admin/blogcategories/add",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.create
+  );
+  app.post(
+    "/api/admin/blogcategories/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.delete
+  );
+  app.post(
+    "/api/admin/blogcategories/update",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.update
+  );
+ 
+  /** blog categories route end   */
 
 
 

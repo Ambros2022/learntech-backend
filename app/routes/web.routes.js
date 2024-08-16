@@ -164,6 +164,10 @@ module.exports = function (app) {
 
   app.post("/api/website/addjobposition/post", webapicontroller.addjobposition);
 
+  app.post("/api/website/addblogcomment/post", webapicontroller.addblogcomment);
+
+  app.get("/api/website/updateApprovalStatus", webapicontroller.updateApprovalStatus);
+
   
 
 
