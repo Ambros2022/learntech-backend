@@ -18,6 +18,7 @@ const abroadpages = db.abroadpages;
 const Op = db.Sequelize.Op;
 const exam = db.exam;
 const blog = db.blog;
+const blogscategories = db.blog_categories;
 const courses = db.courses;
 const college_stream = db.college_stream;
 // const videos = db.video_testimonials;
@@ -1857,7 +1858,7 @@ exports.newsfindone = (req, res) => {
     });
 };
 
-exports.blogs = async (req, res) => {
+exports.blogcategories = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -1870,7 +1871,61 @@ exports.blogs = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
+  let data_array = [];
+
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  blogscategories
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving news and events.",
+      });
+    });
+};
+
+
+exports.blogs = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, category_id, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
   let data_array = [{ status: "Published" }];
+
+  if (category_id) {
+    data_array.push({ category_id: category_id });
+
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1894,6 +1949,11 @@ exports.blogs = async (req, res) => {
           required: false,
           association: "blogcomment",
           attributes: ["id", "blog_id"],
+        },
+        {
+          required: false,
+          association: "blogcategories",
+          attributes: ["id", "name"],
         },
 
       ],

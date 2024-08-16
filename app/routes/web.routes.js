@@ -130,6 +130,8 @@ module.exports = function (app) {
 
   app.get("/api/website/newsfindone/get/:id", webapicontroller.newsfindone);
 
+  app.get("/api/website/blogcategories/get", webapicontroller.blogcategories);
+
   app.get("/api/website/blog/get", webapicontroller.blogs);
 
   app.get("/api/website/blogfindone/get/:id", webapicontroller.blogfindone);

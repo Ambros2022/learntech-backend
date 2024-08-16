@@ -934,6 +934,12 @@ db.course_modes.belongsTo(db.modes, {
 
 /***  Relation ship blogs  */
 
+// db.blog_categories.hasMany(db.blog, { as: "blogcategories", foreignKey: "category_id" });
+db.blog.belongsTo(db.blog_categories, {
+  foreignKey: "category_id",
+  as: "blogcategories",
+});
+
 // db.author.hasMany(db.blog, { as: "author" });
 // db.blog.belongsTo(db.author, {
 //   foreignKey: "author_id",

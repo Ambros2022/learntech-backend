@@ -6,6 +6,9 @@ module.exports = (sequelize, Sequelize) => {
     slug: {
       type: Sequelize.INTEGER
     },
+    category_id: {
+      type: Sequelize.INTEGER
+    },
     banner_image: {
       type: Sequelize.INTEGER
     },

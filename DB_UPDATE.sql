@@ -787,3 +787,13 @@ CREATE TABLE scholar_genders (
   FOREIGN KEY (gender_id) REFERENCES genders(id),
   FOREIGN KEY (scholar_id) REFERENCES scholarships(id) ON DELETE CASCADE
 );
+
+
+CREATE TABLE blog_categories (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+ALTER TABLE blogs ADD COLUMN category_id INT, ADD CONSTRAINT category_id FOREIGN KEY (category_id) REFERENCES blog_categories(id);

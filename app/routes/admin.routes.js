@@ -1512,27 +1512,27 @@ module.exports = function (app) {
   /** blog categories route  start*/
 
   app.get(
-    "/api/admin/blogcategories/get",
+    "/api/admin/blogscategories/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     blogcategoriescontroller.findAll
   );
   app.get(
-    "/api/admin/blogcategories/get/:id",
+    "/api/admin/blogscategories/get/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     blogcategoriescontroller.findOne
   );
   app.post(
-    "/api/admin/blogcategories/add",
+    "/api/admin/blogscategories/add",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     blogcategoriescontroller.create
   );
   app.post(
-    "/api/admin/blogcategories/delete/:id",
+    "/api/admin/blogscategories/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     blogcategoriescontroller.delete
   );
   app.post(
-    "/api/admin/blogcategories/update",
+    "/api/admin/blogscategories/update",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     blogcategoriescontroller.update
   );
