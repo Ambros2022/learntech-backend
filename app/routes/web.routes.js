@@ -141,6 +141,7 @@ module.exports = function (app) {
   app.get("/api/website/schoolboardfindone/get/:id", webapicontroller.schoolboardfindone);
 
   app.get("/api/website/scholarships/get", webapicontroller.scholarships);
+  app.get("/api/website/genders/get", webapicontroller.genders);
 
   app.get("/api/website/scholarshipfindone/get/:id", webapicontroller.scholarshipfindone);
 

@@ -797,3 +797,5 @@ CREATE TABLE blog_categories (
 );
 
 ALTER TABLE blogs ADD COLUMN category_id INT, ADD CONSTRAINT category_id FOREIGN KEY (category_id) REFERENCES blog_categories(id);
+
+ALTER TABLE `genders` ADD `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `name`, ADD `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `created_at`;

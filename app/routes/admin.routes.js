@@ -1507,6 +1507,12 @@ module.exports = function (app) {
     blogcommentcontroller.update
   );
 
+  app.post(
+    "/api/admin/blogcomment/statusupdate",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.statusupdate
+  );
+
   /** blog comment route end   */
 
   /** blog categories route  start*/
