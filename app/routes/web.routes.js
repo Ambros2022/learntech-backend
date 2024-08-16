@@ -130,6 +130,8 @@ module.exports = function (app) {
 
   app.get("/api/website/newsfindone/get/:id", webapicontroller.newsfindone);
 
+  app.get("/api/website/blogcategories/get", webapicontroller.blogcategories);
+
   app.get("/api/website/blog/get", webapicontroller.blogs);
 
   app.get("/api/website/blogfindone/get/:id", webapicontroller.blogfindone);
@@ -139,6 +141,7 @@ module.exports = function (app) {
   app.get("/api/website/schoolboardfindone/get/:id", webapicontroller.schoolboardfindone);
 
   app.get("/api/website/scholarships/get", webapicontroller.scholarships);
+  app.get("/api/website/genders/get", webapicontroller.genders);
 
   app.get("/api/website/scholarshipfindone/get/:id", webapicontroller.scholarshipfindone);
 
@@ -163,6 +166,10 @@ module.exports = function (app) {
   app.get("/api/website/allscholartype/get", webapicontroller.scholartype);
 
   app.post("/api/website/addjobposition/post", webapicontroller.addjobposition);
+
+  app.post("/api/website/addblogcomment/post", webapicontroller.addblogcomment);
+
+  
 
   
 

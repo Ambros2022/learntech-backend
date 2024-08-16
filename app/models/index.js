@@ -85,7 +85,10 @@ db.school_board_recognitions = require("./school_board_recognitions.model.js")(s
 db.reviews = require("./reviews.model.js")(sequelize, Sequelize);
 db.review_replies = require("./review_reply.model.js")(sequelize, Sequelize);
 db.users = require("../models/user.model.js")(sequelize, Sequelize);
-
+db.blog_comment = require("./blog_comment.model.js")(sequelize, Sequelize);
+db.blog_categories = require("./blog_categories.model.js")(sequelize, Sequelize);
+db.scholar_gender = require("../models/scholar_gender.model.js")(sequelize, Sequelize);
+db.genders = require("../models/gender.model.js")(sequelize, Sequelize);
 
 
 
@@ -546,6 +549,18 @@ db.scholarships.belongsTo(db.scholar_types, {
 });
 
 
+db.scholarships.hasMany(db.scholar_gender, { as: "schgenders", foreignKey: "scholar_id" });
+// db.scholar_gender.belongsTo(db.scholarships, {
+//   foreignKey: "scholar_id",
+//   as: "schgenders",
+// });
+
+
+db.scholar_gender.belongsTo(db.genders, {
+  foreignKey: "gender_id",
+  as: "genders",
+});
+
 /***  Relation ship  job location */
 
 // db.job_locations.belongsTo(db.all_job_locations, {
@@ -581,6 +596,26 @@ db.jobs_enquires.belongsTo(db.jobs_positions, {
   foreignKey: "jobs_position_id",
   as: "jobspositions",
 });
+
+
+/***  Relation ship  blog comment */
+
+// db.blog_comment.belongsTo(db.blog, {
+//   foreignKey: "blog_id",
+//   as: "blogcomment",
+// });
+
+// db.blog.hasMany(db.blog_comment, { as: "blogcomment" });
+
+db.blog_comment.belongsTo(db.blog, {
+  foreignKey: "blog_id",
+  as: "blogcomment",
+});
+// db.jobs_enquires.belongsTo(db.jobs_positions, {
+//   foreignKey: "jobs_position_id",
+//   as: "jobspositions",
+// });
+
 
 
 
@@ -912,6 +947,12 @@ db.course_modes.belongsTo(db.modes, {
 
 
 /***  Relation ship blogs  */
+
+// db.blog_categories.hasMany(db.blog, { as: "blogcategories", foreignKey: "category_id" });
+db.blog.belongsTo(db.blog_categories, {
+  foreignKey: "category_id",
+  as: "blogcategories",
+});
 
 // db.author.hasMany(db.blog, { as: "author" });
 // db.blog.belongsTo(db.author, {

@@ -18,6 +18,7 @@ const abroadpages = db.abroadpages;
 const Op = db.Sequelize.Op;
 const exam = db.exam;
 const blog = db.blog;
+const blogscategories = db.blog_categories;
 const courses = db.courses;
 const college_stream = db.college_stream;
 // const videos = db.video_testimonials;
@@ -40,12 +41,14 @@ const scholar_types = db.scholar_types;
 const review_replies = db.review_replies;
 // const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
+const blogcomment = db.blog_comment;
+const genders = db.genders;
 const _ = require('lodash');
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
-const allowed_file_size = 2;
+const allowed_file_size = 10;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -119,68 +122,135 @@ exports.allcountries = async (req, res) => {
       });
     });
 };
-
 exports.allstates = async (req, res) => {
   const { page, size, searchtext, searchfrom, country_id, columnname, orderby } = req.query;
 
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
+  let column = columnname || "id";
+  let order = orderby || "ASC";
+  let orderconfig = [column, order];
 
   const myArray = column.split(".");
   if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
+    const table = myArray[0];
     column = myArray[1];
     orderconfig = [table, column, order];
   }
+
   let data_array = [];
   let conditionCountryId = country_id ? { country_id: country_id } : null;
-  conditionCountryId ? data_array.push(conditionCountryId) : null;
+  if (conditionCountryId) data_array.push(conditionCountryId);
 
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) data_array.push(condition);
 
   const { limit, offset } = getPagination(page, size);
-  state
-    .findAndCountAll({
-      where: data_array, limit, offset,
-      attributes: [
-        "id",
-        "name",
-        "country_id",
-      ],
 
+  try {
+    const data = await state.findAndCountAll({
+      where: {
+        [db.Sequelize.Op.and]: [
+          ...data_array,
+          {
+            id: {
+              [db.Sequelize.Op.in]: db.sequelize.literal(`(
+                SELECT DISTINCT state_id FROM colleges WHERE state_id IS NOT NULL
+              )`)
+            }
+          }
+        ]
+      },
+      limit,
+      offset,
+      attributes: ["id", "name", "country_id"],
       include: [
         {
           required: false,
           association: "city",
           attributes: ["id", "name"],
-
         },
       ],
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving states.",
-      });
+      order: [orderconfig],
     });
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving states.",
+    });
+  }
 };
+
+// exports.allstates = async (req, res) => {
+//   const { page, size, searchtext, searchfrom, country_id, columnname, orderby } = req.query;
+
+//   var column = columnname ? columnname : "id";
+//   var order = orderby ? orderby : "ASC";
+//   var orderconfig = [column, order];
+
+//   const myArray = column.split(".");
+//   if (typeof myArray[1] !== "undefined") {
+//     var table = myArray[0];
+//     column = myArray[1];
+//     orderconfig = [table, column, order];
+//   }
+//   let data_array = [];
+//   let conditionCountryId = country_id ? { country_id: country_id } : null;
+//   conditionCountryId ? data_array.push(conditionCountryId) : null;
+
+//   var condition = sendsearch.customseacrh(searchtext, searchfrom);
+//   condition ? data_array.push(condition) : null;
+
+//   const { limit, offset } = getPagination(page, size);
+//   state
+//     .findAndCountAll({
+//       where: data_array, limit, offset,
+//       attributes: [
+//         "id",
+//         "name",
+//         "country_id",
+//       ],
+
+//       include: [
+//         {
+//           required: false,
+//           association: "city",
+//           attributes: ["id", "name"],
+
+//         },
+//       ],
+//       order: [orderconfig]
+//     })
+//     .then((data) => {
+//       const response = getPagingData(data, page, limit);
+
+//       res.status(200).send({
+//         status: 1,
+//         message: "success",
+//         totalItems: response.totalItems,
+//         currentPage: response.currentPage,
+//         totalPages: response.totalPages,
+//         data: response.finaldata,
+//       });
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         status: 0,
+//         message:
+//           err.message ||
+//           "Some error occurred while retrieving states.",
+//       });
+//     });
+// };
 
 exports.allstream_exams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
@@ -410,7 +480,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name","slug"],
+          attributes: ["id", "name", "slug"],
         },
         {
           required: false,
@@ -443,7 +513,7 @@ exports.genralOnestream = (req, res) => {
 };
 
 exports.allcourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, college_id ,course_type} = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, course_type } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -478,7 +548,7 @@ exports.allcourses = async (req, res) => {
       ],
       order: [orderconfig],
       include: [
-        
+
         {
           required: false,
           association: "generalcourse",
@@ -1449,7 +1519,7 @@ exports.abroadpages = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{ status: "Published" }];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1789,7 +1859,7 @@ exports.newsfindone = (req, res) => {
     });
 };
 
-exports.blogs = async (req, res) => {
+exports.blogcategories = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -1802,7 +1872,61 @@ exports.blogs = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
+  let data_array = [];
+
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  blogscategories
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving news and events.",
+      });
+    });
+};
+
+
+exports.blogs = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, category_id, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
   let data_array = [{ status: "Published" }];
+
+  if (category_id) {
+    data_array.push({ category_id: category_id });
+
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1819,6 +1943,20 @@ exports.blogs = async (req, res) => {
         "meta_title",
         "meta_description",
         "created_at",
+      ],
+      include: [
+
+        {
+          required: false,
+          association: "blogcomment",
+          attributes: ["id", "blog_id"],
+        },
+        {
+          required: false,
+          association: "blogcategories",
+          attributes: ["id", "name"],
+        },
+
       ],
       order: [orderconfig]
     })
@@ -2051,7 +2189,7 @@ exports.schoolboardfindone = (req, res) => {
 };
 
 exports.scholarships = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, gender, level_id, type_id, country_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender, gender_id, level_id, type_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2065,15 +2203,45 @@ exports.scholarships = async (req, res) => {
   }
   let data_array = [{ status: "Published" }];
 
-  if (gender) {
-    data_array.push({ gender });
-  }
 
 
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+  let includearray = [
+    {
+      required: false,
+      association: "country",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "scholarlevels",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "scholartypes",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "schgenders",
+      attributes: ["id", "gender_id"],
+    },
 
+  ];
+
+  if (gender) {
+    includearray.push({
+      required: true,
+      association: "schgenders",
+      attributes: ["id", "gender_id"],
+      where: {
+        gender_id: gender
+      }
+    });
+  }
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2098,26 +2266,10 @@ exports.scholarships = async (req, res) => {
         "total_scholarships",
         "last_date",
       ],
-      include: [
-        {
-          required: false,
-          association: "country",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "scholarlevels",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "scholartypes",
-          attributes: ["id", "name"],
-        },
-
-      ],
+      include: includearray,
       order: [orderconfig]
     })
+
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
@@ -2294,7 +2446,7 @@ exports.allgeneralcourses = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{ status: "Published" }];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
@@ -2441,18 +2593,18 @@ exports.jobpositions = async (req, res) => {
       ],
       include: [
         {
-            required: false,
-            association: "jobpositionlocation",
-            attributes: ["id", "job_location_id"],
-            include: [
-                {
-                    required: false,
-                    association: "jobpositionslocation",
-                    attributes: ["id", "name"],
-                },
-            ],
+          required: false,
+          association: "jobpositionlocation",
+          attributes: ["id", "job_location_id"],
+          include: [
+            {
+              required: false,
+              association: "jobpositionslocation",
+              attributes: ["id", "name"],
+            },
+          ],
         },
-    ],
+      ],
 
       order: [orderconfig]
     })
@@ -2532,59 +2684,59 @@ exports.alljoblocations = async (req, res) => {
 
 exports.addjobenquires = async (req, res) => {
   try {
-      let resumes = "";
+    let resumes = "";
 
-      if (req.files && req.files.resume) {
-          let avatar = req.files.resume;
+    if (req.files && req.files.resume) {
+      let avatar = req.files.resume;
 
-          if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-              return res.status(400).send({
-                  message: "Invalid File type ",
-                  errors: {},
-                  status: 0,
-              });
-          }
-
-          if (avatar.size / (1024 * 1024) > allowed_file_size) {
-              return res.status(400).send({
-                  message: "File too large ",
-                  errors: {},
-                  status: 0,
-              });
-          }
-
-          let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-          let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
-
-          if (IsUpload) {
-              resumes = "jobenquiry_image/" + logoname;
-          }
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
       }
 
-      const jobsenquiresDetails = await jobsenquires.create({
-          jobs_position_id: req.body.jobs_position_id,
-          job_location_id: req.body.job_location_id,
-          name: req.body.name,
-          email: req.body.email,
-          phone: req.body.phone,
-          d_o_b: req.body.d_o_b,
-          current_location: req.body.current_location,
-          total_exp: req.body.total_exp,
-          resume: resumes,
-          status: req.body.status,
-      });
-      res.status(200).send({
-          status: 1,
-          message: "Data Save Successfully",
-          data: jobsenquiresDetails,
-      });
-  } catch (error) {
-      return res.status(400).send({
-          message: "Unable to insert data",
-          errors: error,
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
           status: 0,
-      });
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        resumes = "jobenquiry_image/" + logoname;
+      }
+    }
+
+    const jobsenquiresDetails = await jobsenquires.create({
+      jobs_position_id: req.body.jobs_position_id,
+      job_location_id: req.body.job_location_id,
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      d_o_b: req.body.d_o_b,
+      current_location: req.body.current_location,
+      total_exp: req.body.total_exp,
+      resume: resumes,
+      status: req.body.status,
+    });
+    res.status(200).send({
+      status: 1,
+      message: "Data Save Successfully",
+      data: jobsenquiresDetails,
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to insert data",
+      errors: error,
+      status: 0,
+    });
   }
 };
 
@@ -3905,40 +4057,40 @@ exports.scholartype = async (req, res) => {
 exports.addjobposition = async (req, res) => {
 
   try {
-      const jobspositionsDetails = await jobs_positions.create({
-          name: req.body.name,
-          job_description: req.body.job_description,
-          exp_required: req.body.exp_required,
-          total_positions: req.body.total_positions,
-          status: req.body.status,
+    const jobspositionsDetails = await jobs_positions.create({
+      name: req.body.name,
+      job_description: req.body.job_description,
+      exp_required: req.body.exp_required,
+      total_positions: req.body.total_positions,
+      status: req.body.status,
 
+    });
+
+    if (req.body.joblocations && jobspositionsDetails.id) {
+      const joblocation = JSON.parse(req.body.joblocations);
+      _.forEach(joblocation, async function (value) {
+
+        await alljoblocation.create({
+          job_location_id: value.id,
+          jobs_position_id: jobspositionsDetails.id,
+        });
       });
-
-      if (req.body.joblocations && jobspositionsDetails.id) {
-          const joblocation = JSON.parse(req.body.joblocations);
-          _.forEach(joblocation, async function (value) {
-
-              await alljoblocation.create({
-                  job_location_id: value.id,
-                  jobs_position_id: jobspositionsDetails.id,
-              });
-          });
-      }
+    }
 
 
 
-      res.status(200).send({
-          status: 1,
-          message: 'Data Save Successfully',
-          data: jobspositionsDetails
-      });
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: jobspositionsDetails
+    });
   }
   catch (error) {
-      return res.status(400).send({
-          message: 'Unable to insert data',
-          errors: error,
-          status: 0
-      });
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
   }
 };
 
@@ -3957,8 +4109,8 @@ exports.allcities = async (req, res) => {
   }
   let data_array = [];
 
-  if (state_id ) {
-    data_array.push({ state_id : state_id  });
+  if (state_id) {
+    data_array.push({ state_id: state_id });
   }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -3994,6 +4146,81 @@ exports.allcities = async (req, res) => {
         message:
           err.message ||
           "Some error occurred while retrieving cities.",
+      });
+    });
+};
+
+exports.addblogcomment = async (req, res) => {
+  try {
+
+    const blogcommentDetails = await blogcomment.create({
+      name: req.body.name,
+      blog_id: req.body.blog_id,
+      content: req.body.content,
+    });
+
+
+
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: blogcommentDetails
+    });
+  }
+  catch (error) {
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
+  }
+};
+
+exports.genders = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby, board_type } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  genders
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving schoolboards.",
       });
     });
 };
