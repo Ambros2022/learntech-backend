@@ -87,7 +87,8 @@ db.review_replies = require("./review_reply.model.js")(sequelize, Sequelize);
 db.users = require("../models/user.model.js")(sequelize, Sequelize);
 db.blog_comment = require("./blog_comment.model.js")(sequelize, Sequelize);
 db.blog_categories = require("./blog_categories.model.js")(sequelize, Sequelize);
-
+db.scholar_gender = require("../models/scholar_gender.model.js")(sequelize, Sequelize);
+db.genders = require("../models/gender.model.js")(sequelize, Sequelize);
 
 
 
@@ -547,6 +548,18 @@ db.scholarships.belongsTo(db.scholar_types, {
   as: "scholartypes",
 });
 
+
+db.scholarships.hasMany(db.scholar_gender, { as: "schgenders", foreignKey: "scholar_id" });
+// db.scholar_gender.belongsTo(db.scholarships, {
+//   foreignKey: "scholar_id",
+//   as: "schgenders",
+// });
+
+
+db.scholar_gender.belongsTo(db.genders, {
+  foreignKey: "gender_id",
+  as: "genders",
+});
 
 /***  Relation ship  job location */
 

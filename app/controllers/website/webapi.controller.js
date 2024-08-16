@@ -2188,7 +2188,7 @@ exports.schoolboardfindone = (req, res) => {
 };
 
 exports.scholarships = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, gender, level_id, type_id, country_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender, gender_id, level_id, type_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2210,7 +2210,40 @@ exports.scholarships = async (req, res) => {
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
+  let includearray = [
+    {
+      required: false,
+      association: "country",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "scholarlevels",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "scholartypes",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "schgenders",
+      attributes: ["id", "gender_id"],
+    },
 
+  ];
+
+  // if (gender_id) {
+  //   includearray.push({
+  //     association: "schgenders",
+  //     required: true,
+  //     attributes: ["id","gender_id"],
+  //     where: {
+  //       gender_id: JSON.parse(gender_id)
+  //     }
+  //   });
+  // }
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2235,26 +2268,10 @@ exports.scholarships = async (req, res) => {
         "total_scholarships",
         "last_date",
       ],
-      include: [
-        {
-          required: false,
-          association: "country",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "scholarlevels",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "scholartypes",
-          attributes: ["id", "name"],
-        },
-
-      ],
+      include: includearray,
       order: [orderconfig]
     })
+
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
