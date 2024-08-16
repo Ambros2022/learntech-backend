@@ -1,6 +1,6 @@
 const db = require("../models");
 const path = require('path');
-const newscategories = db.news_categories;
+const blogcategories = db.blog_categories;
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
 const Op = db.Sequelize.Op;
@@ -14,16 +14,16 @@ const getPagination = (page, size) => {
 };
 
 const getPagingData = (data, page, limit) => {
-    const { count: totalItems, rows: newscategories } = data;
+    const { count: totalItems, rows: blogcategories } = data;
     const currentPage = page ? +page : 1;
     const totalPages = Math.ceil(totalItems / limit);
-    return { totalItems, newscategories, totalPages, currentPage };
+    return { totalItems, blogcategories, totalPages, currentPage };
 };
 
 exports.create = async (req, res) => {
 
     try {
-        const newscategoriesDetails = await newscategories.create({
+        const blogcategoriesDetails = await blogcategories.create({
             name: req.body.name,
 
         });
@@ -31,7 +31,7 @@ exports.create = async (req, res) => {
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
-            data: newscategoriesDetails
+            data: blogcategoriesDetails
         });
     }
     catch (error) {
@@ -44,7 +44,7 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-    const { page, size, searchtext, searchfrom, columnname, orderby, state_id } = req.query;
+    const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
     var column = columnname ? columnname : 'name';
     var order = orderby ? orderby : 'ASC';
@@ -65,7 +65,7 @@ exports.findAll = async (req, res) => {
 
     const { limit, offset } = getPagination(page, size);
 
-    newscategories.findAndCountAll({
+    blogcategories.findAndCountAll({
         where: data_array, limit, offset,
 
 
@@ -79,7 +79,7 @@ exports.findAll = async (req, res) => {
                 totalItems: response.totalItems,
                 currentPage: response.currentPage,
                 totalPages: response.totalPages,
-                data: response.newscategories
+                data: response.blogcategories
             });
         })
         .catch(err => {
@@ -87,14 +87,14 @@ exports.findAll = async (req, res) => {
                 status: 0,
                 message:
 
-                    err.message || "Some error occurred while retrieving news categories."
+                    err.message || "Some error occurred while retrieving blog categories."
             });
         });
 };
 
 exports.delete = (req, res) => {
     const id = req.params.id;
-    newscategories.destroy({
+    blogcategories.destroy({
         where: { id: id }
     })
         .then(num => {
@@ -102,14 +102,14 @@ exports.delete = (req, res) => {
 
                 res.status(200).send({
                     status: 1,
-                    message: 'news categories deleted successfully',
+                    message: 'blog categories deleted successfully',
 
                 });
 
             } else {
                 res.status(400).send({
                     status: 0,
-                    message: `news categories  with id=${id}. Maybe news categories id  was not found!`
+                    message: `news categories  with id=${id}. Maybe blog categories id  was not found!`
 
                 });
             }
@@ -117,7 +117,7 @@ exports.delete = (req, res) => {
         .catch(err => {
             res.status(500).send({
                 status: 0,
-                message: "Could not delete news categories with id=" + id
+                message: "Could not delete blog categories with id=" + id
 
             });
 
@@ -126,7 +126,7 @@ exports.delete = (req, res) => {
 exports.update = (req, res) => {
     const id = req.body.id;
     try {
-        newscategories.update
+        blogcategories.update
             ({
                 name: req.body.name,
             },
@@ -151,7 +151,7 @@ exports.update = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    newscategories
+    blogcategories
         .findOne({
             where: {
                 [Op.or]: [
@@ -175,7 +175,7 @@ exports.findOne = (req, res) => {
         .catch((err) => {
             res.status(500).send({
                 status: 0,
-                message: "Error retrieving news categories with id=" + id,
+                message: "Error retrieving blog categories with id=" + id,
             });
         });
 };

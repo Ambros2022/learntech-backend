@@ -4101,30 +4101,3 @@ exports.addblogcomment = async (req, res) => {
   }
 };
 
-exports.updateApprovalStatus = async (req, res) => {
-  try {
-    
-    const { id, is_approved } = req.body;
-
-    // Find the blog comment by ID
-    const blogComment = await blogComment.findByPk(id);
-
-    if (!blogComment) {
-      return res.status(404).send({ message: "Blog comment not found" });
-    }
-
-    // Update the `is_approved` status
-    blogComment.is_approved = is_approved;
-    await blogComment.save();
-
-    res.status(200).send({
-      message: "Approval status updated successfully",
-      blogComment
-    });
-  } catch (error) {
-    res.status(500).send({
-      message: "Error updating approval status",
-      error: error.message
-    });
-  }
-};
