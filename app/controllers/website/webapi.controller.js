@@ -1303,7 +1303,7 @@ exports.coursefindone = (req, res) => {
   courses
     .findOne({
       where: whereClause,
-      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure'],
+      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure','course_short_name'],
       include: [
         {
           required: false,
