@@ -1303,7 +1303,7 @@ exports.coursefindone = (req, res) => {
   courses
     .findOne({
       where: whereClause,
-      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure','course_short_name'],
+      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure', 'course_short_name'],
       include: [
         {
           required: false,
@@ -1639,6 +1639,7 @@ exports.allentranceexams = async (req, res) => {
         "id",
         "exam_title",
         "slug",
+        "logo",
         "exam_short_name",
         "cover_image",
         "stream_id",
@@ -1987,7 +1988,14 @@ exports.blogfindone = (req, res) => {
   blog
     .findByPk(id, {
       attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at', 'overview'],
-
+      include: [
+        {
+          model: blogcomment, // Replace `blogcomment` with the actual model name
+          as: 'blogcomment', // Alias name, ensure it matches the one defined in your associations
+          required: false,
+          attributes: ["id","name","content","is_approved"],
+        },
+      ],
     })
     .then((data) => {
       if (data) {
@@ -2466,6 +2474,7 @@ exports.allgeneralcourses = async (req, res) => {
         "name",
         "short_name",
         "slug",
+        "logo"
       ],
       include: [
         {
