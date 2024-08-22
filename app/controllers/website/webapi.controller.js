@@ -1642,6 +1642,7 @@ exports.allentranceexams = async (req, res) => {
         "cover_image",
         "stream_id",
         "created_at",
+        "logo",
       ],
       order: [orderconfig]
     })
@@ -2468,6 +2469,8 @@ exports.allgeneralcourses = async (req, res) => {
         "name",
         "short_name",
         "slug",
+        "logo",
+        "banner",
       ],
       include: [
         {
