@@ -799,3 +799,8 @@ CREATE TABLE blog_categories (
 ALTER TABLE blogs ADD COLUMN category_id INT, ADD CONSTRAINT category_id FOREIGN KEY (category_id) REFERENCES blog_categories(id);
 
 ALTER TABLE `genders` ADD `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `name`, ADD `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `created_at`;
+
+
+ALTER TABLE video_testimonials CHANGE designation designation VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE video_testimonials ADD type ENUM('Draft','About_us_page','Testimonial_page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft' AFTER full_url;
