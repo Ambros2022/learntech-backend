@@ -80,6 +80,8 @@ module.exports = function (app) {
 
   app.get("/api/website/stream/general/get", webapicontroller.streamGeneralcourse);
 
+  app.get("/api/website/search/course", webapicontroller.searchcourses);
+
   app.get("/api/website/stream/get", webapicontroller.allstreams);
 
   app.get("/api/website/streamfindone/get/:id", webapicontroller.findOnestream);

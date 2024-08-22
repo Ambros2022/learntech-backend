@@ -15,6 +15,9 @@ module.exports = (sequelize, Sequelize) => {
         full_url: {
             type: Sequelize.STRING
         },
+        type: {
+            type: Sequelize.ENUM('Draft','About_us_page','Testimonial_page')
+          },
     }
         ,
         {

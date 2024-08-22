@@ -35,7 +35,7 @@ exports.create = async (req, res) => {
             designation: req.body.designation,
             video_url: req.body.video_url,
             full_url: req.body.full_url,
-
+            type: req.body.type,
         });
 
         res.status(200).send({
@@ -162,6 +162,7 @@ exports.update = (req, res) => {
                 designation: req.body.designation,
                 video_url: req.body.video_url,
                 full_url: req.body.full_url,
+                type: req.body.type,
             },
                 {
                     where: { id: req.body.id }
