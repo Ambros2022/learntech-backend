@@ -53,7 +53,7 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+  const { page, size, searchtext, blog_id, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : 'id';
   var order = orderby ? orderby : 'ASC';
@@ -68,7 +68,9 @@ exports.findAll = async (req, res) => {
   }
   let data_array = [];
 
-
+  if (blog_id) {
+    data_array.push({ blog_id: blog_id })
+  }
   let condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
 
@@ -77,7 +79,13 @@ exports.findAll = async (req, res) => {
   blogcomment
     .findAndCountAll({
       where: data_array, condition, limit, offset,
-     
+      include: [
+        {
+          required: false,
+          association: "blogcomment",
+          attributes: ["id", "name"],
+        },
+      ],
       order: [orderconfig]
     })
     .then((data) => {
@@ -175,11 +183,11 @@ exports.update = (req, res) => {
 
   try {
     blogcomment.update({
-        name: req.body.name,
-        blog_id: req.body.blog_id,
-        content: req.body.content,
-        is_approved: req.body.is_approved,
-        is_reported: req.body.is_reported,
+      name: req.body.name,
+      blog_id: req.body.blog_id,
+      content: req.body.content,
+      is_approved: req.body.is_approved,
+      is_reported: req.body.is_reported,
     }, {
       where: { id: req.body.id }
     });
@@ -200,4 +208,52 @@ exports.update = (req, res) => {
     });
   }
 
+};
+
+exports.statusupdate = async (req, res) => {
+  const { id } = req.body;
+
+  if (id === undefined) {
+    return res.status(400).send({
+      status: 0,
+      message: 'ID is a required field'
+    });
+  }
+
+  try {
+    const review = await blogcomment.findOne({ where: { id: id } });
+
+    if (!review) {
+      return res.status(404).send({
+        status: 0,
+        message: 'Review not found'
+      });
+    }
+    if (review.is_approved == 0) {
+
+      await blogcomment.update(
+        { is_approved: 1 },
+        { where: { id: id } }
+      );
+    } else {
+  
+      await blogcomment.update(
+
+        { is_approved: 0 },
+        { where: { id: id } }
+      );
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: 'Status Updated'
+    });
+
+  } catch (error) {
+    res.status(500).send({
+      status: 0,
+      message: 'Unable to update data',
+      errors: error.message
+    });
+  }
 };
