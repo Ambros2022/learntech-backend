@@ -2416,6 +2416,7 @@ exports.videotestimonial = async (req, res) => {
       attributes: [
         "id",
         "title",
+        "type",
         "name",
         "designation",
         "video_url",
