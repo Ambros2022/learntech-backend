@@ -2420,6 +2420,7 @@ exports.videotestimonial = async (req, res) => {
         "designation",
         "video_url",
         "full_url",
+        "type",
       ],
       order: [orderconfig]
     })
