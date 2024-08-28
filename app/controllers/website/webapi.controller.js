@@ -480,7 +480,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "name", "slug","logo","banner"],
         },
         {
           required: false,
