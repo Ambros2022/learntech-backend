@@ -119,6 +119,7 @@ exports.create = async (req, res) => {
       meta_keywords: req.body.meta_keywords,
       overview: req.body.overview,
       status: req.body.status,
+      pdf_name: req.body.pdf_name,
     });
     res.status(200).send({
       status: 1,
@@ -159,6 +160,7 @@ exports.update = async (req, res) => {
       meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
       overview: req.body.overview || existingRecord.overview,
       status: req.body.status || existingRecord.status,
+      pdf_name: req.body.pdf_name || existingRecord.pdf_name,
 
     };
     if (req.files && req.files.banner_image) {

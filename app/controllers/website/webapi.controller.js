@@ -1645,6 +1645,7 @@ exports.allentranceexams = async (req, res) => {
         "stream_id",
         "created_at",
         "logo",
+        "upcoming_date",
       ],
       order: [orderconfig]
     })
@@ -1737,6 +1738,7 @@ exports.news = async (req, res) => {
         "banner_image",
         "meta_description",
         "pdf_file",
+        "pdf_name",
         "created_at",
         "category_id",
       ],
@@ -1828,7 +1830,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview', 'pdf_name'],
       include: [
         {
           required: false,
