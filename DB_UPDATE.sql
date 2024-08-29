@@ -804,3 +804,4 @@ ALTER TABLE `genders` ADD `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMEST
 ALTER TABLE video_testimonials CHANGE designation designation VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE video_testimonials ADD type ENUM('Draft','About_us_page','Testimonial_page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft' AFTER full_url;
+ALTER TABLE news_and_events ADD pdf_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AFTER status;
