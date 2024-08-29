@@ -2489,7 +2489,7 @@ exports.allgeneralcourses = async (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "name", "slug", "logo", "banner"],
         },
       ],
       order: [orderconfig],
