@@ -92,6 +92,7 @@ const usercontroller = require("../controllers/user.controller");
 const abroadcountriescontroller = require("../controllers/abroadcountries.controller");
 const abroaduniversitiescontroller = require("../controllers/abroaduniversities.controller");
 const youtubevideoscontroller = require("../controllers/youtubevideos.controller");
+const trainingteamcontroller = require("../controllers/trainingteam.controller");
 
 
 

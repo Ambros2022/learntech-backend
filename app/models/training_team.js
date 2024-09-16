@@ -9,6 +9,9 @@ module.exports = (sequelize, Sequelize) => {
         experience : {
             type: Sequelize.STRING
         },
+        description : {
+            type: Sequelize.STRING
+        },
     }
         ,
         {

@@ -140,6 +140,7 @@ exports.create = async (req, res) => {
 
       const examsDetails = await exam.create({
         stream_id: req.body.stream_id,
+        country_id: req.body.country_id,
         exam_title: req.body.exam_title,
         slug: req.body.slug,
         upcoming_date: req.body.upcoming_date,
@@ -163,6 +164,8 @@ exports.create = async (req, res) => {
         cover_image: cover_images,
         promo_banner: promo_banners,
         logo: logos,
+        level_of_study: level_of_study,
+        types_of_exams: types_of_exams,
       });
 
       res.status(200).send({
@@ -196,6 +199,7 @@ exports.update = async (req, res) => {
 
     let examsUpdates = {
       stream_id: req.body.stream_id || existingRecord.stream_id,
+      country_id: req.body.country_id || existingRecord.country_id,
       exam_title: req.body.exam_title || existingRecord.exam_title,
       slug: req.body.slug || existingRecord.slug,
       upcoming_date: req.body.upcoming_date || existingRecord.upcoming_date,
@@ -220,6 +224,8 @@ exports.update = async (req, res) => {
       // promo_banner: req.body.promo_banner || existingRecord.promo_banner,
       promo_banner_status: req.body.promo_banner_status || existingRecord.promo_banner_status,
       status: req.body.status || existingRecord.status,
+      level_of_study: req.body.level_of_study || existingRecord.level_of_study,
+      types_of_exams: req.body.types_of_exams || existingRecord.types_of_exams,
     };
 
     // Check if a new logo is provided
