@@ -18,7 +18,6 @@ const abroadpages = db.abroadpages;
 const Op = db.Sequelize.Op;
 const exam = db.exam;
 const blog = db.blog;
-const blogscategories = db.blog_categories;
 const courses = db.courses;
 const college_stream = db.college_stream;
 // const videos = db.video_testimonials;
@@ -41,14 +40,12 @@ const scholar_types = db.scholar_types;
 const review_replies = db.review_replies;
 // const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
-const blogcomment = db.blog_comment;
-const genders = db.genders;
 const _ = require('lodash');
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
-const allowed_file_size = 10;
+const allowed_file_size = 2;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -122,135 +119,68 @@ exports.allcountries = async (req, res) => {
       });
     });
 };
+
 exports.allstates = async (req, res) => {
   const { page, size, searchtext, searchfrom, country_id, columnname, orderby } = req.query;
 
-  let column = columnname || "id";
-  let order = orderby || "ASC";
-  let orderconfig = [column, order];
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
 
   const myArray = column.split(".");
   if (typeof myArray[1] !== "undefined") {
-    const table = myArray[0];
+    var table = myArray[0];
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-
   let data_array = [];
   let conditionCountryId = country_id ? { country_id: country_id } : null;
-  if (conditionCountryId) data_array.push(conditionCountryId);
+  conditionCountryId ? data_array.push(conditionCountryId) : null;
 
-  const condition = sendsearch.customseacrh(searchtext, searchfrom);
-  if (condition) data_array.push(condition);
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
+  state
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "country_id",
+      ],
 
-  try {
-    const data = await state.findAndCountAll({
-      where: {
-        [db.Sequelize.Op.and]: [
-          ...data_array,
-          {
-            id: {
-              [db.Sequelize.Op.in]: db.sequelize.literal(`(
-                SELECT DISTINCT state_id FROM colleges WHERE state_id IS NOT NULL
-              )`)
-            }
-          }
-        ]
-      },
-      limit,
-      offset,
-      attributes: ["id", "name", "country_id"],
       include: [
         {
           required: false,
           association: "city",
           attributes: ["id", "name"],
+
         },
       ],
-      order: [orderconfig],
-    });
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
 
-    const response = getPagingData(data, page, limit);
-
-    res.status(200).send({
-      status: 1,
-      message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: response.finaldata,
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving states.",
+      });
     });
-  } catch (err) {
-    res.status(500).send({
-      status: 0,
-      message: err.message || "Some error occurred while retrieving states.",
-    });
-  }
 };
-
-// exports.allstates = async (req, res) => {
-//   const { page, size, searchtext, searchfrom, country_id, columnname, orderby } = req.query;
-
-//   var column = columnname ? columnname : "id";
-//   var order = orderby ? orderby : "ASC";
-//   var orderconfig = [column, order];
-
-//   const myArray = column.split(".");
-//   if (typeof myArray[1] !== "undefined") {
-//     var table = myArray[0];
-//     column = myArray[1];
-//     orderconfig = [table, column, order];
-//   }
-//   let data_array = [];
-//   let conditionCountryId = country_id ? { country_id: country_id } : null;
-//   conditionCountryId ? data_array.push(conditionCountryId) : null;
-
-//   var condition = sendsearch.customseacrh(searchtext, searchfrom);
-//   condition ? data_array.push(condition) : null;
-
-//   const { limit, offset } = getPagination(page, size);
-//   state
-//     .findAndCountAll({
-//       where: data_array, limit, offset,
-//       attributes: [
-//         "id",
-//         "name",
-//         "country_id",
-//       ],
-
-//       include: [
-//         {
-//           required: false,
-//           association: "city",
-//           attributes: ["id", "name"],
-
-//         },
-//       ],
-//       order: [orderconfig]
-//     })
-//     .then((data) => {
-//       const response = getPagingData(data, page, limit);
-
-//       res.status(200).send({
-//         status: 1,
-//         message: "success",
-//         totalItems: response.totalItems,
-//         currentPage: response.currentPage,
-//         totalPages: response.totalPages,
-//         data: response.finaldata,
-//       });
-//     })
-//     .catch((err) => {
-//       res.status(500).send({
-//         status: 0,
-//         message:
-//           err.message ||
-//           "Some error occurred while retrieving states.",
-//       });
-//     });
-// };
 
 exports.allstream_exams = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
@@ -480,7 +410,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug","logo","banner"],
+          attributes: ["id", "name","slug"],
         },
         {
           required: false,
@@ -513,7 +443,7 @@ exports.genralOnestream = (req, res) => {
 };
 
 exports.allcourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, course_type } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id ,course_type} = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -548,7 +478,7 @@ exports.allcourses = async (req, res) => {
       ],
       order: [orderconfig],
       include: [
-
+        
         {
           required: false,
           association: "generalcourse",
@@ -651,7 +581,7 @@ exports.searchbarhome = async (req, res) => {
 exports.enquiry = async (req, res) => {
   try {
     // Validate input data
-    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url, bank_name, city } = req.body;
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url } = req.body;
 
 
 
@@ -666,8 +596,6 @@ exports.enquiry = async (req, res) => {
       school_name: school_name || null,
       description: description || null,
       current_url: current_url || null,
-      bank_name: bank_name || null,
-      city: city || null,
     });
 
     res.status(200).send({
@@ -1303,7 +1231,7 @@ exports.coursefindone = (req, res) => {
   courses
     .findOne({
       where: whereClause,
-      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure', 'course_short_name'],
+      attributes: ['id', 'slug', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure'],
       include: [
         {
           required: false,
@@ -1519,7 +1447,7 @@ exports.abroadpages = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [{ status: "Published" }];
+  let data_array = [];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1639,13 +1567,10 @@ exports.allentranceexams = async (req, res) => {
         "id",
         "exam_title",
         "slug",
-        "logo",
         "exam_short_name",
         "cover_image",
         "stream_id",
         "created_at",
-        "logo",
-        "upcoming_date",
       ],
       order: [orderconfig]
     })
@@ -1708,7 +1633,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, category_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1721,8 +1646,14 @@ exports.news = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  let conditioncategoryid = category_id ? { category_id: category_id } : null;
-  conditioncategoryid ? data_array.push(conditioncategoryid) : null;
+
+  if (country_id) {
+    data_array.push({ country_id });
+  }
+
+  if (category_id) {
+    data_array.push({ category_id });
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1738,7 +1669,6 @@ exports.news = async (req, res) => {
         "banner_image",
         "meta_description",
         "pdf_file",
-        "pdf_name",
         "created_at",
         "category_id",
       ],
@@ -1830,7 +1760,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview', 'pdf_name'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview'],
       include: [
         {
           required: false,
@@ -1863,7 +1793,7 @@ exports.newsfindone = (req, res) => {
     });
 };
 
-exports.blogcategories = async (req, res) => {
+exports.blogs = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
@@ -1876,61 +1806,7 @@ exports.blogcategories = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
-
-
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  blogscategories
-    .findAndCountAll({
-      where: data_array, limit, offset,
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving news and events.",
-      });
-    });
-};
-
-
-exports.blogs = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, category_id, orderby } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
   let data_array = [{ status: "Published" }];
-
-  if (category_id) {
-    data_array.push({ category_id: category_id });
-
-  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1947,20 +1823,6 @@ exports.blogs = async (req, res) => {
         "meta_title",
         "meta_description",
         "created_at",
-      ],
-      include: [
-
-        {
-          required: false,
-          association: "blogcomment",
-          attributes: ["id", "blog_id"],
-        },
-        {
-          required: false,
-          association: "blogcategories",
-          attributes: ["id", "name"],
-        },
-
       ],
       order: [orderconfig]
     })
@@ -1991,14 +1853,7 @@ exports.blogfindone = (req, res) => {
   blog
     .findByPk(id, {
       attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at', 'overview'],
-      include: [
-        {
-          model: blogcomment, // Replace `blogcomment` with the actual model name
-          as: 'blogcomment', // Alias name, ensure it matches the one defined in your associations
-          required: false,
-          attributes: ["id", "name", "content", "is_approved"],
-        },
-      ],
+
     })
     .then((data) => {
       if (data) {
@@ -2074,7 +1929,6 @@ exports.schoolboards = async (req, res) => {
         "result_date",
         "address",
         "map",
-        "avg_rating",
       ],
       include: [
 
@@ -2155,7 +2009,6 @@ exports.schoolboardfindone = (req, res) => {
       "result_date",
       "address",
       "map",
-      "avg_rating",
     ],
     include: [
 
@@ -2202,7 +2055,7 @@ exports.schoolboardfindone = (req, res) => {
 };
 
 exports.scholarships = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, gender, gender_id, level_id, type_id, country_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, gender, level_id, type_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2216,45 +2069,15 @@ exports.scholarships = async (req, res) => {
   }
   let data_array = [{ status: "Published" }];
 
+  if (gender) {
+    data_array.push({ gender });
+  }
 
 
   if (level_id) data_array.push({ level_id: JSON.parse(level_id) });
   if (type_id) data_array.push({ type_id: JSON.parse(type_id) });
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
-  let includearray = [
-    {
-      required: false,
-      association: "country",
-      attributes: ["id", "name"],
-    },
-    {
-      required: false,
-      association: "scholarlevels",
-      attributes: ["id", "name"],
-    },
-    {
-      required: false,
-      association: "scholartypes",
-      attributes: ["id", "name"],
-    },
-    {
-      required: false,
-      association: "schgenders",
-      attributes: ["id", "gender_id"],
-    },
 
-  ];
-
-  if (gender) {
-    includearray.push({
-      required: true,
-      association: "schgenders",
-      attributes: ["id", "gender_id"],
-      where: {
-        gender_id: gender
-      }
-    });
-  }
 
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -2279,10 +2102,26 @@ exports.scholarships = async (req, res) => {
         "total_scholarships",
         "last_date",
       ],
-      include: includearray,
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholarlevels",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "scholartypes",
+          attributes: ["id", "name"],
+        },
+
+      ],
       order: [orderconfig]
     })
-
     .then((data) => {
       const response = getPagingData(data, page, limit);
 
@@ -2391,7 +2230,7 @@ exports.pagefindone = (req, res) => {
 
 
 exports.videotestimonial = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, type, orderby } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -2404,9 +2243,8 @@ exports.videotestimonial = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [];
-  if(type){
-    data_array.push({ type: type })
-  }
+
+
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -2418,12 +2256,10 @@ exports.videotestimonial = async (req, res) => {
       attributes: [
         "id",
         "title",
-        "type",
         "name",
         "designation",
         "video_url",
         "full_url",
-        "type",
       ],
       order: [orderconfig]
     })
@@ -2462,7 +2298,7 @@ exports.allgeneralcourses = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [{ status: "Published" }];
+  let data_array = [];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
 
@@ -2482,14 +2318,12 @@ exports.allgeneralcourses = async (req, res) => {
         "name",
         "short_name",
         "slug",
-        "logo",
-        "banner",
       ],
       include: [
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug", "logo", "banner"],
+          attributes: ["id", "name", "slug"],
         },
       ],
       order: [orderconfig],
@@ -2611,18 +2445,18 @@ exports.jobpositions = async (req, res) => {
       ],
       include: [
         {
-          required: false,
-          association: "jobpositionlocation",
-          attributes: ["id", "job_location_id"],
-          include: [
-            {
-              required: false,
-              association: "jobpositionslocation",
-              attributes: ["id", "name"],
-            },
-          ],
+            required: false,
+            association: "jobpositionlocation",
+            attributes: ["id", "job_location_id"],
+            include: [
+                {
+                    required: false,
+                    association: "jobpositionslocation",
+                    attributes: ["id", "name"],
+                },
+            ],
         },
-      ],
+    ],
 
       order: [orderconfig]
     })
@@ -2702,59 +2536,59 @@ exports.alljoblocations = async (req, res) => {
 
 exports.addjobenquires = async (req, res) => {
   try {
-    let resumes = "";
+      let resumes = "";
 
-    if (req.files && req.files.resume) {
-      let avatar = req.files.resume;
+      if (req.files && req.files.resume) {
+          let avatar = req.files.resume;
 
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
+          if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+              return res.status(400).send({
+                  message: "Invalid File type ",
+                  errors: {},
+                  status: 0,
+              });
+          }
+
+          if (avatar.size / (1024 * 1024) > allowed_file_size) {
+              return res.status(400).send({
+                  message: "File too large ",
+                  errors: {},
+                  status: 0,
+              });
+          }
+
+          let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+          let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+          if (IsUpload) {
+              resumes = "jobenquiry_image/" + logoname;
+          }
       }
 
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
-        return res.status(400).send({
-          message: "File too large ",
-          errors: {},
-          status: 0,
-        });
-      }
-
-      let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-      let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
-
-      if (IsUpload) {
-        resumes = "jobenquiry_image/" + logoname;
-      }
-    }
-
-    const jobsenquiresDetails = await jobsenquires.create({
-      jobs_position_id: req.body.jobs_position_id,
-      job_location_id: req.body.job_location_id,
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      d_o_b: req.body.d_o_b,
-      current_location: req.body.current_location,
-      total_exp: req.body.total_exp,
-      resume: resumes,
-      status: req.body.status,
-    });
-    res.status(200).send({
-      status: 1,
-      message: "Data Save Successfully",
-      data: jobsenquiresDetails,
-    });
+      const jobsenquiresDetails = await jobsenquires.create({
+          jobs_position_id: req.body.jobs_position_id,
+          job_location_id: req.body.job_location_id,
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          d_o_b: req.body.d_o_b,
+          current_location: req.body.current_location,
+          total_exp: req.body.total_exp,
+          resume: resumes,
+          status: req.body.status,
+      });
+      res.status(200).send({
+          status: 1,
+          message: "Data Save Successfully",
+          data: jobsenquiresDetails,
+      });
   } catch (error) {
-    return res.status(400).send({
-      message: "Unable to insert data",
-      errors: error,
-      status: 0,
-    });
+      return res.status(400).send({
+          message: "Unable to insert data",
+          errors: error,
+          status: 0,
+      });
   }
 };
 
@@ -3099,7 +2933,7 @@ exports.collegereview = async (req, res) => {
       include: [
         {
           required: false,
-          association: "clgreview",
+          association: "reviewcollege",
           attributes: ["id", "name", "userrating", "likes", "dislikes", "is_reported"],
           where: { is_approved: true },
         },
@@ -3656,53 +3490,46 @@ exports.allreview = async (req, res) => {
 };
 
 exports.reviewrating = async (req, res) => {
-  const { college_id, school_id, school_board_id } = req.query;
+  const { college_id, school_id } = req.query;
 
   try {
-    let filterCondition = {};
-    if (college_id) {
-      filterCondition.college_id = college_id;
-    } else if (school_id) {
-      filterCondition.school_id = school_id;
-    } else if (school_board_id) {
-      filterCondition.school_board_id = school_board_id;
-    }
-
-    const idKey = college_id ? "college_id" : school_id ? "school_id" : "school_board_id";
+    const filterCondition = college_id ? { college_id: college_id } : { school_id: school_id };
 
     const collegeAggregates = await reviews.findAll({
       where: filterCondition,
       attributes: [
-        idKey,
+        college_id ? "college_id" : "school_id",
         [Sequelize.fn("AVG", Sequelize.col("userrating")), "avgRating"],
         [Sequelize.fn("COUNT", Sequelize.col("id")), "totalReviews"],
       ],
-      group: [idKey],
+      group: [college_id ? "college_id" : "school_id"],
       raw: true,
     });
 
     const ratingCounts = await reviews.findAll({
       where: filterCondition,
       attributes: [
-        idKey,
+        college_id ? "college_id" : "school_id",
         "userrating",
         [Sequelize.fn("COUNT", Sequelize.col("userrating")), "ratingCount"],
       ],
-      group: [idKey, "userrating"],
+      group: [college_id ? "college_id" : "school_id", "userrating"],
       raw: true,
     });
 
     const totalLikesDislikes = collegeAggregates.map(item => ({
-      [idKey]: item[idKey],
+      college_id: item.college_id,
+      school_id: item.school_id,
       avgRating: Math.round(parseFloat(item.avgRating)),
       totalReviews: parseInt(item.totalReviews),
     }));
 
     const ratingsGroupedByCollege = ratingCounts.reduce((acc, item) => {
+      const idKey = college_id ? 'college_id' : 'school_id';
       if (!acc[item[idKey]]) {
         acc[item[idKey]] = {
           [idKey]: item[idKey],
-          ratings: {},
+          ratings: {}
         };
       }
       acc[item[idKey]].ratings[item.userrating] = parseInt(item.ratingCount);
@@ -3713,7 +3540,7 @@ exports.reviewrating = async (req, res) => {
       status: 1,
       message: "success",
       totalLikesDislikes: totalLikesDislikes,
-      ratingCounts: ratingsGroupedByCollege,
+      ratingCounts: ratingsGroupedByCollege
     });
   } catch (err) {
     res.status(500).send({
@@ -3724,7 +3551,7 @@ exports.reviewrating = async (req, res) => {
 };
 
 exports.findreview = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, school_id, school_board_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, school_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -3751,11 +3578,6 @@ exports.findreview = async (req, res) => {
     data_array.push({ school_id });
   }
 
-  if (school_board_id) {
-    data_array.push({ school_board_id });
-  }
-
-
   const { limit, offset } = getPagination(page, size);
 
   try {
@@ -3773,7 +3595,6 @@ exports.findreview = async (req, res) => {
         "passing_year",
         "college_id",
         "school_id",
-        "school_board_id",
         "likes",
         "dislikes",
         "created_at",
@@ -3871,27 +3692,22 @@ exports.statusupdate = async (req, res) => {
       { is_approved: updatedIsApproved },
       { where: { id: id } }
     );
-
+    // console.log(reviews, "reviews");
     if (previousIsApproved !== updatedIsApproved) {
       const collegeId = review.college_id;
       const schoolId = review.school_id;
-      const schoolBoardId = review.school_board_id;
 
-      // Update average rating for college
-      if (collegeId) {
-        const collegeReviews = await reviews.findAll({
-          where: { college_id: collegeId, is_approved: true }
-        });
+      const collegeReviews = await reviews.findAll({
+        where: { college_id: collegeId, is_approved: true }
+      });
 
-        const totalCollegeRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
-        const avgCollegeRating = collegeReviews.length ? Math.round(totalCollegeRating / collegeReviews.length) : 0;
-        await college.update(
-          { avg_rating: avgCollegeRating },
-          { where: { id: collegeId } }
-        );
-      }
+      const totalCollegeRating = collegeReviews.reduce((acc, curr) => acc + curr.userrating, 0);
+      const avgCollegeRating = collegeReviews.length ? Math.round(totalCollegeRating / collegeReviews.length) : 0;
+      await college.update(
+        { avg_rating: avgCollegeRating },
+        { where: { id: collegeId } }
+      );
 
-      // Update average rating for school
       if (schoolId) {
         const schoolReviews = await reviews.findAll({
           where: { school_id: schoolId, is_approved: true }
@@ -3903,21 +3719,6 @@ exports.statusupdate = async (req, res) => {
         await school.update(
           { avg_rating: avgSchoolRating },
           { where: { id: schoolId } }
-        );
-      }
-
-      // Update average rating for school_board
-      if (schoolBoardId) {
-        const schoolBoardReviews = await reviews.findAll({
-          where: { school_board_id: schoolBoardId, is_approved: true }
-        });
-
-        const totalSchoolBoardRating = schoolBoardReviews.reduce((acc, curr) => acc + curr.userrating, 0);
-        const avgSchoolBoardRating = schoolBoardReviews.length ? Math.round(totalSchoolBoardRating / schoolBoardReviews.length) : 0;
-
-        await schoolboards.update(
-          { avg_rating: avgSchoolBoardRating },
-          { where: { id: schoolBoardId } }
         );
       }
     }
@@ -4108,40 +3909,40 @@ exports.scholartype = async (req, res) => {
 exports.addjobposition = async (req, res) => {
 
   try {
-    const jobspositionsDetails = await jobs_positions.create({
-      name: req.body.name,
-      job_description: req.body.job_description,
-      exp_required: req.body.exp_required,
-      total_positions: req.body.total_positions,
-      status: req.body.status,
+      const jobspositionsDetails = await jobs_positions.create({
+          name: req.body.name,
+          job_description: req.body.job_description,
+          exp_required: req.body.exp_required,
+          total_positions: req.body.total_positions,
+          status: req.body.status,
 
-    });
-
-    if (req.body.joblocations && jobspositionsDetails.id) {
-      const joblocation = JSON.parse(req.body.joblocations);
-      _.forEach(joblocation, async function (value) {
-
-        await alljoblocation.create({
-          job_location_id: value.id,
-          jobs_position_id: jobspositionsDetails.id,
-        });
       });
-    }
+
+      if (req.body.joblocations && jobspositionsDetails.id) {
+          const joblocation = JSON.parse(req.body.joblocations);
+          _.forEach(joblocation, async function (value) {
+
+              await alljoblocation.create({
+                  job_location_id: value.id,
+                  jobs_position_id: jobspositionsDetails.id,
+              });
+          });
+      }
 
 
 
-    res.status(200).send({
-      status: 1,
-      message: 'Data Save Successfully',
-      data: jobspositionsDetails
-    });
+      res.status(200).send({
+          status: 1,
+          message: 'Data Save Successfully',
+          data: jobspositionsDetails
+      });
   }
   catch (error) {
-    return res.status(400).send({
-      message: 'Unable to insert data',
-      errors: error,
-      status: 0
-    });
+      return res.status(400).send({
+          message: 'Unable to insert data',
+          errors: error,
+          status: 0
+      });
   }
 };
 
@@ -4160,8 +3961,8 @@ exports.allcities = async (req, res) => {
   }
   let data_array = [];
 
-  if (state_id) {
-    data_array.push({ state_id: state_id });
+  if (state_id ) {
+    data_array.push({ state_id : state_id  });
   }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -4201,267 +4002,4 @@ exports.allcities = async (req, res) => {
     });
 };
 
-exports.addblogcomment = async (req, res) => {
-  try {
 
-    const blogcommentDetails = await blogcomment.create({
-      name: req.body.name,
-      blog_id: req.body.blog_id,
-      content: req.body.content,
-    });
-
-
-
-    res.status(200).send({
-      status: 1,
-      message: 'Data Save Successfully',
-      data: blogcommentDetails
-    });
-  }
-  catch (error) {
-    return res.status(400).send({
-      message: 'Unable to insert data',
-      errors: error,
-      status: 0
-    });
-  }
-};
-
-exports.genders = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, board_type } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [];
-
-
-
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-  genders
-    .findAndCountAll({
-      where: data_array, limit, offset,
-      order: [orderconfig]
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving schoolboards.",
-      });
-    });
-};
-
-exports.schoolreview = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [];
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  if (condition) {
-    data_array.push(condition);
-  }
-
-  const { limit, offset } = getPagination(page, size);
-
-  try {
-    const data = await college.findAndCountAll({
-      where: data_array,
-      limit,
-      offset,
-      attributes: [
-        "id",
-        "name",
-        "slug",
-        "type",
-        "avg_rating",
-      ],
-      include: [
-        {
-          required: false,
-          association: "clgreview",
-          attributes: ["id", "name", "userrating", "likes", "dislikes", "is_reported"],
-          where: { is_approved: true },
-        },
-      ],
-      order: [orderconfig],
-      subQuery: false
-    });
-
-    const response = getPagingData(data, page, limit);
-
-    res.status(200).send({
-      status: 1,
-      message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: response.finaldata,
-    });
-  } catch (err) {
-    res.status(500).send({
-      status: 0,
-      message: err.message || "Some error occurred while retrieving collegereview.",
-    });
-  }
-};
-
-exports.schoolboardreview = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [];
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  if (condition) {
-    data_array.push(condition);
-  }
-
-  const { limit, offset } = getPagination(page, size);
-
-  try {
-    const data = await college.findAndCountAll({
-      where: data_array,
-      limit,
-      offset,
-      attributes: [
-        "id",
-        "name",
-        "slug",
-        "type",
-        "avg_rating",
-      ],
-      include: [
-        {
-          required: false,
-          association: "clgreview",
-          attributes: ["id", "name", "userrating", "likes", "dislikes", "is_reported"],
-          where: { is_approved: true },
-        },
-      ],
-      order: [orderconfig],
-      subQuery: false
-    });
-
-    const response = getPagingData(data, page, limit);
-
-    res.status(200).send({
-      status: 1,
-      message: "success",
-      totalItems: response.totalItems,
-      currentPage: response.currentPage,
-      totalPages: response.totalPages,
-      data: response.finaldata,
-    });
-  } catch (err) {
-    res.status(500).send({
-      status: 0,
-      message: err.message || "Some error occurred while retrieving collegereview.",
-    });
-  }
-};
-
-
-exports.searchcourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-  var column = columnname ? columnname : "id";
-  var order = orderby ? orderby : "ASC";
-  var orderconfig = [column, order];
-
-  const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
-    column = myArray[1];
-    orderconfig = [table, column, order];
-  }
-  let data_array = [];
-
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-  condition ? data_array.push(condition) : null;
-
-  const { limit, offset } = getPagination(page, size);
-
-  stream
-    .findAndCountAll({
-      where: data_array, limit, offset,
-      attributes: [
-        "id",
-        "name",
-        "slug",
-    
-      ],
-      include: [
-        {
-          required: false,
-          association: "general_courses",
-          attributes: ["id","name","short_name", "slug"],
-        },
-      ],
-      order: [orderconfig],
-      subQuery: false
-    })
-    .then((data) => {
-      const response = getPagingData(data, page, limit);
-
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.finaldata,
-      });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message:
-          err.message ||
-          "Some error occurred while retrieving streams.",
-      });
-    });
-};

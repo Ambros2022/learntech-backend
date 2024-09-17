@@ -110,6 +110,7 @@ exports.create = async (req, res) => {
 
     const newsandeventsDetails = await newsandevents.create({
       category_id: req.body.category_id,
+      country_id: req.body.country_id,
       name: req.body.name,
       slug: req.body.slug,
       banner_image: bannerimages,
@@ -119,7 +120,6 @@ exports.create = async (req, res) => {
       meta_keywords: req.body.meta_keywords,
       overview: req.body.overview,
       status: req.body.status,
-      pdf_name: req.body.pdf_name,
     });
     res.status(200).send({
       status: 1,
@@ -153,6 +153,7 @@ exports.update = async (req, res) => {
 
     const newsandeventsUpdates = {
       category_id: req.body.category_id || existingRecord.category_id,
+      country_id: req.body.country_id || existingRecord.country_id,
       name: req.body.name || existingRecord.name,
       slug: req.body.slug || existingRecord.slug,
       meta_title: req.body.meta_title || existingRecord.meta_title,
@@ -160,7 +161,6 @@ exports.update = async (req, res) => {
       meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
       overview: req.body.overview || existingRecord.overview,
       status: req.body.status || existingRecord.status,
-      pdf_name: req.body.pdf_name || existingRecord.pdf_name,
 
     };
     if (req.files && req.files.banner_image) {
@@ -248,7 +248,7 @@ exports.update = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, columnname, searchfrom, orderby, category_id  } = req.query;
+  const { page, size, searchtext, columnname, searchfrom, orderby, category_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -263,8 +263,8 @@ exports.findAll = async (req, res) => {
 
   let data_array = [];
 
-  if (category_id  ) {
-    data_array.push({ category_id  : category_id   });
+  if (category_id) {
+    data_array.push({ category_id: category_id });
   }
 
   condition ? data_array.push(condition) : null;
