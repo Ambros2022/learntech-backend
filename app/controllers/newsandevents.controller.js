@@ -279,6 +279,15 @@ exports.findAll = async (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
+            {
+           required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
+        },
       ],
       order: [orderconfig]
     })
@@ -339,6 +348,15 @@ exports.findOne = (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
+            {
+           required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
+        }
 
 
       ],
