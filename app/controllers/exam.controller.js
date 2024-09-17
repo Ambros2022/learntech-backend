@@ -386,6 +386,15 @@ exports.findAll = async (req, res) => {
           association: "stream",
           attributes: ["id", "name"],
         },
+            {
+           required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
+        },
 
       ],
       order: [orderconfig],
@@ -452,6 +461,15 @@ exports.findOne = (req, res) => {
           required: false,
           association: "examfaqs",
           attributes: ["id", "questions", "answers"],
+        },
+        {
+           required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
         },
 
       ],
