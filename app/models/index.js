@@ -211,6 +211,15 @@ db.youtubevideos = require("../models/youtubevideos.model.js")(sequelize, Sequel
 
 /***  Relation ship courses  */
 
+db.exam.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+db.newsandevents.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+
 db.courses.belongsTo(db.college, {
   foreignKey: "college_id",
   as: "college",
