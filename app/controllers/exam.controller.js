@@ -351,7 +351,7 @@ exports.update = async (req, res) => {
 
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, stream_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, stream_id, country_id, level_of_study, types_of_exams } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -369,6 +369,18 @@ exports.findAll = async (req, res) => {
 
   if (stream_id ) {
     data_array.push({ stream_id : stream_id  });
+  }
+
+  if (country_id ) {
+    data_array.push({ country_id : country_id  });
+  }
+
+  if (level_of_study ) {
+    data_array.push({ level_of_study : level_of_study  });
+  }
+
+  if (types_of_exams ) {
+    data_array.push({ types_of_exams : types_of_exams  });
   }
 
   condition ? data_array.push(condition) : null;

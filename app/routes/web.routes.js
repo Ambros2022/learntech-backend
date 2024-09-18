@@ -171,6 +171,8 @@ module.exports = function (app) {
 
   // app.post("/api/website/addblogcomment/post", webapicontroller.addblogcomment);
 
+  app.get("/api/website/counsellorteams/get", webapicontroller.counsellorteams);
+
   
 
   

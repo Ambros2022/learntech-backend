@@ -92,7 +92,7 @@ const usercontroller = require("../controllers/user.controller");
 const abroadcountriescontroller = require("../controllers/abroadcountries.controller");
 const abroaduniversitiescontroller = require("../controllers/abroaduniversities.controller");
 const youtubevideoscontroller = require("../controllers/youtubevideos.controller");
-const trainingteamcontroller = require("../controllers/trainingteam.controller");
+const counsellorteamcontroller = require("../controllers/counsellor_teams.controller");
 
 
 
@@ -2671,6 +2671,37 @@ module.exports = function (app) {
     syllabuscontroller.update
   );
   /**syllabus route end   */
+
+
+/** counsellor teams route  start*/
+
+app.get(
+  "/api/admin/counsellorteam/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.findAll
+);
+app.get(
+  "/api/admin/counsellorteam/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.findOne
+);
+app.post(
+  "/api/admin/counsellorteam/add",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.create
+);
+app.post(
+  "/api/admin/counsellorteam/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.delete
+);
+app.post(
+  "/api/admin/counsellorteam/update",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.update
+);
+/**counsellor teams route end   */
+
 
 
 
