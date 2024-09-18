@@ -41,6 +41,7 @@ const review_replies = db.review_replies;
 // const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
 const _ = require('lodash');
+const counsellorteam = db.counsellor_teams;
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
@@ -4018,6 +4019,61 @@ exports.allcities = async (req, res) => {
         message:
           err.message ||
           "Some error occurred while retrieving cities.",
+      });
+    });
+};
+
+exports.counsellorteams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  counsellorteam
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "location",
+        "experience",
+        "description",
+        "image",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving counsellor team.",
       });
     });
 };
