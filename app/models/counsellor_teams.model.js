@@ -1,15 +1,18 @@
 module.exports = (sequelize, Sequelize) => {
-    const training_teams = sequelize.define("training_teams", {
+    const counsellor_teams = sequelize.define("counsellor_teams", {
         name: {
             type: Sequelize.STRING,
         },
         location: {
             type: Sequelize.STRING
         },
-        experience : {
+        experience: {
             type: Sequelize.STRING
         },
-        description : {
+        description: {
+            type: Sequelize.STRING
+        },
+        image: {
             type: Sequelize.STRING
         },
     }
@@ -25,5 +28,5 @@ module.exports = (sequelize, Sequelize) => {
 
     );
 
-    return training_teams;
+    return counsellor_teams;
 };
