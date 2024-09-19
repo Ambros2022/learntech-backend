@@ -90,6 +90,8 @@ db.blog_categories = require("./blog_categories.model.js")(sequelize, Sequelize)
 db.scholar_gender = require("../models/scholar_gender.model.js")(sequelize, Sequelize);
 db.genders = require("../models/gender.model.js")(sequelize, Sequelize);
 db.counsellor_teams = require("./counsellor_teams.model.js")(sequelize, Sequelize);
+db.organization_pages = require("./organization_page.model.js")(sequelize, Sequelize);
+db.organization_page_steps = require("./organization_page_steps.model.js")(sequelize, Sequelize);
 
 
 

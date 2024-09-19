@@ -93,6 +93,8 @@ const abroadcountriescontroller = require("../controllers/abroadcountries.contro
 const abroaduniversitiescontroller = require("../controllers/abroaduniversities.controller");
 const youtubevideoscontroller = require("../controllers/youtubevideos.controller");
 const counsellorteamcontroller = require("../controllers/counsellor_teams.controller");
+const organizationpagecontroller = require("../controllers/organization_page.controller");
+const organizationpagestepscontroller = require("../controllers/organization_page_steps.controller");
 
 
 
@@ -2701,6 +2703,66 @@ app.post(
   counsellorteamcontroller.update
 );
 /**counsellor teams route end   */
+
+
+/** organization page route  start*/
+
+app.get(
+  "/api/admin/organizationpage/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.findAll
+);
+app.get(
+  "/api/admin/organizationpage/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.findOne
+);
+app.post(
+  "/api/admin/organizationpage/add",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.create
+);
+app.post(
+  "/api/admin/organizationpage/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.delete
+);
+app.post(
+  "/api/admin/organizationpage/update",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.update
+);
+/**organization page route end   */
+
+
+/** organization page steps route  start*/
+
+app.get(
+  "/api/admin/organizationpagesteps/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.findAll
+);
+app.get(
+  "/api/admin/organizationpagesteps/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.findOne
+);
+app.post(
+  "/api/admin/organizationpagesteps/add",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.create
+);
+app.post(
+  "/api/admin/organizationpagesteps/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.delete
+);
+app.post(
+  "/api/admin/organizationpagesteps/update",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.update
+);
+/**organization page steps route end   */
 
 
 
