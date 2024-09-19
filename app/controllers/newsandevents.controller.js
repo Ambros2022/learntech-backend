@@ -119,6 +119,7 @@ exports.create = async (req, res) => {
       meta_description: req.body.meta_description,
       meta_keywords: req.body.meta_keywords,
       overview: req.body.overview,
+      pdf_name: req.body.pdf_name,
       status: req.body.status,
     });
     res.status(200).send({
@@ -160,6 +161,7 @@ exports.update = async (req, res) => {
       meta_description: req.body.meta_description || existingRecord.meta_description,
       meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
       overview: req.body.overview || existingRecord.overview,
+      pdf_name: req.body.pdf_name || existingRecord.pdf_name,
       status: req.body.status || existingRecord.status,
 
     };
