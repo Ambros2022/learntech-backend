@@ -3,6 +3,9 @@ module.exports = (sequelize, Sequelize) => {
     category_id: {
       type: Sequelize.STRING
     },
+    country_id: {
+      type: Sequelize.STRING
+    },
     name: {
       type: Sequelize.STRING
     },

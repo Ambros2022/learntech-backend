@@ -1662,14 +1662,24 @@ exports.news = async (req, res) => {
   }
   let data_array = [{ status: "Published" }];
 
-  // if (country_id) {
-  //   data_array.push({ country_id });
-  // }
 
-  if (country_id != null) {
-    data_array.push({ country_id });
+  if (country_id) {
+    if (country_id === '204') {
+      data_array.push({ country_id: '204' });
+    } else {
+      data_array.push({
+        country_id: {
+          [Op.ne]: '204'
+        }
+      });
+    }
+  } else {
+    data_array.push({
+      country_id: {
+        [Op.ne]: '204'
+      }
+    });
   }
-
 
   if (category_id) {
     data_array.push({ category_id });
@@ -1699,8 +1709,15 @@ exports.news = async (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "country",
+          attributes: [
+            "id",
+            "name",
 
-
+          ],
+        },
       ],
       order: [orderconfig]
     })
