@@ -216,7 +216,7 @@ db.exam.belongsTo(db.countries, {
   foreignKey: "country_id",
   as: "country",
 });
-db.newsandevents.belongsTo(db.countries, {
+db.news_and_events.belongsTo(db.countries, {
   foreignKey: "country_id",
   as: "country",
 });
@@ -521,6 +521,9 @@ db.news_and_events.belongsTo(db.news_categories, {
   foreignKey: "category_id",
   as: "newscategories",
 });
+
+
+
 
 
 //Exam RELATIONSHIP
