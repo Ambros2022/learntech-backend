@@ -1649,7 +1649,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id, includeIndia } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1664,22 +1664,37 @@ exports.news = async (req, res) => {
   let data_array = [{ status: "Published" }];
 
 
+  // if (country_id) {
+  //   if (country_id === '204') {
+  //     data_array.push({ country_id: '204' });
+  //   } else {
+  //     data_array.push({
+  //       country_id: {
+  //         [Op.ne]: '204'
+  //       }
+  //     });
+  //   }
+  // } else {
+  //   data_array.push({
+  //     country_id: {
+  //       [Op.ne]: '204'
+  //     }
+  //   });
+  // }
+
+  // Logic for country_id and includeIndia
   if (country_id) {
-    if (country_id === '204') {
-      data_array.push({ country_id: '204' });
-    } else {
-      data_array.push({
-        country_id: {
-          [Op.ne]: '204'
-        }
-      });
+    if (country_id === "204" && includeIndia === "true") {
+      data_array.push({ country_id: "204" }); // Show only India news
+    } else if (country_id !== "204" && includeIndia === "false") {
+      data_array.push({ country_id: { [Op.ne]: "204" } }); // Show all except India news
     }
   } else {
-    data_array.push({
-      country_id: {
-        [Op.ne]: '204'
-      }
-    });
+    if (includeIndia === "true") {
+      data_array.push({ country_id: "204" }); // Include India news
+    } else if (includeIndia === "false") {
+      data_array.push({ country_id: { [Op.ne]: "204" } }); // Exclude India news
+    }
   }
 
   if (category_id) {

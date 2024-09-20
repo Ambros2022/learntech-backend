@@ -25,15 +25,9 @@ module.exports = (sequelize, Sequelize) => {
         meta_keyword: {
             type: Sequelize.TEXT
         },
-        level_of_study: {
-            type: Sequelize.ENUM("UG", "PG", "professional"),
+        status: {
+            type: Sequelize.ENUM("Draft", "Published"),
         },
-        // level_of_exams: {
-        //     type: Sequelize.ENUM("Language-Proficiency","Aptitude-Test","Streams"),
-        // },
-        // status: {
-        //     type: Sequelize.ENUM("Draft", "Published"),
-        // },
     }
         ,
         {
