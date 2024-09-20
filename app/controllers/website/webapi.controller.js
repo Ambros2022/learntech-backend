@@ -42,6 +42,7 @@ const review_replies = db.review_replies;
 const alljoblocation = db.job_locations;
 const _ = require('lodash');
 const counsellorteam = db.counsellor_teams;
+const organizationpages = db.organization_pages;
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
@@ -1664,36 +1665,17 @@ exports.news = async (req, res) => {
   let data_array = [{ status: "Published" }];
 
 
-  // if (country_id) {
-  //   if (country_id === '204') {
-  //     data_array.push({ country_id: '204' });
-  //   } else {
-  //     data_array.push({
-  //       country_id: {
-  //         [Op.ne]: '204'
-  //       }
-  //     });
-  //   }
-  // } else {
-  //   data_array.push({
-  //     country_id: {
-  //       [Op.ne]: '204'
-  //     }
-  //   });
-  // }
-
-  // Logic for country_id and includeIndia
   if (country_id) {
     if (country_id === "204" && includeIndia === "true") {
-      data_array.push({ country_id: "204" }); // Show only India news
+      data_array.push({ country_id: "204" }); 
     } else if (country_id !== "204" && includeIndia === "false") {
-      data_array.push({ country_id: { [Op.ne]: "204" } }); // Show all except India news
+      data_array.push({ country_id: { [Op.ne]: "204" } }); 
     }
   } else {
     if (includeIndia === "true") {
-      data_array.push({ country_id: "204" }); // Include India news
+      data_array.push({ country_id: "204" });
     } else if (includeIndia === "false") {
-      data_array.push({ country_id: { [Op.ne]: "204" } }); // Exclude India news
+      data_array.push({ country_id: { [Op.ne]: "204" } }); 
     }
   }
 
@@ -4110,5 +4092,59 @@ exports.counsellorteams = async (req, res) => {
       });
     });
 };
+
+exports.organizationpages = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  organizationpages
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "title",
+        "content",
+        "categories",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving organization pages.",
+      });
+    });
+};
+
 
 

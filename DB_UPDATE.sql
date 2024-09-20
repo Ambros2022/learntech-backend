@@ -810,3 +810,6 @@ CREATE TABLE organization_pages ( id INTEGER PRIMARY KEY AUTO_INCREMENT, title V
 
 
 CREATE TABLE organization_page_steps ( id INTEGER PRIMARY KEY AUTO_INCREMENT, organization_page_id INT, title VARCHAR(150) NOT NULL, description VARCHAR(150) DEFAULT NULL, icon VARCHAR(150) DEFAULT NULL, order_by VARCHAR(150) DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (organization_page_id) REFERENCES organization_pages(id) );
+
+ALTER TABLE school_boards 
+ADD status ENUM('Draft', 'Published') DEFAULT 'Published';

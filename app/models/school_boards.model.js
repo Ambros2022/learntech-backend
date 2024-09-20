@@ -65,6 +65,15 @@ module.exports = (sequelize, Sequelize) => {
       status: {
         type: Sequelize.ENUM("Draft", "Published"),
       },
+      meta_title: {
+        type: Sequelize.STRING
+      },
+      meta_description: {
+        type: Sequelize.INTEGER
+      },
+      meta_keyword: {
+        type: Sequelize.INTEGER
+      },
     },
     {
       timestamps: true,
