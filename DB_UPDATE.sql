@@ -805,3 +805,8 @@ ALTER TABLE video_testimonials CHANGE designation designation VARCHAR(255) CHARA
 
 ALTER TABLE video_testimonials ADD type ENUM('Draft','About_us_page','Testimonial_page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft' AFTER full_url;
 ALTER TABLE news_and_events ADD pdf_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AFTER status;
+
+CREATE TABLE organization_pages ( id INTEGER PRIMARY KEY AUTO_INCREMENT, title VARCHAR(150) NOT NULL, content VARCHAR(150) DEFAULT NULL, categories ENUM('Streams', 'Courses', 'Exams', 'Study_Abroad'), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP );
+
+
+CREATE TABLE organization_page_steps ( id INTEGER PRIMARY KEY AUTO_INCREMENT, organization_page_id INT, title VARCHAR(150) NOT NULL, description VARCHAR(150) DEFAULT NULL, icon VARCHAR(150) DEFAULT NULL, order_by VARCHAR(150) DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (organization_page_id) REFERENCES organization_pages(id) );

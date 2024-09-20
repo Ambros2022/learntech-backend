@@ -62,6 +62,9 @@ module.exports = (sequelize, Sequelize) => {
       map: {
         type: Sequelize.STRING
       },
+      status: {
+        type: Sequelize.ENUM("Draft", "Published"),
+      },
     },
     {
       timestamps: true,
