@@ -1585,6 +1585,7 @@ exports.allentranceexams = async (req, res) => {
         "country_id",
         "level_of_study",
         "types_of_exams",
+        "upcoming_date",
         "created_at",
       ],
       order: [orderconfig]
