@@ -4122,6 +4122,13 @@ exports.organizationpages = async (req, res) => {
         "content",
         "categories",
       ],
+      include: [
+        {
+          required: false,
+          association: "organizatiopagesteps",
+          attributes: ["id", "title", "description", "icon", "order_by"],
+        },
+      ],
       order: [orderconfig]
     })
     .then((data) => {

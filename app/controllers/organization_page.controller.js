@@ -28,10 +28,10 @@ exports.create = async (req, res) => {
   try {
 
     const organizationpagesDetails = await organizationpages.create({
-        title: req.body.title,
-        content: req.body.content,
-        categories: req.body.categories,
- });
+      title: req.body.title,
+      content: req.body.content,
+      categories: req.body.categories,
+    });
 
 
     res.status(200).send({
@@ -72,7 +72,17 @@ exports.findAll = async (req, res) => {
 
 
   const { limit, offset } = getPagination(page, size);
-  organizationpages.findAndCountAll({ where: condition, limit, offset, order: [orderconfig] },)
+  organizationpages.findAndCountAll({
+    where: condition, limit, offset,
+    include: [
+      {
+        required: false,
+        association: "organizatiopagesteps",
+        attributes: ["id", "title", "description", "icon", "order_by"],
+      },
+    ],
+    order: [orderconfig]
+  },)
     .then(data => {
       const response = getPagingData(data, page, limit);
 
@@ -178,9 +188,9 @@ exports.update = (req, res) => {
   try {
 
     organizationpages.update({
-        title: req.body.title,
-        content: req.body.content,
-        categories: req.body.categories,
+      title: req.body.title,
+      content: req.body.content,
+      categories: req.body.categories,
     }, {
       where: { id: req.body.id }
     });
@@ -199,65 +209,3 @@ exports.update = (req, res) => {
   }
 
 };
-
-exports.updatesteps = async (req, res) => {
-
-  try {
-      if (req.body.faqs && req.body.id) {
-          await abroadpage_faq.destroy({
-              where: { abroad_page_id: req.body.id },
-          });
-          const faqss = JSON.parse(req.body.faqs);
-          await _.forEach(faqss, function (value) {
-              abroadpage_faq.create({
-                organization_page_id: req.body.id,
-                title: value.title ? value.title : null,
-                description: value.description ? value.description : null,
-                icon: value.icon ? value.icon : null,
-                description: value.description ? value.description : null,
-              });
-          });
-      }
-
-      res.status(200).send({
-          status: 1,
-          message: "Data Save Successfully",
-      });
-  } catch (error) {
-      return res.status(400).send({
-          message: "Unable to update data",
-          errors: error,
-          status: 0,
-      });
-  }
-};
-
-// exports.updatesteps = async (req, res) => {
-
-//   try {
-//       if (req.body.faqs && req.body.id) {
-//           await abroadpage_faq.destroy({
-//               where: { abroad_page_id: req.body.id },
-//           });
-//           const faqss = JSON.parse(req.body.faqs);
-//           await _.forEach(faqss, function (value) {
-//               abroadpage_faq.create({
-//                   abroad_page_id: req.body.id,
-//                   questions: value.questions ? value.questions : null,
-//                   answers: value.answers ? value.answers : null,
-//               });
-//           });
-//       }
-
-//       res.status(200).send({
-//           status: 1,
-//           message: "Data Save Successfully",
-//       });
-//   } catch (error) {
-//       return res.status(400).send({
-//           message: "Unable to update data",
-//           errors: error,
-//           status: 0,
-//       });
-//   }
-// }

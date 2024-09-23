@@ -600,6 +600,19 @@ db.job_locations.belongsTo(db.all_job_locations, {
   as: "jobpositionslocation",
 });
 
+/***  Relation ship organization page steps enquiry */
+
+db.organization_page_steps.belongsTo(db.organization_pages, {
+  foreignKey: "organization_page_id",
+  as: "organizationpage",
+});
+
+db.organization_pages.hasMany(db.organization_page_steps, {
+  foreignKey: "organization_page_id",
+  as: "organizatiopagesteps"
+});
+
+
 
 /***  Relation ship  jobs enquiry */
 
