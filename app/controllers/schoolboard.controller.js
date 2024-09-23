@@ -99,6 +99,10 @@ exports.create = async (req, res) => {
         results: req.body.results,
         address: req.body.address,
         map: req.body.map,
+        status: req.body.status,
+        meta_title: req.body.meta_title,
+        meta_description: req.body.meta_description,
+        meta_keyword: req.body.meta_keyword,
       });
 
       if (req.body.recoginations && schoolboardsDetails.id) {
@@ -330,6 +334,10 @@ exports.update = async (req, res) => {
       sample_paper: req.body.sample_paper || existingRecord.sample_paper,
       address: req.body.address || existingRecord.address,
       map: req.body.map || existingRecord.map,
+      status: req.body.status || existingRecord.status,
+      meta_title: req.body.meta_title || existingRecord.meta_title,
+      meta_description: req.body.meta_description || existingRecord.meta_description,
+      meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
     };
 
     // Check if a new logo is provided
