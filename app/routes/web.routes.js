@@ -173,6 +173,8 @@ module.exports = function (app) {
 
   app.get("/api/website/counsellorteams/get", webapicontroller.counsellorteams);
 
+  app.get("/api/website/organizationpage/get", webapicontroller.organizationpages);
+
   
 
   

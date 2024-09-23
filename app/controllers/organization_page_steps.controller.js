@@ -117,6 +117,13 @@ exports.findAll = async (req, res) => {
     organizationpagesteps
         .findAndCountAll({
             where: condition, limit, offset,
+            include: [
+                {
+                    required: false,
+                    association: "organizationpage",
+                    attributes: ["id", "title"],
+                },
+            ],
 
             order: [orderconfig]
         })
@@ -170,6 +177,13 @@ exports.delete = (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
     organizationpagesteps.findByPk(id, {
+        include: [
+            {
+                required: false,
+                association: "organizationpage",
+                attributes: ["id", "title"],
+            },
+        ],
     })
         .then((data) => {
             if (data) {

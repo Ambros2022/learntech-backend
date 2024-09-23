@@ -2733,11 +2733,6 @@ app.post(
   organizationpagecontroller.update
 );
 
-app.post(
-  "/api/admin/organizationpage/updatesteps",
-  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-  organizationpagecontroller.updatesteps
-);
 
 /**organization page route end   */
 
