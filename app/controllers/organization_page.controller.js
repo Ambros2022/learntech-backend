@@ -148,7 +148,17 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  organizationpages.findByPk(id)
+  organizationpages
+  .findByPk(id, {
+    include: [
+        {
+          required: false,
+          association: "organizatiopagesteps",
+          attributes: ["id", "title", "description", "icon", "order_by"],
+        },
+      ],
+  })
+ 
     .then(data => {
       if (data) {
 
