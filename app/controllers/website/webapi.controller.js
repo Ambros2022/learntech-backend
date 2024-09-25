@@ -1965,6 +1965,7 @@ exports.schoolboards = async (req, res) => {
         "result_date",
         "address",
         "map",
+        "short_name",
       ],
       include: [
 
@@ -2045,6 +2046,7 @@ exports.schoolboardfindone = (req, res) => {
       "result_date",
       "address",
       "map",
+      "short_name",
     ],
     include: [
 
@@ -4093,69 +4095,6 @@ exports.counsellorteams = async (req, res) => {
     });
 };
 
-// exports.organizationpages = async (req, res) => {
-//   const { page, size, searchtext, searchfrom, columnname, categories, orderby } = req.query;
-
-//   let column = columnname || 'id';
-//   let order = orderby || 'ASC';
-//   let orderconfig = [column, order];
-
-//   const myArray = column.split(".");
-//   if (myArray.length > 1) {
-//     const table = myArray[0];
-//     column = myArray[1];
-//     orderconfig = [table, column, order];
-//   }
-
-//   let data_array = [];
-//   if (categories) {
-//     data_array.push({ categories: categories });
-//   }
-
-//   const condition = sendsearch.customseacrh(searchtext, searchfrom);
-//   if (condition) {
-//     data_array.push(condition);
-//   }
-
-//   const { limit, offset } = getPagination(page, size);
-
-//   try {
-//     const organizationPagesData = await organizationpages.findAndCountAll({
-//       where: data_array,
-//       limit,
-//       offset,
-//       include: [
-//         {
-//           required: false,
-//           association: "organizatiopagesteps",
-//           attributes: ["id", "title", "description", "icon", "order_by"],
-//         },
-//       ],
-//       order: [orderconfig]
-//     });
-
-//     const totalItems = await organizationpages.count({
-//       where: data_array,
-//     });
-
-//     const response = getPagingData(organizationPagesData, page, limit);
-//     res.status(200).send({
-//       status: 1,
-//       message: "success",
-//       totalItems: response.totalItems,
-//       currentPage: response.currentPage,
-//       totalPages: response.totalPages,
-//       data: response.finaldata,
-//     });
-//   } catch (err) {
-//     res.status(500).send({
-//       status: 0,
-//       message: err.message || "Some error occurred while retrieving organization pages."
-//     });
-//   }
-// };
-
-
 exports.organizationpages = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, categories, orderby } = req.query;
 
@@ -4183,7 +4122,6 @@ exports.organizationpages = async (req, res) => {
   const { limit, offset } = getPagination(page, size);
 
   try {
-    // Fetch the organization pages data
     const organizationPagesData = await organizationpages.findAndCountAll({
       where: data_array,
       limit,
@@ -4198,7 +4136,6 @@ exports.organizationpages = async (req, res) => {
       order: [orderconfig],
     });
 
-    // Count the total number of organization pages without the associated steps
     const totalItems = await organizationpages.count({
       where: data_array,
     });
@@ -4207,7 +4144,7 @@ exports.organizationpages = async (req, res) => {
     res.status(200).send({
       status: 1,
       message: "success",
-      totalItems: totalItems, // Use totalItems from the count query
+      totalItems: totalItems,
       currentPage: response.currentPage,
       totalPages: response.totalPages,
       data: response.finaldata,
