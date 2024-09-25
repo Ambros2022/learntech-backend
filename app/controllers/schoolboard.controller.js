@@ -103,6 +103,7 @@ exports.create = async (req, res) => {
         meta_title: req.body.meta_title,
         meta_description: req.body.meta_description,
         meta_keyword: req.body.meta_keyword,
+        short_name: req.body.short_name,
       });
 
       if (req.body.recoginations && schoolboardsDetails.id) {
@@ -338,6 +339,7 @@ exports.update = async (req, res) => {
       meta_title: req.body.meta_title || existingRecord.meta_title,
       meta_description: req.body.meta_description || existingRecord.meta_description,
       meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
+      short_name: req.body.short_name || existingRecord.short_name,
     };
 
     // Check if a new logo is provided

@@ -43,7 +43,7 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let cover_images = " ";
+    let cover_images = "";
     let promo_banners = "";
     let logos = "";
 
@@ -182,6 +182,7 @@ exports.create = async (req, res) => {
     });
   }
 };
+
 
 exports.update = async (req, res) => {
   try {

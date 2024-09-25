@@ -259,7 +259,7 @@ exports.update = async (req, res) => {
 
             await avatar.mv(UploadPath);
 
-            organizationpagestepsUpdates.image = "organizationpagesteps_image/" + logoname;
+            organizationpagestepsUpdates.icon = "organizationpagesteps_image/" + logoname;
 
             // If there's an old logo associated with the record, remove it
             if (existingRecord.icon) {
