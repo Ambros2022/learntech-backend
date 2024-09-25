@@ -48,63 +48,68 @@ exports.create = async (req, res) => {
     });
   }
 
-}
+};
 
 exports.findAll = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, categories, orderby } = req.query;
 
-
-  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
-
-  var column = columnname ? columnname : 'id';
-  var order = orderby ? orderby : 'ASC';
-  var orderconfig = [column, order];
-
+  let column = columnname || 'id';
+  let order = orderby || 'ASC';
+  let orderconfig = [column, order];
 
   const myArray = column.split(".");
-  if (typeof myArray[1] !== "undefined") {
-    var table = myArray[0];
+  if (myArray.length > 1) {
+    const table = myArray[0];
     column = myArray[1];
     orderconfig = [table, column, order];
   }
 
+  let data_array = [];
+  if (categories) {
+    data_array.push({ categories: categories });
+  }
 
-  var condition = sendsearch.customseacrh(searchtext, searchfrom);
-
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
 
   const { limit, offset } = getPagination(page, size);
-  organizationpages.findAndCountAll({
-    where: condition, limit, offset,
-    include: [
-      {
-        required: false,
-        association: "organizatiopagesteps",
-        attributes: ["id", "title", "description", "icon", "order_by"],
-      },
-    ],
-    order: [orderconfig]
-  },)
-    .then(data => {
-      const response = getPagingData(data, page, limit);
 
-      res.status(200).send({
-        status: 1,
-        message: "success",
-        totalItems: response.totalItems,
-        currentPage: response.currentPage,
-        totalPages: response.totalPages,
-        data: response.organizationpages
-      });
-
-
-    })
-    .catch(err => {
-      res.status(500).send({
-        status: 0,
-        message:
-
-          err.message || "Some error occurred while retrieving organization pages."
-      });
+  try {
+    const organizationPagesData = await organizationpages.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      include: [
+        {
+          required: false,
+          association: "organizatiopagesteps",
+          attributes: ["id", "title", "description", "icon", "order_by"],
+        },
+      ],
+      order: [orderconfig]
     });
+
+    const totalItems = await organizationpages.count({
+      where: data_array,
+    });
+
+    const response = getPagingData(organizationPagesData, page, limit);
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: totalItems, 
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.organizationpages, 
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving organization pages."
+    });
+  }
 };
 
 

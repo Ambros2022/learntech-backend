@@ -74,6 +74,9 @@ module.exports = (sequelize, Sequelize) => {
       meta_keyword: {
         type: Sequelize.INTEGER
       },
+      short_name: {
+        type: Sequelize.STRING
+      },
     },
     {
       timestamps: true,
