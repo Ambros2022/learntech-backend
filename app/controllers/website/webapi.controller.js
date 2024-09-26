@@ -1571,6 +1571,7 @@ exports.allentranceexams = async (req, res) => {
         "slug",
         "exam_short_name",
         "cover_image",
+        "logo",
         "stream_id",
         "created_at",
       ],
@@ -2314,6 +2315,7 @@ exports.allgeneralcourses = async (req, res) => {
         "name",
         "short_name",
         "slug",
+        "logo",
       ],
       include: [
         {
