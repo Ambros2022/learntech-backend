@@ -412,7 +412,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "name", "slug","banner"],
         },
         {
           required: false,
@@ -767,10 +767,8 @@ exports.exploreCollege = async (req, res) => {
   }
   const { limit, offset } = getPagination(page, size);
   try {
-    // Count the total number of streams
     const totalItems = await stream.count();
 
-    // Fetch the paginated data
     const data = await stream.findAll({
       attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
@@ -783,7 +781,6 @@ exports.exploreCollege = async (req, res) => {
       order: [orderconfig],
     });
 
-    // Map the data to include the course count
     const formattedData = data.map(stream => {
       const courseCount = stream.clgstreamm.length;
       return {
@@ -941,12 +938,6 @@ exports.explorecourses = async (req, res) => {
 
 
 
-
-
-
-
-
-
 exports.allcolleges = async (req, res) => {
   const {
     page,
@@ -1034,7 +1025,7 @@ exports.allcolleges = async (req, res) => {
       association: "collegestreams",
       required: true,
       attributes: ["id"],
-      where: {
+      where: { 
         stream_id: JSON.parse(stream_id)
       }
     });
@@ -2363,7 +2354,7 @@ exports.allgeneralcourses = async (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "name", "slug","logo"],
         },
       ],
       order: [orderconfig],
