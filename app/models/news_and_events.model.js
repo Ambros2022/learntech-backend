@@ -3,6 +3,9 @@ module.exports = (sequelize, Sequelize) => {
     category_id: {
       type: Sequelize.STRING
     },
+    country_id: {
+      type: Sequelize.STRING
+    },
     name: {
       type: Sequelize.STRING
     },
@@ -29,6 +32,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     status: {
       type: Sequelize.ENUM('Draft', 'Published'),
+    },
+    pdf_name: {
+      type: Sequelize.STRING
     },
 
   }

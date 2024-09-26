@@ -503,6 +503,7 @@ CREATE TABLE news_and_events (
 
 CREATE TABLE blogs (
   id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  category_id INT,
   name VARCHAR(150) NOT NULL,
   slug VARCHAR(150) NOT NULL,
   banner_image VARCHAR(150) DEFAULT NULL,
@@ -513,6 +514,7 @@ CREATE TABLE blogs (
   status ENUM('Draft', 'Published') DEFAULT 'Published',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  FOREIGN KEY (category_id) REFERENCES blog_categories(id)
 );
 
 CREATE TABLE scholar_levels (
@@ -717,3 +719,97 @@ ALTER TABLE exams ADD logo VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_ge
 ALTER TABLE courses ADD course_short_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AFTER status;
 
 ALTER TABLE enquiries ADD bank_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER current_url, ADD city VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL AFTER bank_name;
+
+CREATE TABLE blog_comments (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  blog_id INT DEFAULT NULL,
+  content VARCHAR(255) NOT NULL,
+  is_approved TINYINT DEFAULT 0,
+  is_reported TINYINT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (blog_id) REFERENCES blogs(id) ON DELETE CASCADE
+);
+
+
+ALTER TABLE `abroadpages`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+
+
+ALTER TABLE `blogs`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `colleges`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `courses`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `exams`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+
+ALTER TABLE `general_courses`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `news_and_events`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `pages`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `scholarships`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+ALTER TABLE `schools`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+	
+ALTER TABLE `streams`
+MODIFY COLUMN `meta_description` VARCHAR(400) DEFAULT NULL;
+
+
+CREATE TABLE genders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL
+);
+INSERT INTO genders (name) VALUES ('Male');
+INSERT INTO genders (name) VALUES ('Female');
+INSERT INTO genders (name) VALUES ('Others');
+
+CREATE TABLE scholar_genders (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  gender_id INT,
+  scholar_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (gender_id) REFERENCES genders(id),
+  FOREIGN KEY (scholar_id) REFERENCES scholarships(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE blog_categories (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(150) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+ALTER TABLE blogs ADD COLUMN category_id INT, ADD CONSTRAINT category_id FOREIGN KEY (category_id) REFERENCES blog_categories(id);
+
+ALTER TABLE `genders` ADD `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `name`, ADD `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `created_at`;
+
+
+ALTER TABLE video_testimonials CHANGE designation designation VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE video_testimonials ADD type ENUM('Draft','About_us_page','Testimonial_page') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Draft' AFTER full_url;
+ALTER TABLE news_and_events ADD pdf_name VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL AFTER status;
+
+CREATE TABLE organization_pages ( id INTEGER PRIMARY KEY AUTO_INCREMENT, title VARCHAR(150) NOT NULL, content VARCHAR(150) DEFAULT NULL, categories ENUM('Streams', 'Courses', 'Exams', 'Study_Abroad'), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP );
+
+
+CREATE TABLE organization_page_steps ( id INTEGER PRIMARY KEY AUTO_INCREMENT, organization_page_id INT, title VARCHAR(150) NOT NULL, description VARCHAR(150) DEFAULT NULL, icon VARCHAR(150) DEFAULT NULL, order_by VARCHAR(150) DEFAULT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (organization_page_id) REFERENCES organization_pages(id) );
+
+ALTER TABLE school_boards 
+ADD status ENUM('Draft', 'Published') DEFAULT 'Published';

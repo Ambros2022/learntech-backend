@@ -110,6 +110,7 @@ exports.create = async (req, res) => {
 
     const newsandeventsDetails = await newsandevents.create({
       category_id: req.body.category_id,
+      country_id: req.body.country_id,
       name: req.body.name,
       slug: req.body.slug,
       banner_image: bannerimages,
@@ -118,6 +119,7 @@ exports.create = async (req, res) => {
       meta_description: req.body.meta_description,
       meta_keywords: req.body.meta_keywords,
       overview: req.body.overview,
+      pdf_name: req.body.pdf_name,
       status: req.body.status,
     });
     res.status(200).send({
@@ -152,12 +154,14 @@ exports.update = async (req, res) => {
 
     const newsandeventsUpdates = {
       category_id: req.body.category_id || existingRecord.category_id,
+      country_id: req.body.country_id || existingRecord.country_id,
       name: req.body.name || existingRecord.name,
       slug: req.body.slug || existingRecord.slug,
       meta_title: req.body.meta_title || existingRecord.meta_title,
       meta_description: req.body.meta_description || existingRecord.meta_description,
       meta_keywords: req.body.meta_keywords || existingRecord.meta_keywords,
       overview: req.body.overview || existingRecord.overview,
+      pdf_name: req.body.pdf_name || existingRecord.pdf_name,
       status: req.body.status || existingRecord.status,
 
     };
@@ -246,7 +250,7 @@ exports.update = async (req, res) => {
 };
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, columnname, searchfrom, orderby, category_id  } = req.query;
+  const { page, size, searchtext, columnname, searchfrom, orderby, category_id, country_id } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -261,8 +265,12 @@ exports.findAll = async (req, res) => {
 
   let data_array = [];
 
-  if (category_id  ) {
-    data_array.push({ category_id  : category_id   });
+  if (category_id) {
+    data_array.push({ category_id: category_id });
+  }
+
+  if (country_id != null) {
+    data_array.push({ country_id });
   }
 
   condition ? data_array.push(condition) : null;
@@ -276,6 +284,15 @@ exports.findAll = async (req, res) => {
           required: false,
           association: "newscategories",
           attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "country",
+          attributes: [
+            "id",
+            "name",
+
+          ],
         },
       ],
       order: [orderconfig]
@@ -337,8 +354,15 @@ exports.findOne = (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "country",
+          attributes: [
+            "id",
+            "name",
 
-
+          ],
+        },
       ],
     })
     .then((data) => {

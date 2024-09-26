@@ -43,7 +43,7 @@ const getPagingData = (data, page, limit) => {
 
 exports.create = async (req, res) => {
   try {
-    let cover_images = " ";
+    let cover_images = "";
     let promo_banners = "";
     let logos = "";
 
@@ -140,6 +140,7 @@ exports.create = async (req, res) => {
 
       const examsDetails = await exam.create({
         stream_id: req.body.stream_id,
+        country_id: req.body.country_id,
         exam_title: req.body.exam_title,
         slug: req.body.slug,
         upcoming_date: req.body.upcoming_date,
@@ -163,6 +164,8 @@ exports.create = async (req, res) => {
         cover_image: cover_images,
         promo_banner: promo_banners,
         logo: logos,
+        level_of_study: level_of_study,
+        types_of_exams: types_of_exams,
       });
 
       res.status(200).send({
@@ -180,6 +183,7 @@ exports.create = async (req, res) => {
   }
 };
 
+
 exports.update = async (req, res) => {
   try {
     // Check if the record exists in the database
@@ -196,6 +200,7 @@ exports.update = async (req, res) => {
 
     let examsUpdates = {
       stream_id: req.body.stream_id || existingRecord.stream_id,
+      country_id: req.body.country_id || existingRecord.country_id,
       exam_title: req.body.exam_title || existingRecord.exam_title,
       slug: req.body.slug || existingRecord.slug,
       upcoming_date: req.body.upcoming_date || existingRecord.upcoming_date,
@@ -220,6 +225,8 @@ exports.update = async (req, res) => {
       // promo_banner: req.body.promo_banner || existingRecord.promo_banner,
       promo_banner_status: req.body.promo_banner_status || existingRecord.promo_banner_status,
       status: req.body.status || existingRecord.status,
+      level_of_study: req.body.level_of_study || existingRecord.level_of_study,
+      types_of_exams: req.body.types_of_exams || existingRecord.types_of_exams,
     };
 
     // Check if a new logo is provided
@@ -345,7 +352,7 @@ exports.update = async (req, res) => {
 
 
 exports.findAll = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, stream_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, stream_id, country_id, level_of_study, types_of_exams } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -365,6 +372,18 @@ exports.findAll = async (req, res) => {
     data_array.push({ stream_id : stream_id  });
   }
 
+  if (country_id ) {
+    data_array.push({ country_id : country_id  });
+  }
+
+  if (level_of_study ) {
+    data_array.push({ level_of_study : level_of_study  });
+  }
+
+  if (types_of_exams ) {
+    data_array.push({ types_of_exams : types_of_exams  });
+  }
+
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
@@ -379,6 +398,15 @@ exports.findAll = async (req, res) => {
           required: false,
           association: "stream",
           attributes: ["id", "name"],
+        },
+            {
+           required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
         },
 
       ],
@@ -446,6 +474,15 @@ exports.findOne = (req, res) => {
           required: false,
           association: "examfaqs",
           attributes: ["id", "questions", "answers"],
+        },
+        {
+           required: false,
+                    association: "country",
+                    attributes: [
+                        "id",
+                        "name",
+
+                    ],
         },
 
       ],

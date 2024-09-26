@@ -41,6 +41,8 @@ const review_replies = db.review_replies;
 // const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
 const _ = require('lodash');
+const counsellorteam = db.counsellor_teams;
+const organizationpages = db.organization_pages;
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
@@ -410,7 +412,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name","slug"],
+          attributes: ["id", "name", "slug"],
         },
         {
           required: false,
@@ -443,7 +445,7 @@ exports.genralOnestream = (req, res) => {
 };
 
 exports.allcourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, college_id ,course_type} = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, course_type } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -478,7 +480,7 @@ exports.allcourses = async (req, res) => {
       ],
       order: [orderconfig],
       include: [
-        
+
         {
           required: false,
           association: "generalcourse",
@@ -581,7 +583,7 @@ exports.searchbarhome = async (req, res) => {
 exports.enquiry = async (req, res) => {
   try {
     // Validate input data
-    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url, bank_name, city } = req.body;
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url } = req.body;
 
 
 
@@ -596,8 +598,6 @@ exports.enquiry = async (req, res) => {
       school_name: school_name || null,
       description: description || null,
       current_url: current_url || null,
-      bank_name: bank_name || null,
-      city: city || null,
     });
 
     res.status(200).send({
@@ -1537,7 +1537,7 @@ exports.abroadcollegefindone = (req, res) => {
 
 
 exports.allentranceexams = async (req, res) => {
-  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status } = req.query;
+  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status, country_id, level_of_study, types_of_exams } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1555,6 +1555,17 @@ exports.allentranceexams = async (req, res) => {
     data_array.push({ promo_banner_status });
   }
 
+  if (country_id) {
+    data_array.push({ country_id });
+  }
+
+  if (level_of_study) {
+    data_array.push({ level_of_study });
+  }
+
+  if (types_of_exams) {
+    data_array.push({ types_of_exams });
+  }
 
   if (stream_id) data_array.push({ stream_id: JSON.parse(stream_id) });
 
@@ -1573,6 +1584,10 @@ exports.allentranceexams = async (req, res) => {
         "cover_image",
         "logo",
         "stream_id",
+        "country_id",
+        "level_of_study",
+        "types_of_exams",
+        "upcoming_date",
         "created_at",
       ],
       order: [orderconfig]
@@ -1636,7 +1651,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, category_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id, includeIndia } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1649,8 +1664,25 @@ exports.news = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  let conditioncategoryid = category_id ? { category_id: category_id } : null;
-  conditioncategoryid ? data_array.push(conditioncategoryid) : null;
+
+
+  if (country_id) {
+    if (country_id === "204" && includeIndia === "true") {
+      data_array.push({ country_id: "204" });
+    } else if (country_id !== "204" && includeIndia === "false") {
+      data_array.push({ country_id: { [Op.ne]: "204" } });
+    }
+  } else {
+    if (includeIndia === "true") {
+      data_array.push({ country_id: "204" });
+    } else if (includeIndia === "false") {
+      data_array.push({ country_id: { [Op.ne]: "204" } });
+    }
+  }
+
+  if (category_id) {
+    data_array.push({ category_id });
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1668,6 +1700,7 @@ exports.news = async (req, res) => {
         "pdf_file",
         "created_at",
         "category_id",
+        "country_id",
       ],
       include: [
         {
@@ -1675,8 +1708,15 @@ exports.news = async (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "country",
+          attributes: [
+            "id",
+            "name",
 
-
+          ],
+        },
       ],
       order: [orderconfig]
     })
@@ -1926,6 +1966,7 @@ exports.schoolboards = async (req, res) => {
         "result_date",
         "address",
         "map",
+        "short_name",
       ],
       include: [
 
@@ -2006,6 +2047,7 @@ exports.schoolboardfindone = (req, res) => {
       "result_date",
       "address",
       "map",
+      "short_name",
     ],
     include: [
 
@@ -2443,18 +2485,18 @@ exports.jobpositions = async (req, res) => {
       ],
       include: [
         {
-            required: false,
-            association: "jobpositionlocation",
-            attributes: ["id", "job_location_id"],
-            include: [
-                {
-                    required: false,
-                    association: "jobpositionslocation",
-                    attributes: ["id", "name"],
-                },
-            ],
+          required: false,
+          association: "jobpositionlocation",
+          attributes: ["id", "job_location_id"],
+          include: [
+            {
+              required: false,
+              association: "jobpositionslocation",
+              attributes: ["id", "name"],
+            },
+          ],
         },
-    ],
+      ],
 
       order: [orderconfig]
     })
@@ -2534,59 +2576,59 @@ exports.alljoblocations = async (req, res) => {
 
 exports.addjobenquires = async (req, res) => {
   try {
-      let resumes = "";
+    let resumes = "";
 
-      if (req.files && req.files.resume) {
-          let avatar = req.files.resume;
+    if (req.files && req.files.resume) {
+      let avatar = req.files.resume;
 
-          if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-              return res.status(400).send({
-                  message: "Invalid File type ",
-                  errors: {},
-                  status: 0,
-              });
-          }
-
-          if (avatar.size / (1024 * 1024) > allowed_file_size) {
-              return res.status(400).send({
-                  message: "File too large ",
-                  errors: {},
-                  status: 0,
-              });
-          }
-
-          let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-          let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
-
-          if (IsUpload) {
-              resumes = "jobenquiry_image/" + logoname;
-          }
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
       }
 
-      const jobsenquiresDetails = await jobsenquires.create({
-          jobs_position_id: req.body.jobs_position_id,
-          job_location_id: req.body.job_location_id,
-          name: req.body.name,
-          email: req.body.email,
-          phone: req.body.phone,
-          d_o_b: req.body.d_o_b,
-          current_location: req.body.current_location,
-          total_exp: req.body.total_exp,
-          resume: resumes,
-          status: req.body.status,
-      });
-      res.status(200).send({
-          status: 1,
-          message: "Data Save Successfully",
-          data: jobsenquiresDetails,
-      });
-  } catch (error) {
-      return res.status(400).send({
-          message: "Unable to insert data",
-          errors: error,
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
           status: 0,
-      });
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        resumes = "jobenquiry_image/" + logoname;
+      }
+    }
+
+    const jobsenquiresDetails = await jobsenquires.create({
+      jobs_position_id: req.body.jobs_position_id,
+      job_location_id: req.body.job_location_id,
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      d_o_b: req.body.d_o_b,
+      current_location: req.body.current_location,
+      total_exp: req.body.total_exp,
+      resume: resumes,
+      status: req.body.status,
+    });
+    res.status(200).send({
+      status: 1,
+      message: "Data Save Successfully",
+      data: jobsenquiresDetails,
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to insert data",
+      errors: error,
+      status: 0,
+    });
   }
 };
 
@@ -3907,40 +3949,40 @@ exports.scholartype = async (req, res) => {
 exports.addjobposition = async (req, res) => {
 
   try {
-      const jobspositionsDetails = await jobs_positions.create({
-          name: req.body.name,
-          job_description: req.body.job_description,
-          exp_required: req.body.exp_required,
-          total_positions: req.body.total_positions,
-          status: req.body.status,
+    const jobspositionsDetails = await jobs_positions.create({
+      name: req.body.name,
+      job_description: req.body.job_description,
+      exp_required: req.body.exp_required,
+      total_positions: req.body.total_positions,
+      status: req.body.status,
 
+    });
+
+    if (req.body.joblocations && jobspositionsDetails.id) {
+      const joblocation = JSON.parse(req.body.joblocations);
+      _.forEach(joblocation, async function (value) {
+
+        await alljoblocation.create({
+          job_location_id: value.id,
+          jobs_position_id: jobspositionsDetails.id,
+        });
       });
-
-      if (req.body.joblocations && jobspositionsDetails.id) {
-          const joblocation = JSON.parse(req.body.joblocations);
-          _.forEach(joblocation, async function (value) {
-
-              await alljoblocation.create({
-                  job_location_id: value.id,
-                  jobs_position_id: jobspositionsDetails.id,
-              });
-          });
-      }
+    }
 
 
 
-      res.status(200).send({
-          status: 1,
-          message: 'Data Save Successfully',
-          data: jobspositionsDetails
-      });
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: jobspositionsDetails
+    });
   }
   catch (error) {
-      return res.status(400).send({
-          message: 'Unable to insert data',
-          errors: error,
-          status: 0
-      });
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
   }
 };
 
@@ -3959,8 +4001,8 @@ exports.allcities = async (req, res) => {
   }
   let data_array = [];
 
-  if (state_id ) {
-    data_array.push({ state_id : state_id  });
+  if (state_id) {
+    data_array.push({ state_id: state_id });
   }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -3999,3 +4041,121 @@ exports.allcities = async (req, res) => {
       });
     });
 };
+
+exports.counsellorteams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  counsellorteam
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "location",
+        "experience",
+        "description",
+        "image",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving counsellor team.",
+      });
+    });
+};
+
+exports.organizationpages = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, categories, orderby } = req.query;
+
+  let column = columnname || 'id';
+  let order = orderby || 'ASC';
+  let orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (myArray.length > 1) {
+    const table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  let data_array = [];
+  if (categories) {
+    data_array.push({ categories: categories });
+  }
+
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const organizationPagesData = await organizationpages.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      include: [
+        {
+          required: false,
+          association: "organizatiopagesteps",
+          attributes: ["id", "title", "description", "icon", "order_by"],
+        },
+      ],
+      order: [orderconfig],
+    });
+
+    const totalItems = await organizationpages.count({
+      where: data_array,
+    });
+
+    const response = getPagingData(organizationPagesData, page, limit);
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving organization pages."
+    });
+  }
+};
+

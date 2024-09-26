@@ -1,6 +1,7 @@
 const db = require("../models");
 const path = require("path");
 const scholarships = db.scholarships;
+const scholargenders = db.scholar_gender;
 const _ = require("lodash");
 const sendsearch = require("../utility/Customsearch");
 
@@ -91,6 +92,16 @@ exports.create = async (req, res) => {
       status: req.body.status,
     });
 
+    if (req.body.genders && scholarshipsDetails.id) {
+      const stream = JSON.parse(req.body.genders);
+      _.forEach(stream, async function (value) {
+
+        await scholargenders.create({
+          gender_id: value.id,
+          scholar_id: scholarshipsDetails.id,
+        });
+      });
+    }
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -174,6 +185,19 @@ exports.update = async (req, res) => {
 
     // Update database record
     await scholarships.update(scholarshipsUpdates, { where: { id: req.body.id } });
+
+    if (req.body.genders && req.body.id) {
+      await scholargenders.destroy({
+        where: { scholar_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.genders);
+      _.forEach(stream, async function (value) {
+        await scholargenders.create({
+          scholar_id: req.body.id,
+          gender_id: value.id,
+        });
+      });
+    }
 
     res.status(200).send({
       status: 1,
@@ -275,6 +299,17 @@ exports.findOne = (req, res) => {
           required: false,
           association: "scholartypes",
           attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "schgenders",
+          attributes: ["id", "gender_id"],
+          include: [
+            {
+              association: "genders",
+              attributes: ["id", "name"],
+            },
+          ],
         },
 
       ],

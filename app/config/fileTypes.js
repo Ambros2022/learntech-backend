@@ -5,8 +5,9 @@ module.exports = {
         "image/jpg",
         "image/gif",
         "image/svg+xml",
-        "image/webp"
-
-      ],
- 
-  };
+        "image/webp",
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ]
+};
