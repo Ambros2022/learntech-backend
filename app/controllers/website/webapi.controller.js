@@ -1316,7 +1316,7 @@ exports.allschools = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "established", "icon", "school_type"],
+      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating"],
       include: includearray,
       order: [orderconfig],
       limit,
