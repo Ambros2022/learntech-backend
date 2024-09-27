@@ -9,7 +9,6 @@ module.exports = (sequelize, Sequelize) => {
         categories: {
             type: Sequelize.ENUM('Streams', 'Courses', 'Exams', 'Study_Abroad'),
         },
-
     }
         ,
         {
@@ -20,7 +19,6 @@ module.exports = (sequelize, Sequelize) => {
             updatedAt: "updated_at",
 
         }
-
     );
 
     return organization_pages;
