@@ -412,7 +412,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug","banner"],
+          attributes: ["id", "name", "slug", "banner"],
         },
         {
           required: false,
@@ -1025,7 +1025,7 @@ exports.allcolleges = async (req, res) => {
       association: "collegestreams",
       required: true,
       attributes: ["id"],
-      where: { 
+      where: {
         stream_id: JSON.parse(stream_id)
       }
     });
@@ -1400,7 +1400,6 @@ exports.schoolfindone = (req, res) => {
           association: "schfaqs",
           attributes: ["id", "questions", "answers"],
         },
-
       ],
 
     })
@@ -1528,7 +1527,7 @@ exports.abroadcollegefindone = (req, res) => {
 
 
 exports.allentranceexams = async (req, res) => {
-  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status, country_id, level_of_study, types_of_exams } = req.query;
+  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status, country_id, level_of_study, types_of_exams, isIndia } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1540,6 +1539,7 @@ exports.allentranceexams = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
+
   let data_array = [{ status: "Published" }];
 
   if (promo_banner_status) {
@@ -1558,15 +1558,28 @@ exports.allentranceexams = async (req, res) => {
     data_array.push({ types_of_exams });
   }
 
-  if (stream_id) data_array.push({ stream_id: JSON.parse(stream_id) });
+  if (stream_id) {
+    data_array.push({ stream_id: JSON.parse(stream_id) });
+  }
+
+  // Add logic to filter by `isIndia`
+  if (isIndia === 'true') {
+    data_array.push({ country_id: 204 }); // Show only exams with country_id 204
+  } else if (isIndia === 'false') {
+    data_array.push({ country_id: { [Op.ne]: 204 } }); // Show exams with country_id NOT equal to 204
+  }
 
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
-  if (condition) data_array.push(condition);
+  if (condition) {
+    data_array.push(condition);
+  }
 
   const { limit, offset } = getPagination(page, size);
   exam
     .findAndCountAll({
-      where: data_array, limit, offset,
+      where: data_array,
+      limit,
+      offset,
       attributes: [
         "id",
         "exam_title",
@@ -1599,11 +1612,11 @@ exports.allentranceexams = async (req, res) => {
       res.status(500).send({
         status: 0,
         message:
-          err.message ||
-          "Some error occurred while retrieving exams.",
+          err.message || "Some error occurred while retrieving exams.",
       });
     });
 };
+
 
 exports.findoneexam = (req, res) => {
   const id = req.params.id;
@@ -2354,7 +2367,7 @@ exports.allgeneralcourses = async (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug","logo"],
+          attributes: ["id", "name", "slug", "logo"],
         },
       ],
       order: [orderconfig],
