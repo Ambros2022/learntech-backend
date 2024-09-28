@@ -1271,6 +1271,7 @@ exports.allschools = async (req, res) => {
     country_id,
     state_id,
     city_id,
+    school_board_id,
     columnname,
     orderby,
     school_type,
@@ -1302,6 +1303,7 @@ exports.allschools = async (req, res) => {
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
   if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
   if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
+  if (school_board_id) data_array.push({ school_board_id: JSON.parse(school_board_id) });
 
 
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -1316,7 +1318,7 @@ exports.allschools = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating"],
+      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating", "slug"],
       include: includearray,
       order: [orderconfig],
       limit,
