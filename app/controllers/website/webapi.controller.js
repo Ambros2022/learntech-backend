@@ -2491,18 +2491,17 @@ exports.jobpositions = async (req, res) => {
       ],
       include: [
         {
-          required: false,
-          association: "jobpositionlocation",
-          attributes: ["id", "job_location_id"],
-          include: [
-            {
-              required: false,
-              association: "jobpositionslocation",
-              attributes: ["id", "name"],
-            },
-          ],
+            required: false,
+            association: "jobpositionlocation",
+            attributes: ["id", "job_location_id"],
+            include: [
+                {
+                    association: "jobpositionslocation",
+                    attributes: ["id", "name"],
+                },
+            ],
         },
-      ],
+    ],
 
       order: [orderconfig]
     })
