@@ -1347,7 +1347,7 @@ exports.schoolfindone = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
-      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established'],
+      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established', 'short_name'],
       include: [
         {
           required: false,
@@ -4078,6 +4078,7 @@ exports.counsellorteams = async (req, res) => {
         "experience",
         "description",
         "image",
+        "info",
       ],
       order: [orderconfig]
     })
