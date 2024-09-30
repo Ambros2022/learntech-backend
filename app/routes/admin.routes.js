@@ -494,7 +494,7 @@ module.exports = function (app) {
   );
 
   app.get(
-    "/api/admin/schoolboard/:id",
+    "/api/admin/schoolboard/get/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     schoolboardcontroller.findOne
   );
