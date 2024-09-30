@@ -1367,7 +1367,7 @@ exports.schoolfindone = (req, res) => {
         {
           required: false,
           association: "schoolboard",
-          attributes: ["id", "name"],
+          attributes: ["id", "name","short_name"],
         },
         {
           required: false,
