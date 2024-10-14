@@ -18,6 +18,9 @@ module.exports = (sequelize, Sequelize) => {
         info: {
             type: Sequelize.STRING
         },
+        listing_order: {
+            type: Sequelize.INTEGER
+          },
     }
         ,
         {

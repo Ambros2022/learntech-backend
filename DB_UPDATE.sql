@@ -813,3 +813,9 @@ CREATE TABLE organization_page_steps ( id INTEGER PRIMARY KEY AUTO_INCREMENT, or
 
 ALTER TABLE school_boards 
 ADD status ENUM('Draft', 'Published') DEFAULT 'Published';
+
+ALTER TABLE `schools` CHANGE `map` `map` VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE `jobs_positions` CHANGE `job_description` `job_description` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE counsellor_teams ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER image;
