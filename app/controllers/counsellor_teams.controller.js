@@ -79,6 +79,7 @@ exports.create = async (req, res) => {
             experience: req.body.experience,
             description: req.body.description,
             info: req.body.info,
+            listing_order: req.body.listing_order,
             image: images,
         });
 
@@ -217,6 +218,7 @@ exports.update = async (req, res) => {
             experience: req.body.experience || existingRecord.experience,
             description: req.body.description || existingRecord.description,
             info: req.body.info || existingRecord.info,
+            listing_order: req.body.listing_order || existingRecord.listing_order,
         };
         if (req.files && req.files.image) {
             const avatar = req.files.image;
