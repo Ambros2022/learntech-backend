@@ -819,3 +819,5 @@ ALTER TABLE `schools` CHANGE `map` `map` VARCHAR(500) CHARACTER SET utf8mb4 COLL
 ALTER TABLE `jobs_positions` CHANGE `job_description` `job_description` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE counsellor_teams ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER image;
+ALTER TABLE `states` ADD `is_top` TINYINT(1) NOT NULL DEFAULT '0' AFTER `country_id`;
+ALTER TABLE `reviews` CHANGE `content` `content` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;

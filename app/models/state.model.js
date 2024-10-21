@@ -6,6 +6,9 @@ module.exports = (sequelize, Sequelize) => {
     country_id: {
       type: Sequelize.INTEGER
     },
+    is_top: {
+      type: Sequelize.STRING
+    },
 
   }
     ,
