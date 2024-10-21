@@ -1803,7 +1803,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview','pdf_name'],
       include: [
         {
           required: false,
@@ -2305,6 +2305,7 @@ exports.videotestimonial = async (req, res) => {
         "designation",
         "video_url",
         "full_url",
+        "type"
       ],
       order: [orderconfig]
     })
