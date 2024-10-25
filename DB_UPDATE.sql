@@ -821,3 +821,34 @@ ALTER TABLE `jobs_positions` CHANGE `job_description` `job_description` LONGTEXT
 ALTER TABLE counsellor_teams ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER image;
 ALTER TABLE `states` ADD `is_top` TINYINT(1) NOT NULL DEFAULT '0' AFTER `country_id`;
 ALTER TABLE `reviews` CHANGE `content` `content` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+
+
+CREATE TABLE college_testimonials (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  video_id INT,
+  college_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (video_id) REFERENCES video_testimonials(id) ON DELETE CASCADE,
+  FOREIGN KEY (college_id) REFERENCES colleges(id) ON DELETE CASCADE
+);
+
+CREATE TABLE stream_testimonials (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  video_id INT,
+  stream_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (video_id) REFERENCES video_testimonials(id) ON DELETE CASCADE,
+  FOREIGN KEY (stream_id) REFERENCES streams(id) ON DELETE CASCADE
+);
+
+CREATE TABLE general_course_testimonials (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  video_id INT,
+  general_course_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (video_id) REFERENCES video_testimonials(id) ON DELETE CASCADE,
+  FOREIGN KEY (general_course_id) REFERENCES general_courses(id) ON DELETE CASCADE
+);

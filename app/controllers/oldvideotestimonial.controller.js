@@ -1,6 +1,9 @@
 const db = require("../models");
 const path = require('path');
 const videotestimonial = db.videotestimonial;
+const Collegetestimonial = db.college_testimonials;
+const Streamtestimonial = db.stream_testimonials;
+const GeneralCoursetestimonial = db.general_course_testimonials;
 const _ = require('lodash');
 const sendsearch = require("../utility/Customsearch");
 
@@ -35,6 +38,37 @@ exports.create = async (req, res) => {
       designation: req.body.designation ? req.body.designation : null,
       description: req.body.description ? req.body.description : null,
     });
+    console.log(req.body.colleges, "s");
+
+    if (req.body.colleges && videotestimonialDetails.id) {
+      const stream = JSON.parse(req.body.colleges);
+      console.log(stream, "s");
+      _.forEach(stream, async function (value) {
+        await Collegetestimonial.create({
+          college_id: value.id,
+          video_id: videotestimonialDetails.id,
+        });
+      });
+    }
+    if (req.body.streams && videotestimonialDetails.id) {
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
+        await Streamtestimonial.create({
+          stream_id: value.id,
+          video_id: videotestimonialDetails.id,
+        });
+      });
+    }
+
+    if (req.body.courses && videotestimonialDetails.id) {
+      const stream = JSON.parse(req.body.courses);
+      _.forEach(stream, async function (value) {
+        await GeneralCoursetestimonial.create({
+          general_course_id: value.id,
+          video_id: videotestimonialDetails.id,
+        });
+      });
+    }
 
     res.status(200).send({
       status: 1,
@@ -143,7 +177,24 @@ exports.delete = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  videotestimonial.findByPk(id)
+  videotestimonial.findByPk(id, {
+    include: [
+
+      {
+        required: false,
+        association: "collegetestis",
+        attributes: ["id", "college_id"],
+        include: [
+          {
+            association: "clgtestis",
+            attributes: ["id", "name"],
+          },
+        ],
+      },
+
+
+    ]
+  })
     .then(data => {
       if (data) {
 
@@ -177,14 +228,14 @@ exports.findOne = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
 
 
 
   try {
 
 
-    videotestimonial.update({
+    await videotestimonial.update({
       name: req.body.name,
       video_url: req.body.video_url,
       full_url: req.body.full_url,
@@ -195,6 +246,52 @@ exports.update = (req, res) => {
     }, {
       where: { id: req.body.id }
     });
+
+
+    if (req.body.colleges && req.body.id) {
+
+      await Collegetestimonial.destroy({
+        where: { video_id: req.body.id },
+      });
+
+      const stream = JSON.parse(req.body.colleges);
+      _.forEach(stream, async function (value) {
+        await Collegetestimonial.create({
+          college_id: value.id,
+          video_id: req.body.id,
+
+
+        });
+      });
+    }
+    if (req.body.streams && req.body.id) {
+      await Streamtestimonial.destroy({
+        where: { video_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
+        await Streamtestimonial.create({
+
+          stream_id: value.id,
+          video_id: req.body.id,
+
+        });
+      });
+    }
+
+    if (req.body.courses && req.body.id) {
+      await GeneralCoursetestimonial.destroy({
+        where: { video_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.courses);
+      _.forEach(stream, async function (value) {
+        await GeneralCoursetestimonial.create({
+          general_course_id: value.id,
+          video_id: req.body.id,
+
+        });
+      });
+    }
 
 
     res.status(200).send({

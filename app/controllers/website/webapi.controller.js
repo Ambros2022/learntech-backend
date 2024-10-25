@@ -43,7 +43,9 @@ const alljoblocation = db.job_locations;
 const _ = require('lodash');
 const counsellorteam = db.counsellor_teams;
 const organizationpages = db.organization_pages;
-
+const Collegetestimonial = db.college_testimonials;
+const Streamtestimonial = db.stream_testimonials;
+const GeneralCoursetestimonial = db.general_course_testimonials;
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
@@ -1367,7 +1369,7 @@ exports.schoolfindone = (req, res) => {
         {
           required: false,
           association: "schoolboard",
-          attributes: ["id", "name","short_name"],
+          attributes: ["id", "name", "short_name"],
         },
         {
           required: false,
@@ -1803,7 +1805,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview','pdf_name'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview', 'pdf_name'],
       include: [
         {
           required: false,
@@ -2492,17 +2494,17 @@ exports.jobpositions = async (req, res) => {
       ],
       include: [
         {
-            required: false,
-            association: "jobpositionlocation",
-            attributes: ["id", "job_location_id"],
-            include: [
-                {
-                    association: "jobpositionslocation",
-                    attributes: ["id", "name"],
-                },
-            ],
+          required: false,
+          association: "jobpositionlocation",
+          attributes: ["id", "job_location_id"],
+          include: [
+            {
+              association: "jobpositionslocation",
+              attributes: ["id", "name"],
+            },
+          ],
         },
-    ],
+      ],
 
       order: [orderconfig]
     })
@@ -4166,3 +4168,78 @@ exports.organizationpages = async (req, res) => {
   }
 };
 
+
+
+exports.videotestimonialsFilter = async (req, res) => {
+  const { page, size, college_id, stream_id, general_course_id } = req.query;
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    let data;
+
+    if (college_id) {
+      data = await Collegetestimonial.findAndCountAll({
+        where: { college_id: college_id },
+        limit,
+        offset,
+        attributes: ["id", "video_id", "college_id"],
+        include: [
+          {
+            association: "collegeTestimonials",
+            attributes: ["id", "title", "name", "designation", "video_url", "full_url"],
+            required: false,
+          },
+        ],
+      });
+    } else if (stream_id) {
+      data = await Streamtestimonial.findAndCountAll({
+        where: { stream_id: stream_id },
+        limit,
+        offset,
+        attributes: ["id", "video_id", "stream_id"],
+        include: [
+          {
+            association: "streamTestimonials",
+            attributes: ["id", "title", "name", "designation", "video_url", "full_url"],
+            required: false,
+          },
+        ],
+      });
+    } else if (general_course_id) {
+      data = await GeneralCoursetestimonial.findAndCountAll({
+        where: { general_course_id: general_course_id },
+        limit,
+        offset,
+        attributes: ["id", "video_id", "general_course_id"],
+        include: [
+          {
+            association: "courseTestimonials",
+            attributes: ["id", "title", "name", "designation", "video_url", "full_url"],
+            required: false,
+          },
+        ],
+      });
+    } else {
+      return res.status(400).send({
+        status: 0,
+        message: "Please provide a valid college_id, stream_id, or general_course_id.",
+      });
+    }
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "Success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving data.",
+    });
+  }
+};

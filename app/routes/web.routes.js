@@ -104,6 +104,10 @@ module.exports = function (app) {
 
 
 
+  app.get("/api/website/testimonial/filter/get", webapicontroller.videotestimonialsFilter);
+
+
+
   app.get("/api/website/colleges/get", webapicontroller.allcolleges);
 
 
