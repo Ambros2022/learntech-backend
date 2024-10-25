@@ -92,6 +92,9 @@ db.genders = require("../models/gender.model.js")(sequelize, Sequelize);
 db.counsellor_teams = require("./counsellor_teams.model.js")(sequelize, Sequelize);
 db.organization_pages = require("./organization_page.model.js")(sequelize, Sequelize);
 db.organization_page_steps = require("./organization_page_steps.model.js")(sequelize, Sequelize);
+db.college_testimonials = require("./college_testimonial.model.js")(sequelize, Sequelize);
+db.stream_testimonials = require("./stream_testimonial.model.js")(sequelize, Sequelize);
+db.general_course_testimonials = require("./general_course_testimonial.model.js")(sequelize, Sequelize);
 
 
 
@@ -166,7 +169,7 @@ db.service = require("../models/service.model.js")(sequelize, Sequelize);
 db.resettokens = require("../models/resettoken.model.js")(sequelize, Sequelize);
 db.groups = require("../models/groups.model.js")(sequelize, Sequelize);
 db.testimonial = require("../models/testimonial.model.js")(sequelize, Sequelize);
-db.videotestimonial = require("../models/videotestimonial.model.js")(sequelize, Sequelize);
+db.videotestimonial = require("./oldvideotestimonial.model.js")(sequelize, Sequelize);
 db.team = require("../models/team.model.js")(sequelize, Sequelize);
 db.studentform = require("../models/student_form.model.js")(sequelize, Sequelize);
 db.commingform = require("../models/comming_form_sidetab.model.js")(sequelize, Sequelize);
@@ -394,6 +397,55 @@ db.college.belongsTo(db.city, {
   foreignKey: "city_id",
   as: "citys",
 });
+
+
+
+
+
+
+db.video_testimonials.hasMany(db.college_testimonials, { as: "collegeTestimonials", foreignKey: "video_id" });
+db.college_testimonials.belongsTo(db.video_testimonials, {
+  foreignKey: "video_id",
+  as: "collegeTestimonials",
+});
+
+// Defining the association between college_testimonials and colleges
+db.college_testimonials.belongsTo(db.college, {
+  foreignKey: "college_id",
+  as: "collegeDetails",
+});
+
+
+
+
+db.video_testimonials.hasMany(db.stream_testimonials, { as: "streamTestimonials", foreignKey: "video_id" });
+db.stream_testimonials.belongsTo(db.video_testimonials, {
+  foreignKey: "video_id",
+  as: "streamTestimonials",
+});
+
+
+db.stream_testimonials.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "streamDetails",
+});
+
+
+
+db.video_testimonials.hasMany(db.general_course_testimonials, { as: "courseTestimonials", foreignKey: "video_id" });
+db.general_course_testimonials.belongsTo(db.video_testimonials, {
+  foreignKey: "video_id",
+  as: "courseTestimonials",
+});
+
+
+db.general_course_testimonials.belongsTo(db.general_course, {
+  foreignKey: "general_course_id",
+  as: "courseDetails",
+});
+
+
+
 
 
 db.college.hasMany(db.college_stream, { as: "collegestreams" });
