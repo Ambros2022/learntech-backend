@@ -486,7 +486,7 @@ exports.allcourses = async (req, res) => {
         {
           required: false,
           association: "generalcourse",
-          attributes: ["id", "name","short_name"],
+          attributes: ["id", "name"],
         },
 
 
@@ -1236,7 +1236,7 @@ exports.coursefindone = (req, res) => {
         {
           required: false,
           association: 'generalcourse',
-          attributes: ['id', 'name', 'stream_id'],
+          attributes: ['id', 'name', 'stream_id','short_name'],
         },
       ],
     })
