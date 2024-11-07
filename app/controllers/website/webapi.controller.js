@@ -1183,14 +1183,16 @@ exports.courses = async (req, res) => {
       attributes: [
         "id",
         "name",
+        "slug"
       ],
       include: [{
         required: false,
         association: "general_courses",
-        attributes: ["id", "name", "slug"],
+        attributes: ["id", "name", "slug","short_name"],
         where: { status: "Published" }
       }],
-      order: [orderconfig]
+      order: [orderconfig],
+      subQuery:false
     })
     .then((data) => {
       const response = getPagingData(data, page, limit);
