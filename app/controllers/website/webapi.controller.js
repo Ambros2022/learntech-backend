@@ -50,6 +50,7 @@ const GeneralCoursetestimonial = db.general_course_testimonials;
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
 const allowed_file_size = 2;
+const blogcategories = db.blog_categories;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -1188,11 +1189,11 @@ exports.courses = async (req, res) => {
       include: [{
         required: false,
         association: "general_courses",
-        attributes: ["id", "name", "slug","short_name"],
+        attributes: ["id", "name", "slug", "short_name"],
         where: { status: "Published" }
       }],
       order: [orderconfig],
-      subQuery:false
+      subQuery: false
     })
     .then((data) => {
       const response = getPagingData(data, page, limit);
@@ -1238,7 +1239,7 @@ exports.coursefindone = (req, res) => {
         {
           required: false,
           association: 'generalcourse',
-          attributes: ['id', 'name', 'stream_id','short_name'],
+          attributes: ['id', 'name', 'stream_id', 'short_name'],
         },
       ],
     })
@@ -4244,4 +4245,54 @@ exports.videotestimonialsFilter = async (req, res) => {
       message: err.message || "Some error occurred while retrieving data.",
     });
   }
+};
+
+
+exports.blogcategories = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : 'name';
+  var order = orderby ? orderby : 'ASC';
+  var orderconfig = [column, order];
+
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  let condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+
+  blogcategories.findAndCountAll({
+    where: data_array, limit, offset,
+
+
+    order: [orderconfig]
+  })
+    .then(data => {
+      const response = getPagingData(data, page, limit);
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch(err => {
+      res.status(500).send({
+        status: 0,
+        message:
+
+          err.message || "Some error occurred while retrieving blog categories."
+      });
+    });
 };
