@@ -201,7 +201,7 @@ exports.update = async (req, res) => {
       meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
       address: req.body.address || existingRecord.address,
       map: req.body.map || existingRecord.map,
-      video_url: req.body.video_url || existingRecord.video_url,
+      video_url: req.body.video_url,
       avg_rating: req.body.avg_rating || existingRecord.avg_rating,
       info: req.body.info || existingRecord.info,
       admissions_process: req.body.admissions_process || existingRecord.admissions_process,
