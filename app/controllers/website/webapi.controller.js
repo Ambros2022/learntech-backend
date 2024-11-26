@@ -1323,7 +1323,7 @@ exports.allschools = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating", "slug"],
+      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating", "slug","listing_order"],
       include: includearray,
       order: [orderconfig],
       limit,
@@ -1352,7 +1352,7 @@ exports.schoolfindone = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
-      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established', 'short_name','meta_title', 'meta_description'],
+      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established', 'short_name', 'meta_title', 'meta_description'],
       include: [
         {
           required: false,
