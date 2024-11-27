@@ -41,11 +41,16 @@ const review_replies = db.review_replies;
 // const jobs_positions = db.jobs_positions;
 const alljoblocation = db.job_locations;
 const _ = require('lodash');
-
+const counsellorteam = db.counsellor_teams;
+const organizationpages = db.organization_pages;
+const Collegetestimonial = db.college_testimonials;
+const Streamtestimonial = db.stream_testimonials;
+const GeneralCoursetestimonial = db.general_course_testimonials;
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
 const allowed_file_size = 2;
+const blogcategories = db.blog_categories;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -410,7 +415,7 @@ exports.genralOnestream = (req, res) => {
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name","slug"],
+          attributes: ["id", "name", "slug", "banner"],
         },
         {
           required: false,
@@ -443,7 +448,7 @@ exports.genralOnestream = (req, res) => {
 };
 
 exports.allcourses = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, college_id ,course_type} = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, college_id, course_type } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -478,7 +483,7 @@ exports.allcourses = async (req, res) => {
       ],
       order: [orderconfig],
       include: [
-        
+
         {
           required: false,
           association: "generalcourse",
@@ -765,10 +770,8 @@ exports.exploreCollege = async (req, res) => {
   }
   const { limit, offset } = getPagination(page, size);
   try {
-    // Count the total number of streams
     const totalItems = await stream.count();
 
-    // Fetch the paginated data
     const data = await stream.findAll({
       attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
@@ -781,7 +784,6 @@ exports.exploreCollege = async (req, res) => {
       order: [orderconfig],
     });
 
-    // Map the data to include the course count
     const formattedData = data.map(stream => {
       const courseCount = stream.clgstreamm.length;
       return {
@@ -936,12 +938,6 @@ exports.explorecourses = async (req, res) => {
     });
   }
 };
-
-
-
-
-
-
 
 
 
@@ -1188,14 +1184,16 @@ exports.courses = async (req, res) => {
       attributes: [
         "id",
         "name",
+        "slug"
       ],
       include: [{
         required: false,
         association: "general_courses",
-        attributes: ["id", "name", "slug"],
+        attributes: ["id", "name", "slug", "short_name"],
         where: { status: "Published" }
       }],
-      order: [orderconfig]
+      order: [orderconfig],
+      subQuery: false
     })
     .then((data) => {
       const response = getPagingData(data, page, limit);
@@ -1241,7 +1239,7 @@ exports.coursefindone = (req, res) => {
         {
           required: false,
           association: 'generalcourse',
-          attributes: ['id', 'name', 'stream_id'],
+          attributes: ['id', 'name', 'stream_id', 'short_name'],
         },
       ],
     })
@@ -1278,6 +1276,7 @@ exports.allschools = async (req, res) => {
     country_id,
     state_id,
     city_id,
+    school_board_id,
     columnname,
     orderby,
     school_type,
@@ -1309,6 +1308,7 @@ exports.allschools = async (req, res) => {
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
   if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
   if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
+  if (school_board_id) data_array.push({ school_board_id: JSON.parse(school_board_id) });
 
 
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -1323,7 +1323,7 @@ exports.allschools = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "established", "icon", "school_type"],
+      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating", "slug","listing_order"],
       include: includearray,
       order: [orderconfig],
       limit,
@@ -1352,7 +1352,7 @@ exports.schoolfindone = (req, res) => {
   const id = req.params.id;
   school
     .findByPk(id, {
-      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established'],
+      attributes: ['id', 'country_id', 'state_id', 'city_id', 'name', 'slug', 'icon', 'banner_image', 'info', 'admissions_process', 'extracurriculars', 'map', 'video_url', 'address', 'established', 'short_name', 'meta_title', 'meta_description'],
       include: [
         {
           required: false,
@@ -1372,7 +1372,7 @@ exports.schoolfindone = (req, res) => {
         {
           required: false,
           association: "schoolboard",
-          attributes: ["id", "name"],
+          attributes: ["id", "name", "short_name"],
         },
         {
           required: false,
@@ -1407,7 +1407,6 @@ exports.schoolfindone = (req, res) => {
           association: "schfaqs",
           attributes: ["id", "questions", "answers"],
         },
-
       ],
 
     })
@@ -1535,7 +1534,7 @@ exports.abroadcollegefindone = (req, res) => {
 
 
 exports.allentranceexams = async (req, res) => {
-  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status } = req.query;
+  const { page, size, searchtext, searchfrom, stream_id, columnname, orderby, promo_banner_status, country_id, level_of_study, types_of_exams, isIndia } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1547,29 +1546,59 @@ exports.allentranceexams = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
+
   let data_array = [{ status: "Published" }];
 
   if (promo_banner_status) {
     data_array.push({ promo_banner_status });
   }
 
+  if (country_id) {
+    data_array.push({ country_id });
+  }
 
-  if (stream_id) data_array.push({ stream_id: JSON.parse(stream_id) });
+  if (level_of_study) {
+    data_array.push({ level_of_study });
+  }
+
+  if (types_of_exams) {
+    data_array.push({ types_of_exams });
+  }
+
+  if (stream_id) {
+    data_array.push({ stream_id: JSON.parse(stream_id) });
+  }
+
+  // Add logic to filter by `isIndia`
+  if (isIndia === 'true') {
+    data_array.push({ country_id: 204 }); // Show only exams with country_id 204
+  } else if (isIndia === 'false') {
+    data_array.push({ country_id: { [Op.ne]: 204 } }); // Show exams with country_id NOT equal to 204
+  }
 
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
-  if (condition) data_array.push(condition);
+  if (condition) {
+    data_array.push(condition);
+  }
 
   const { limit, offset } = getPagination(page, size);
   exam
     .findAndCountAll({
-      where: data_array, limit, offset,
+      where: data_array,
+      limit,
+      offset,
       attributes: [
         "id",
         "exam_title",
         "slug",
         "exam_short_name",
         "cover_image",
+        "logo",
         "stream_id",
+        "country_id",
+        "level_of_study",
+        "types_of_exams",
+        "upcoming_date",
         "created_at",
       ],
       order: [orderconfig]
@@ -1590,11 +1619,11 @@ exports.allentranceexams = async (req, res) => {
       res.status(500).send({
         status: 0,
         message:
-          err.message ||
-          "Some error occurred while retrieving exams.",
+          err.message || "Some error occurred while retrieving exams.",
       });
     });
 };
+
 
 exports.findoneexam = (req, res) => {
   const id = req.params.id;
@@ -1633,7 +1662,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, category_id } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id, includeIndia } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1646,8 +1675,25 @@ exports.news = async (req, res) => {
     orderconfig = [table, column, order];
   }
   let data_array = [{ status: "Published" }];
-  let conditioncategoryid = category_id ? { category_id: category_id } : null;
-  conditioncategoryid ? data_array.push(conditioncategoryid) : null;
+
+
+  if (country_id) {
+    if (country_id === "204" && includeIndia === "true") {
+      data_array.push({ country_id: "204" });
+    } else if (country_id !== "204" && includeIndia === "false") {
+      data_array.push({ country_id: { [Op.ne]: "204" } });
+    }
+  } else {
+    if (includeIndia === "true") {
+      data_array.push({ country_id: "204" });
+    } else if (includeIndia === "false") {
+      data_array.push({ country_id: { [Op.ne]: "204" } });
+    }
+  }
+
+  if (category_id) {
+    data_array.push({ category_id });
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1665,6 +1711,7 @@ exports.news = async (req, res) => {
         "pdf_file",
         "created_at",
         "category_id",
+        "country_id",
       ],
       include: [
         {
@@ -1672,8 +1719,15 @@ exports.news = async (req, res) => {
           association: "newscategories",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "country",
+          attributes: [
+            "id",
+            "name",
 
-
+          ],
+        },
       ],
       order: [orderconfig]
     })
@@ -1754,7 +1808,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview'],
+      attributes: ['id', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview', 'pdf_name'],
       include: [
         {
           required: false,
@@ -1923,6 +1977,7 @@ exports.schoolboards = async (req, res) => {
         "result_date",
         "address",
         "map",
+        "short_name",
       ],
       include: [
 
@@ -2003,6 +2058,7 @@ exports.schoolboardfindone = (req, res) => {
       "result_date",
       "address",
       "map",
+      "short_name",
     ],
     include: [
 
@@ -2254,6 +2310,7 @@ exports.videotestimonial = async (req, res) => {
         "designation",
         "video_url",
         "full_url",
+        "type"
       ],
       order: [orderconfig]
     })
@@ -2312,12 +2369,13 @@ exports.allgeneralcourses = async (req, res) => {
         "name",
         "short_name",
         "slug",
+        "logo",
       ],
       include: [
         {
           required: false,
           association: "streams",
-          attributes: ["id", "name", "slug"],
+          attributes: ["id", "name", "slug", "logo"],
         },
       ],
       order: [orderconfig],
@@ -2439,18 +2497,17 @@ exports.jobpositions = async (req, res) => {
       ],
       include: [
         {
-            required: false,
-            association: "jobpositionlocation",
-            attributes: ["id", "job_location_id"],
-            include: [
-                {
-                    required: false,
-                    association: "jobpositionslocation",
-                    attributes: ["id", "name"],
-                },
-            ],
+          required: false,
+          association: "jobpositionlocation",
+          attributes: ["id", "job_location_id"],
+          include: [
+            {
+              association: "jobpositionslocation",
+              attributes: ["id", "name"],
+            },
+          ],
         },
-    ],
+      ],
 
       order: [orderconfig]
     })
@@ -2530,59 +2587,59 @@ exports.alljoblocations = async (req, res) => {
 
 exports.addjobenquires = async (req, res) => {
   try {
-      let resumes = "";
+    let resumes = "";
 
-      if (req.files && req.files.resume) {
-          let avatar = req.files.resume;
+    if (req.files && req.files.resume) {
+      let avatar = req.files.resume;
 
-          if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-              return res.status(400).send({
-                  message: "Invalid File type ",
-                  errors: {},
-                  status: 0,
-              });
-          }
-
-          if (avatar.size / (1024 * 1024) > allowed_file_size) {
-              return res.status(400).send({
-                  message: "File too large ",
-                  errors: {},
-                  status: 0,
-              });
-          }
-
-          let logoname = "logo" + Date.now() + path.extname(avatar.name);
-
-          let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
-
-          if (IsUpload) {
-              resumes = "jobenquiry_image/" + logoname;
-          }
+      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+        return res.status(400).send({
+          message: "Invalid File type ",
+          errors: {},
+          status: 0,
+        });
       }
 
-      const jobsenquiresDetails = await jobsenquires.create({
-          jobs_position_id: req.body.jobs_position_id,
-          job_location_id: req.body.job_location_id,
-          name: req.body.name,
-          email: req.body.email,
-          phone: req.body.phone,
-          d_o_b: req.body.d_o_b,
-          current_location: req.body.current_location,
-          total_exp: req.body.total_exp,
-          resume: resumes,
-          status: req.body.status,
-      });
-      res.status(200).send({
-          status: 1,
-          message: "Data Save Successfully",
-          data: jobsenquiresDetails,
-      });
-  } catch (error) {
-      return res.status(400).send({
-          message: "Unable to insert data",
-          errors: error,
+      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+        return res.status(400).send({
+          message: "File too large ",
+          errors: {},
           status: 0,
-      });
+        });
+      }
+
+      let logoname = "logo" + Date.now() + path.extname(avatar.name);
+
+      let IsUpload = avatar.mv("./storage/jobenquiry_image/" + logoname) ? 1 : 0;
+
+      if (IsUpload) {
+        resumes = "jobenquiry_image/" + logoname;
+      }
+    }
+
+    const jobsenquiresDetails = await jobsenquires.create({
+      jobs_position_id: req.body.jobs_position_id,
+      job_location_id: req.body.job_location_id,
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      d_o_b: req.body.d_o_b,
+      current_location: req.body.current_location,
+      total_exp: req.body.total_exp,
+      resume: resumes,
+      status: req.body.status,
+    });
+    res.status(200).send({
+      status: 1,
+      message: "Data Save Successfully",
+      data: jobsenquiresDetails,
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: "Unable to insert data",
+      errors: error,
+      status: 0,
+    });
   }
 };
 
@@ -3903,40 +3960,40 @@ exports.scholartype = async (req, res) => {
 exports.addjobposition = async (req, res) => {
 
   try {
-      const jobspositionsDetails = await jobs_positions.create({
-          name: req.body.name,
-          job_description: req.body.job_description,
-          exp_required: req.body.exp_required,
-          total_positions: req.body.total_positions,
-          status: req.body.status,
+    const jobspositionsDetails = await jobs_positions.create({
+      name: req.body.name,
+      job_description: req.body.job_description,
+      exp_required: req.body.exp_required,
+      total_positions: req.body.total_positions,
+      status: req.body.status,
 
+    });
+
+    if (req.body.joblocations && jobspositionsDetails.id) {
+      const joblocation = JSON.parse(req.body.joblocations);
+      _.forEach(joblocation, async function (value) {
+
+        await alljoblocation.create({
+          job_location_id: value.id,
+          jobs_position_id: jobspositionsDetails.id,
+        });
       });
-
-      if (req.body.joblocations && jobspositionsDetails.id) {
-          const joblocation = JSON.parse(req.body.joblocations);
-          _.forEach(joblocation, async function (value) {
-
-              await alljoblocation.create({
-                  job_location_id: value.id,
-                  jobs_position_id: jobspositionsDetails.id,
-              });
-          });
-      }
+    }
 
 
 
-      res.status(200).send({
-          status: 1,
-          message: 'Data Save Successfully',
-          data: jobspositionsDetails
-      });
+    res.status(200).send({
+      status: 1,
+      message: 'Data Save Successfully',
+      data: jobspositionsDetails
+    });
   }
   catch (error) {
-      return res.status(400).send({
-          message: 'Unable to insert data',
-          errors: error,
-          status: 0
-      });
+    return res.status(400).send({
+      message: 'Unable to insert data',
+      errors: error,
+      status: 0
+    });
   }
 };
 
@@ -3955,8 +4012,8 @@ exports.allcities = async (req, res) => {
   }
   let data_array = [];
 
-  if (state_id ) {
-    data_array.push({ state_id : state_id  });
+  if (state_id) {
+    data_array.push({ state_id: state_id });
   }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
@@ -3996,4 +4053,246 @@ exports.allcities = async (req, res) => {
     });
 };
 
+exports.counsellorteams = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+  counsellorteam
+    .findAndCountAll({
+      where: data_array, limit, offset,
+      attributes: [
+        "id",
+        "name",
+        "location",
+        "experience",
+        "description",
+        "image",
+        "info",
+      ],
+      order: [orderconfig]
+    })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message:
+          err.message ||
+          "Some error occurred while retrieving counsellor team.",
+      });
+    });
+};
+
+exports.organizationpages = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, categories, orderby } = req.query;
+
+  let column = columnname || 'id';
+  let order = orderby || 'ASC';
+  let orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (myArray.length > 1) {
+    const table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+
+  let data_array = [];
+  if (categories) {
+    data_array.push({ categories: categories });
+  }
+
+  const condition = sendsearch.customseacrh(searchtext, searchfrom);
+  if (condition) {
+    data_array.push(condition);
+  }
+
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    const organizationPagesData = await organizationpages.findAndCountAll({
+      where: data_array,
+      limit,
+      offset,
+      include: [
+        {
+          required: false,
+          association: "organizatiopagesteps",
+          attributes: ["id", "title", "description", "icon", "order_by"],
+        },
+      ],
+      order: [orderconfig],
+    });
+
+    const totalItems = await organizationpages.count({
+      where: data_array,
+    });
+
+    const response = getPagingData(organizationPagesData, page, limit);
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      totalItems: totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving organization pages."
+    });
+  }
+};
+
+
+
+exports.videotestimonialsFilter = async (req, res) => {
+  const { page, size, college_id, stream_id, general_course_id } = req.query;
+  const { limit, offset } = getPagination(page, size);
+
+  try {
+    let data;
+
+    if (college_id) {
+      data = await Collegetestimonial.findAndCountAll({
+        where: { college_id: college_id },
+        limit,
+        offset,
+        attributes: ["id", "video_id", "college_id"],
+        include: [
+          {
+            association: "collegeTestimonials",
+            attributes: ["id", "title", "name", "designation", "video_url", "full_url"],
+            required: false,
+          },
+        ],
+      });
+    } else if (stream_id) {
+      data = await Streamtestimonial.findAndCountAll({
+        where: { stream_id: stream_id },
+        limit,
+        offset,
+        attributes: ["id", "video_id", "stream_id"],
+        include: [
+          {
+            association: "streamTestimonials",
+            attributes: ["id", "title", "name", "designation", "video_url", "full_url"],
+            required: false,
+          },
+        ],
+      });
+    } else if (general_course_id) {
+      data = await GeneralCoursetestimonial.findAndCountAll({
+        where: { general_course_id: general_course_id },
+        limit,
+        offset,
+        attributes: ["id", "video_id", "general_course_id"],
+        include: [
+          {
+            association: "courseTestimonials",
+            attributes: ["id", "title", "name", "designation", "video_url", "full_url"],
+            required: false,
+          },
+        ],
+      });
+    } else {
+      return res.status(400).send({
+        status: 0,
+        message: "Please provide a valid college_id, stream_id, or general_course_id.",
+      });
+    }
+
+    const response = getPagingData(data, page, limit);
+
+    res.status(200).send({
+      status: 1,
+      message: "Success",
+      totalItems: response.totalItems,
+      currentPage: response.currentPage,
+      totalPages: response.totalPages,
+      data: response.finaldata,
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: err.message || "Some error occurred while retrieving data.",
+    });
+  }
+};
+
+
+exports.blogcategories = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : 'name';
+  var order = orderby ? orderby : 'ASC';
+  var orderconfig = [column, order];
+
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  let data_array = [];
+
+
+  let condition = sendsearch.customseacrh(searchtext, searchfrom);
+  condition ? data_array.push(condition) : null;
+
+  const { limit, offset } = getPagination(page, size);
+
+  blogcategories.findAndCountAll({
+    where: data_array, limit, offset,
+
+
+    order: [orderconfig]
+  })
+    .then(data => {
+      const response = getPagingData(data, page, limit);
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch(err => {
+      res.status(500).send({
+        status: 0,
+        message:
+
+          err.message || "Some error occurred while retrieving blog categories."
+      });
+    });
+};

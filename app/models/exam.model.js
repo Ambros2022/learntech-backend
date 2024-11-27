@@ -3,6 +3,9 @@ module.exports = (sequelize, Sequelize) => {
     stream_id: {
       type: Sequelize.STRING,
     },
+    country_id: {
+      type: Sequelize.STRING
+    },
     exam_title: {
       type: Sequelize.STRING,
     },
@@ -71,6 +74,12 @@ module.exports = (sequelize, Sequelize) => {
     },
     logo: {
       type: Sequelize.STRING,
+    },
+    level_of_study: {
+      type: Sequelize.ENUM("UG", "PG", "Professional"),
+    },
+    types_of_exams: {
+      type: Sequelize.ENUM("Language_Proficiency", "Aptitude_Test", "Streams"),
     },
   },
     {

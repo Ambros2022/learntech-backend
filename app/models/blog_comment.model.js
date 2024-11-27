@@ -1,19 +1,24 @@
 module.exports = (sequelize, Sequelize) => {
-  const State = sequelize.define("states", {
+  const blog_comment = sequelize.define("blog_comments", {
     name: {
       type: Sequelize.STRING
     },
-    country_id: {
+    blog_id: {
       type: Sequelize.INTEGER
     },
-    is_top: {
-      type: Sequelize.STRING
+    content: {
+      type: Sequelize.TEXT
     },
-
+    is_approved: {
+      type: Sequelize.INTEGER
+    },
+    is_reported: {
+      type: Sequelize.INTEGER
+    },
   }
     ,
     {
-      freezeTableName: true,
+
       timestamps: true,
       underscored: true,
       createdAt: "created_at",
@@ -23,5 +28,5 @@ module.exports = (sequelize, Sequelize) => {
 
   );
 
-  return State;
+  return blog_comment;
 };

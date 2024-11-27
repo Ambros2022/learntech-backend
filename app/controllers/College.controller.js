@@ -440,7 +440,7 @@ exports.update = async (req, res) => {
         status: 0,
       });
     }
-
+    console.log(req.body.video_url,"req.body.video_url")
     const collegeupdate = {
       country_id: req.body.country_id || existingRecord.country_id,
       state_id: req.body.state_id || existingRecord.state_id,
@@ -458,7 +458,7 @@ exports.update = async (req, res) => {
       meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
       address: req.body.address || existingRecord.address,
       map: req.body.map || existingRecord.map,
-      video_url: req.body.video_url || existingRecord.video_url,
+      video_url: req.body.video_url,
       // avg_rating: req.body.avg_rating || existingRecord.avg_rating,
       info: req.body.info || existingRecord.info,
       course_fees: req.body.course_fees || existingRecord.course_fees,

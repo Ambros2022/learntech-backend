@@ -1,22 +1,25 @@
 module.exports = (sequelize, Sequelize) => {
-    const video_testimonials = sequelize.define("video_testimonials", {
-        title: {
+    const counsellor_teams = sequelize.define("counsellor_teams", {
+        name: {
             type: Sequelize.STRING,
         },
-        name: {
+        location: {
             type: Sequelize.STRING
         },
-        designation: {
+        experience: {
             type: Sequelize.STRING
         },
-        video_url: {
+        description: {
             type: Sequelize.STRING
         },
-        full_url: {
+        image: {
             type: Sequelize.STRING
         },
-        type: {
-            type: Sequelize.ENUM('Draft','About_us_page','Testimonial_page')
+        info: {
+            type: Sequelize.STRING
+        },
+        listing_order: {
+            type: Sequelize.INTEGER
           },
     }
         ,
@@ -31,5 +34,5 @@ module.exports = (sequelize, Sequelize) => {
 
     );
 
-    return video_testimonials;
+    return counsellor_teams;
 };

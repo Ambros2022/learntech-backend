@@ -404,9 +404,9 @@ const schoolboardSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
-  ...validateIdRequired_id(countries, "country_id"),
-  ...validateIdRequired_id(state, "state_id"),
-  ...validateIdRequired_id(city, "city_id"),
+  // ...validateIdRequired_id(countries, "country_id"),
+  // ...validateIdRequired_id(state, "state_id"),
+  // ...validateIdRequired_id(city, "city_id"),
 ];
 
 const schoolboardUpdateSchema = [
@@ -417,9 +417,9 @@ const schoolboardUpdateSchema = [
     .withMessage("Slug is required")
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
-  ...validateIdRequired_id(countries, "country_id"),
-  ...validateIdRequired_id(state, "state_id"),
-  ...validateIdRequired_id(city, "city_id"),
+  // ...validateIdRequired_id(countries, "country_id"),
+  // ...validateIdRequired_id(state, "state_id"),
+  // ...validateIdRequired_id(city, "city_id"),
 ];
 
 
@@ -611,7 +611,7 @@ const GeneralcoursesSchema = [
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
   ...validateIdRequired_id(stream, "stream_id"),
-  ...validateIdRequired_id(substream, "sub_streams_id"),
+  // ...validateIdRequired_id(substream, "sub_streams_id"),
 
 
 ];
@@ -625,7 +625,7 @@ const GeneralcoursesSchemaupdate = [
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
   ...validateIdRequired_id(stream, "stream_id"),
-  ...validateIdRequired_id(substream, "sub_streams_id"),
+  // ...validateIdRequired_id(substream, "sub_streams_id"),
 
 ];
 
@@ -951,11 +951,11 @@ const reviewSchema = [
 const reviewUpdateSchema = [
   ...validateIdRequired_id(reviews, "id"),
 
-  ...validateIdRequired_id(users, "user_id"),
-  ...validateIdRequired_id(college, "college_id"),
-  ...validateIdRequired_id(courses, "course_id"),
-  ...validateIdRequired_id(school, "school_id"),
-  ...validateIdRequired_id(schoolboards, "school_board_id"),
+  // ...validateIdRequired_id(users, "user_id"),
+  // ...validateIdRequired_id(college, "college_id"),
+  // ...validateIdRequired_id(courses, "course_id"),
+  // ...validateIdRequired_id(school, "school_id"),
+  // ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
 

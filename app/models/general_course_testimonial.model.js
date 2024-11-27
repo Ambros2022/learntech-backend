@@ -1,19 +1,17 @@
 module.exports = (sequelize, Sequelize) => {
-  const State = sequelize.define("states", {
-    name: {
-      type: Sequelize.STRING
-    },
-    country_id: {
+  const general_course_testimonials = sequelize.define("general_course_testimonials", {
+    video_id: {
       type: Sequelize.INTEGER
     },
-    is_top: {
-      type: Sequelize.STRING
+
+    general_course_id: {
+      type: Sequelize.INTEGER
     },
 
   }
     ,
     {
-      freezeTableName: true,
+
       timestamps: true,
       underscored: true,
       createdAt: "created_at",
@@ -23,5 +21,5 @@ module.exports = (sequelize, Sequelize) => {
 
   );
 
-  return State;
+  return general_course_testimonials;
 };

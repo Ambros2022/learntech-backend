@@ -85,7 +85,16 @@ db.school_board_recognitions = require("./school_board_recognitions.model.js")(s
 db.reviews = require("./reviews.model.js")(sequelize, Sequelize);
 db.review_replies = require("./review_reply.model.js")(sequelize, Sequelize);
 db.users = require("../models/user.model.js")(sequelize, Sequelize);
-
+db.blog_comment = require("./blog_comment.model.js")(sequelize, Sequelize);
+db.blog_categories = require("./blog_categories.model.js")(sequelize, Sequelize);
+db.scholar_gender = require("../models/scholar_gender.model.js")(sequelize, Sequelize);
+db.genders = require("../models/gender.model.js")(sequelize, Sequelize);
+db.counsellor_teams = require("./counsellor_teams.model.js")(sequelize, Sequelize);
+db.organization_pages = require("./organization_page.model.js")(sequelize, Sequelize);
+db.organization_page_steps = require("./organization_page_steps.model.js")(sequelize, Sequelize);
+db.college_testimonials = require("./college_testimonial.model.js")(sequelize, Sequelize);
+db.stream_testimonials = require("./stream_testimonial.model.js")(sequelize, Sequelize);
+db.general_course_testimonials = require("./general_course_testimonial.model.js")(sequelize, Sequelize);
 
 
 
@@ -160,7 +169,7 @@ db.service = require("../models/service.model.js")(sequelize, Sequelize);
 db.resettokens = require("../models/resettoken.model.js")(sequelize, Sequelize);
 db.groups = require("../models/groups.model.js")(sequelize, Sequelize);
 db.testimonial = require("../models/testimonial.model.js")(sequelize, Sequelize);
-db.videotestimonial = require("../models/videotestimonial.model.js")(sequelize, Sequelize);
+db.videotestimonial = require("./oldvideotestimonial.model.js")(sequelize, Sequelize);
 db.team = require("../models/team.model.js")(sequelize, Sequelize);
 db.studentform = require("../models/student_form.model.js")(sequelize, Sequelize);
 db.commingform = require("../models/comming_form_sidetab.model.js")(sequelize, Sequelize);
@@ -207,6 +216,15 @@ db.youtubevideos = require("../models/youtubevideos.model.js")(sequelize, Sequel
 
 
 /***  Relation ship courses  */
+
+db.exam.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
+db.news_and_events.belongsTo(db.countries, {
+  foreignKey: "country_id",
+  as: "country",
+});
 
 db.courses.belongsTo(db.college, {
   foreignKey: "college_id",
@@ -381,6 +399,55 @@ db.college.belongsTo(db.city, {
 });
 
 
+
+
+
+
+db.video_testimonials.hasMany(db.college_testimonials, { as: "collegeTestimonials", foreignKey: "video_id" });
+db.college_testimonials.belongsTo(db.video_testimonials, {
+  foreignKey: "video_id",
+  as: "collegeTestimonials",
+});
+
+// Defining the association between college_testimonials and colleges
+db.college_testimonials.belongsTo(db.college, {
+  foreignKey: "college_id",
+  as: "collegeDetails",
+});
+
+
+
+
+db.video_testimonials.hasMany(db.stream_testimonials, { as: "streamTestimonials", foreignKey: "video_id" });
+db.stream_testimonials.belongsTo(db.video_testimonials, {
+  foreignKey: "video_id",
+  as: "streamTestimonials",
+});
+
+
+db.stream_testimonials.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "streamDetails",
+});
+
+
+
+db.video_testimonials.hasMany(db.general_course_testimonials, { as: "courseTestimonials", foreignKey: "video_id" });
+db.general_course_testimonials.belongsTo(db.video_testimonials, {
+  foreignKey: "video_id",
+  as: "courseTestimonials",
+});
+
+
+db.general_course_testimonials.belongsTo(db.general_course, {
+  foreignKey: "general_course_id",
+  as: "courseDetails",
+});
+
+
+
+
+
 db.college.hasMany(db.college_stream, { as: "collegestreams" });
 db.college_stream.belongsTo(db.college, {
   foreignKey: "college_id",
@@ -510,6 +577,9 @@ db.news_and_events.belongsTo(db.news_categories, {
 });
 
 
+
+
+
 //Exam RELATIONSHIP
 
 db.stream.hasMany(db.exam, { as: "exams", foreignKey: "stream_id" });
@@ -546,6 +616,18 @@ db.scholarships.belongsTo(db.scholar_types, {
 });
 
 
+db.scholarships.hasMany(db.scholar_gender, { as: "schgenders", foreignKey: "scholar_id" });
+// db.scholar_gender.belongsTo(db.scholarships, {
+//   foreignKey: "scholar_id",
+//   as: "schgenders",
+// });
+
+
+db.scholar_gender.belongsTo(db.genders, {
+  foreignKey: "gender_id",
+  as: "genders",
+});
+
 /***  Relation ship  job location */
 
 // db.job_locations.belongsTo(db.all_job_locations, {
@@ -570,6 +652,19 @@ db.job_locations.belongsTo(db.all_job_locations, {
   as: "jobpositionslocation",
 });
 
+/***  Relation ship organization page steps enquiry */
+
+db.organization_page_steps.belongsTo(db.organization_pages, {
+  foreignKey: "organization_page_id",
+  as: "organizationpage",
+});
+
+db.organization_pages.hasMany(db.organization_page_steps, {
+  foreignKey: "organization_page_id",
+  as: "organizatiopagesteps"
+});
+
+
 
 /***  Relation ship  jobs enquiry */
 
@@ -581,6 +676,26 @@ db.jobs_enquires.belongsTo(db.jobs_positions, {
   foreignKey: "jobs_position_id",
   as: "jobspositions",
 });
+
+
+/***  Relation ship  blog comment */
+
+// db.blog_comment.belongsTo(db.blog, {
+//   foreignKey: "blog_id",
+//   as: "blogcomment",
+// });
+
+db.blog.hasMany(db.blog_comment, { as: "blogcomment" });
+
+db.blog_comment.belongsTo(db.blog, {
+  foreignKey: "blog_id",
+  as: "blogcomment",
+});
+// db.jobs_enquires.belongsTo(db.jobs_positions, {
+//   foreignKey: "jobs_position_id",
+//   as: "jobspositions",
+// });
+
 
 
 
@@ -912,6 +1027,12 @@ db.course_modes.belongsTo(db.modes, {
 
 
 /***  Relation ship blogs  */
+
+// db.blog_categories.hasMany(db.blog, { as: "blogcategories", foreignKey: "category_id" });
+db.blog.belongsTo(db.blog_categories, {
+  foreignKey: "category_id",
+  as: "blogcategories",
+});
 
 // db.author.hasMany(db.blog, { as: "author" });
 // db.blog.belongsTo(db.author, {

@@ -33,6 +33,8 @@ const schoolboardrecognitionscontroller = require("../controllers/schoolboardrec
 const webapicontroller = require("../controllers/website/webapi.controller");
 const reviewscontroller = require("../controllers/reviews.controller");
 const reviewsrepliescontroller = require("../controllers/review_reply.controller");
+const blogcommentcontroller = require("../controllers/blog_comment.controller");
+const blogcategoriescontroller = require("../controllers/blogcategories.controller");
 
 
 
@@ -70,7 +72,7 @@ const feescontroller = require("../controllers/fees.controller");
 const syllabuscontroller = require("../controllers/syllabus.controller");
 const groupscontroller = require("../controllers/groups.controller");
 const testimonialcontroller = require("../controllers/testimonial.controller");
-const videotestimonialcontroller = require("../controllers/videotestimonial.controller");
+const videotestimonialcontroller = require("../controllers/oldvideotestimonial.controller.js");
 const teamcontroller = require("../controllers/team.controller");
 const studentformcontroller = require("../controllers/studentform.controller");
 const nricontroller = require("../controllers/nri.controller");
@@ -90,6 +92,9 @@ const usercontroller = require("../controllers/user.controller");
 const abroadcountriescontroller = require("../controllers/abroadcountries.controller");
 const abroaduniversitiescontroller = require("../controllers/abroaduniversities.controller");
 const youtubevideoscontroller = require("../controllers/youtubevideos.controller");
+const counsellorteamcontroller = require("../controllers/counsellor_teams.controller");
+const organizationpagecontroller = require("../controllers/organization_page.controller");
+const organizationpagestepscontroller = require("../controllers/organization_page_steps.controller");
 
 
 
@@ -1477,6 +1482,74 @@ module.exports = function (app) {
 
 
 
+   /** blog comment route  start*/
+
+   app.get(
+    "/api/admin/blogcomment/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.findAll
+  );
+  app.get(
+    "/api/admin/blogcomment/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.findOne
+  );
+  app.post(
+    "/api/admin/blogcomment/add",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.create
+  );
+  app.post(
+    "/api/admin/blogcomment/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.delete
+  );
+  app.post(
+    "/api/admin/blogcomment/update",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.update
+  );
+
+  app.post(
+    "/api/admin/blogcomment/statusupdate",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcommentcontroller.statusupdate
+  );
+
+  /** blog comment route end   */
+
+  /** blog categories route  start*/
+
+  app.get(
+    "/api/admin/blogscategories/get",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.findAll
+  );
+  app.get(
+    "/api/admin/blogscategories/get/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.findOne
+  );
+  app.post(
+    "/api/admin/blogscategories/add",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.create
+  );
+  app.post(
+    "/api/admin/blogscategories/delete/:id",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.delete
+  );
+  app.post(
+    "/api/admin/blogscategories/update",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcategoriescontroller.update
+  );
+ 
+  /** blog categories route end   */
+
+
+
   ////////////////////////old apis-------------------------------------------------------------------------------
 
 
@@ -2600,6 +2673,102 @@ module.exports = function (app) {
     syllabuscontroller.update
   );
   /**syllabus route end   */
+
+
+/** counsellor teams route  start*/
+
+app.get(
+  "/api/admin/counsellorteam/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.findAll
+);
+app.get(
+  "/api/admin/counsellorteam/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.findOne
+);
+app.post(
+  "/api/admin/counsellorteam/add",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.create
+);
+app.post(
+  "/api/admin/counsellorteam/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.delete
+);
+app.post(
+  "/api/admin/counsellorteam/update",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  counsellorteamcontroller.update
+);
+/**counsellor teams route end   */
+
+
+/** organization page route  start*/
+
+app.get(
+  "/api/admin/organizationpage/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.findAll
+);
+app.get(
+  "/api/admin/organizationpage/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.findOne
+);
+app.post(
+  "/api/admin/organizationpage/add",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.create
+);
+app.post(
+  "/api/admin/organizationpage/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.delete
+);
+app.post(
+  "/api/admin/organizationpage/update",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagecontroller.update
+);
+
+
+/**organization page route end   */
+
+
+/** organization page steps route  start*/
+
+app.get(
+  "/api/admin/organizationpagesteps/get",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.findAll
+);
+app.get(
+  "/api/admin/organizationpagesteps/get/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.findOne
+);
+app.post(
+  "/api/admin/organizationpagesteps/add",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.create
+);
+app.post(
+  "/api/admin/organizationpagesteps/delete/:id",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.delete
+);
+app.post(
+  "/api/admin/organizationpagesteps/update",
+  [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+  organizationpagestepscontroller.update
+);
+
+
+
+/**organization page steps route end   */
+
 
 
 
