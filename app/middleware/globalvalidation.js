@@ -352,7 +352,7 @@ const updatestateSchema = [
   checkField_update('name', 150, state, true),
 
   ...validateIdRequired_id(state, "id"),
-  ...validateIdRequired_id(countries, "id"),
+  ...validateIdRequired_id(countries, "country_id"),
 
 
 ];
