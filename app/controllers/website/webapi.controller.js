@@ -153,6 +153,7 @@ exports.allstates = async (req, res) => {
         "id",
         "name",
         "country_id",
+        "is_top",
       ],
 
       include: [
@@ -1323,7 +1324,7 @@ exports.allschools = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating", "slug","listing_order"],
+      attributes: ["id", "name", "city_id", "established", "icon", "school_type", "address", "banner_image", "avg_rating", "slug", "listing_order"],
       include: includearray,
       order: [orderconfig],
       limit,
@@ -2311,6 +2312,20 @@ exports.videotestimonial = async (req, res) => {
         "video_url",
         "full_url",
         "type"
+      ],
+      include: [
+        {
+          association: "collegeTestimonials",
+          attributes: ["id", "college_id"],
+          required: false,
+          include: [
+            {
+              association: "collegeDetails",
+              attributes: ["id", "name", "slug"],
+              required: false,
+            },
+          ],
+        },
       ],
       order: [orderconfig]
     })

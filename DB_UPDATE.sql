@@ -852,3 +852,5 @@ CREATE TABLE general_course_testimonials (
   FOREIGN KEY (video_id) REFERENCES video_testimonials(id) ON DELETE CASCADE,
   FOREIGN KEY (general_course_id) REFERENCES general_courses(id) ON DELETE CASCADE
 );
+
+ALTER TABLE `video_testimonials` CHANGE `designation` `designation` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
