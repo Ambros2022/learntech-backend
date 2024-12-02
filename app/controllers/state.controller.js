@@ -27,6 +27,7 @@ exports.create = async (req, res) => {
         const stateDetails = await state.create({
             name: req.body.name,
             country_id: req.body.country_id,
+            is_top: req.body.is_top,
 
         });
 
@@ -143,9 +144,8 @@ exports.update = (req, res) => {
             ({
                 name: req.body.name,
                 country_id: req.body.country_id,
-                // city_slug: req.body.city_slug,
-                // city_description: req.body.city_description,
-                //state_id: req.body.state_id ? req.body.state_id : null,
+                is_top: req.body.is_top,
+       
             },
                 {
                     where: { id: req.body.id }
