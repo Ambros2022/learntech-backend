@@ -44,7 +44,7 @@ require('./app/routes/admin.routes')(app);
 
 
 app.get("/api", (req, res) => {
- res.json({ message: "Welcome to Learntechww.com v1.2805" });
+ res.json({ message: "Welcome to Learntechww.com v1.2811" });
 });
 
 // Start the HTTP server
