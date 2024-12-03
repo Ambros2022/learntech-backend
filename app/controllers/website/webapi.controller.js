@@ -2060,6 +2060,9 @@ exports.schoolboardfindone = (req, res) => {
       "address",
       "map",
       "short_name",
+      "meta_title",
+      "meta_description",
+      "meta_keywords",
     ],
     include: [
 

@@ -527,11 +527,11 @@ const PageUpdateSchema = [
 
 const bannerSchema = [
   checkField('title', 150, banner, true),
-  body("link")
-    .exists({ checkFalsy: true })
-    .withMessage("link is required")
-    .isLength({ max: 150 })
-    .withMessage("link should be less than 150 character"),
+  // body("link")
+  //   .exists({ checkFalsy: true })
+  //   .withMessage("link is required")
+  //   .isLength({ max: 150 })
+  //   .withMessage("link should be less than 150 character"),
 
   body("status")
     .exists({ checkFalsy: true })
@@ -545,11 +545,11 @@ const bannerSchema = [
 const bannerUpdateSchema = [
   ...validateIdRequired_id(banner, "id"),
   checkField_update('title', 150, banner, true),
-  body("link")
-    .exists({ checkFalsy: true })
-    .withMessage("link is required")
-    .isLength({ max: 150 })
-    .withMessage("link should be less than 150 character"),
+  // body("link")
+  //   .exists({ checkFalsy: true })
+  //   .withMessage("link is required")
+  //   .isLength({ max: 150 })
+  //   .withMessage("link should be less than 150 character"),
 ];
 
 const CollegeSchema = [
