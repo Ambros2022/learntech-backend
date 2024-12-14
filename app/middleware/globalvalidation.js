@@ -912,14 +912,14 @@ const ourteamsUpdateSchema = [
 ];
 
 const videotestimonialsSchema = [
-  checkField('title', 250, videotestimonials, true),
+  // checkField('title', 250, videotestimonials, true),
   checkField('name', 250, videotestimonials, true),
 ];
 
 const videotestimonialsUpdateSchema = [
   ...validateIdRequired_id(videotestimonials, "id"),
 
-  checkField_update('title', 250, videotestimonials, true),
+  // checkField_update('title', 250, videotestimonials, true),
   checkField_update('name', 250, videotestimonials, true),
 
 ];
