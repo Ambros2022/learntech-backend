@@ -854,3 +854,5 @@ CREATE TABLE general_course_testimonials (
 );
 
 ALTER TABLE `video_testimonials` CHANGE `designation` `designation` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+ALTER TABLE `video_testimonials` CHANGE `title` `title` VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;

@@ -2062,7 +2062,7 @@ exports.schoolboardfindone = (req, res) => {
       "short_name",
       "meta_title",
       "meta_description",
-      "meta_keywords",
+
     ],
     include: [
 
@@ -2077,6 +2077,7 @@ exports.schoolboardfindone = (req, res) => {
         attributes: ["id", "recognition_id"],
         include: [
           {
+            required: false,
             association: "brdrecognitions",
             attributes: ["id", "recognition_approval_name"],
           },
@@ -2103,6 +2104,7 @@ exports.schoolboardfindone = (req, res) => {
     .catch((err) => {
       res.status(500).send({
         status: 0,
+        err: err,
         message: "Error retrieving schoolboards with id=" + id,
       });
     });
