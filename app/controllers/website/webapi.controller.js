@@ -1043,7 +1043,8 @@ exports.allcolleges = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "slug", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating"],
+      attributes: ["id", "name", "slug", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating","listing_order","type"],
+
       include: includearray,
       order: [orderconfig],
       limit,
@@ -2612,15 +2613,15 @@ exports.addjobenquires = async (req, res) => {
     if (req.files && req.files.resume) {
       let avatar = req.files.resume;
 
-      if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-        return res.status(400).send({
-          message: "Invalid File type ",
-          errors: {},
-          status: 0,
-        });
-      }
+      // if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
+      //   return res.status(400).send({
+      //     message: "Invalid File type ",
+      //     errors: {},
+      //     status: 0,
+      //   });
+      // }
 
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+      if (avatar.size / (1024 * 1024) > 12) {
         return res.status(400).send({
           message: "File too large ",
           errors: {},
@@ -3634,7 +3635,7 @@ exports.findreview = async (req, res) => {
     column = myArray[1];
     orderconfig = [table, column, order];
   }
-  let data_array = [];
+  let data_array = [{ is_approved: 1 }];
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   if (condition) {
@@ -3732,7 +3733,7 @@ exports.findreview = async (req, res) => {
 
 exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
-
+  console.log(is_approved,"is_approved");
   if (id === undefined) {
     return res.status(400).send({
       status: 0,
@@ -3756,7 +3757,7 @@ exports.statusupdate = async (req, res) => {
     if (is_approved === undefined) {
       updatedIsApproved = !previousIsApproved;
     } else {
-      updatedIsApproved = is_approved;
+      updatedIsApproved = previousIsApproved == 1 ? 0 : 1;
     }
 
     await reviews.update(
