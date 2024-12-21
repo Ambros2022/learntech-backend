@@ -491,7 +491,9 @@ module.exports = function (app) {
     "/api/website/home/seolink/get", homecontroller.seolink
   );
 
-
+  app.get(
+    "/api/website/langingpage/get", homecontroller.landingpages
+  );
 
 };
 
