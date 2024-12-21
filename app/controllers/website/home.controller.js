@@ -49,7 +49,7 @@ const nri = db.nri;
 const recognitioneditor = db.recognitioneditor;
 const service = db.service;
 const scholarships = db.scholarships;
-
+const landingpage = db.landing_pages;
 const videotestimonial = db.videotestimonial;
 const abroad_universities = db.abroad_universities;
 const abroadcountries = db.abroadcountries;
@@ -5498,4 +5498,42 @@ exports.uploadpdf = async (req, res) => {
       status: 0,
     });
   }
+};
+
+exports.landingpages = async (req, res) => {
+  const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+  var column = columnname ? columnname : "id";
+  var order = orderby ? orderby : "ASC";
+  var orderconfig = [column, order];
+
+  const myArray = column.split(".");
+  if (typeof myArray[1] !== "undefined") {
+    var table = myArray[0];
+    column = myArray[1];
+    orderconfig = [table, column, order];
+  }
+  var condition = sendsearch.customseacrh(searchtext, searchfrom);
+
+  const { limit, offset } = getPagination(page, size);
+  landingpage
+    .findAndCountAll({ where: condition, limit, offset, order: [orderconfig] })
+    .then((data) => {
+      const response = getPagingData(data, page, limit);
+
+      res.status(200).send({
+        status: 1,
+        message: "success",
+        totalItems: response.totalItems,
+        currentPage: response.currentPage,
+        totalPages: response.totalPages,
+        data: response.finaldata,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        status: 0,
+        message: err.message || "Some error occurred while retrieving teams.",
+      });
+    });
 };
