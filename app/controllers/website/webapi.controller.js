@@ -2855,6 +2855,7 @@ exports.dashboard = async (req, res) => {
       publishednews,
       totallandingpage,
       publishedlandingpage,
+      totalJobsEnquires
 
     ] = await Promise.all([
       college.count({ where: { type: "college" } }),
@@ -2885,6 +2886,7 @@ exports.dashboard = async (req, res) => {
       news_and_events.count({ where: { status: "PUBLISHED" } }),
       landing_pages.count(),
       landing_pages.count({ where: { status: "PUBLISHED" } }),
+      jobsenquires.count(),
     ]);
 
     res.status(200).send({
@@ -2919,6 +2921,7 @@ exports.dashboard = async (req, res) => {
         Published_news: publishednews,
         Total_landingpage: totallandingpage,
         Published_landingpage: publishedlandingpage,
+        totalJobsEnquires: totalJobsEnquires,
       }
     });
   } catch (error) {
