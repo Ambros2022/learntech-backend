@@ -1,24 +1,24 @@
 module.exports = (sequelize, Sequelize) => {
     const exams= sequelize.define("exams", {
        
-      status: {
-        type: Sequelize.ENUM('Draft', 'Published')	
-      }, 
-      meta_title: {
-        type: Sequelize.STRING
-      },
-      meta_description: {
-        type: Sequelize.STRING
-      },
-      meta_keyword: {
-        type: Sequelize.STRING
-      },
-      code_before_head: {
-        type: Sequelize.STRING
-      }, 
-      code_before_body: {
-        type: Sequelize.STRING
-      }
+      // status: {
+      //   type: Sequelize.ENUM('Draft', 'Published')	
+      // }, 
+      // meta_title: {
+      //   type: Sequelize.STRING
+      // },
+      // meta_description: {
+      //   type: Sequelize.STRING
+      // },
+      // meta_keyword: {
+      //   type: Sequelize.STRING
+      // },
+      // code_before_head: {
+      //   type: Sequelize.STRING
+      // }, 
+      // code_before_body: {
+      //   type: Sequelize.STRING
+      // }
      
     }
     ,

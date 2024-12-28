@@ -71,6 +71,7 @@ db.news_and_events = require("../models/news_and_events.model.js")(sequelize, Se
 db.blog = require("../models/blog.model.js")(sequelize, Sequelize);
 db.exam = require("../models/exam.model.js")(sequelize, Sequelize);
 db.exam_faqs = require("../models/exam_faq.model.js")(sequelize, Sequelize);
+db.exam_streams = require("./exam_streams.model.js")(sequelize, Sequelize);
 db.scholar_levels = require("./scholar_level.model.js")(sequelize, Sequelize);
 db.scholar_types = require("./scholar_type.model.js")(sequelize, Sequelize);
 db.scholarships = require("./scholarship.model.js")(sequelize, Sequelize);
@@ -593,6 +594,18 @@ db.exam.hasMany(db.exam_faqs, { as: "examfaqs", foreignKey: "exam_id" });
 db.exam_faqs.belongsTo(db.exam, {
   foreignKey: "exam_id",
   as: "examfaqs",
+});
+
+db.exam.hasMany(db.exam_streams, { as: "examstreams", foreignKey: "exam_id" });
+db.exam_streams.belongsTo(db.exam, {
+  foreignKey: "exam_id",
+  as: "examstreams",
+});
+
+
+db.exam_streams.belongsTo(db.stream, {
+  foreignKey: "stream_id",
+  as: "examstrDetails",
 });
 
 

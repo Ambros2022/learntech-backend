@@ -78,6 +78,7 @@ exports.create = async (req, res) => {
             name: req.body.name,
             link: req.body.link,
             status: req.body.status,
+            listing_order: req.body.listing_order,
             logo: logos,
 
         });
@@ -213,6 +214,7 @@ exports.update = async (req, res) => {
             name: req.body.name || existingRecord.name,
             link: req.body.link || existingRecord.link,
             status: req.body.status || existingRecord.status,
+            listing_order: req.body.listing_order || existingRecord.listing_order,
           
         };
         if (req.files && req.files.logo) {
