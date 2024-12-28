@@ -459,7 +459,7 @@ exports.update = async (req, res) => {
       address: req.body.address || existingRecord.address,
       map: req.body.map || existingRecord.map,
       video_url: req.body.video_url,
-      // avg_rating: req.body.avg_rating || existingRecord.avg_rating,
+      avg_rating: req.body.avg_rating,
       info: req.body.info || existingRecord.info,
       course_fees: req.body.course_fees || existingRecord.course_fees,
       admissions: req.body.admissions || existingRecord.admissions,

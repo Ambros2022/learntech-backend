@@ -121,6 +121,8 @@ exports.create = async (req, res) => {
       overview: req.body.overview,
       pdf_name: req.body.pdf_name,
       status: req.body.status,
+      is_trending: req.body.is_trending,
+      listing_order: req.body.listing_order,
     });
     res.status(200).send({
       status: 1,
@@ -163,7 +165,8 @@ exports.update = async (req, res) => {
       overview: req.body.overview || existingRecord.overview,
       pdf_name: req.body.pdf_name,
       status: req.body.status || existingRecord.status,
-
+      is_trending: req.body.is_trending || existingRecord.is_trending,
+      listing_order: req.body.listing_order || existingRecord.listing_order,
     };
     if (req.files && req.files.banner_image) {
       const avatar = req.files.banner_image;

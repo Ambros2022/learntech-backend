@@ -782,7 +782,7 @@ const examSchema = [
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
 
-  ...validateIdRequired_id(stream, "stream_id"),
+  // ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 const examUpdateSchema = [
@@ -796,7 +796,7 @@ const examUpdateSchema = [
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
 
-  ...validateIdRequired_id(stream, "stream_id"),
+  // ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 const scholarlevelSchema = [

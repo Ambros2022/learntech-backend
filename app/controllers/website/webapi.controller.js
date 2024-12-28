@@ -1043,7 +1043,7 @@ exports.allcolleges = async (req, res) => {
       where: {
         [Op.and]: data_array,
       },
-      attributes: ["id", "name", "slug", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating","listing_order","type"],
+      attributes: ["id", "name", "slug", "city_id", "state_id", "address", "banner_image", "established", "college_type", "avg_rating", "listing_order", "type"],
 
       include: includearray,
       order: [orderconfig],
@@ -1550,6 +1550,19 @@ exports.allentranceexams = async (req, res) => {
   }
 
   let data_array = [{ status: "Published" }];
+  let includearray = [];
+
+
+  if (stream_id) {
+    includearray.push({
+      association: "examstreams",
+      required: true,
+      attributes: ["id"],
+      where: {
+        stream_id: JSON.parse(stream_id)
+      }
+    });
+  }
 
   if (promo_banner_status) {
     data_array.push({ promo_banner_status });
@@ -1567,9 +1580,9 @@ exports.allentranceexams = async (req, res) => {
     data_array.push({ types_of_exams });
   }
 
-  if (stream_id) {
-    data_array.push({ stream_id: JSON.parse(stream_id) });
-  }
+  // if (stream_id) {
+  //   data_array.push({ stream_id: JSON.parse(stream_id) });
+  // }
 
   // Add logic to filter by `isIndia`
   if (isIndia === 'true') {
@@ -1603,6 +1616,7 @@ exports.allentranceexams = async (req, res) => {
         "upcoming_date",
         "created_at",
       ],
+      include: includearray,
       order: [orderconfig]
     })
     .then((data) => {
@@ -1664,7 +1678,7 @@ exports.findoneexam = (req, res) => {
 };
 
 exports.news = async (req, res) => {
-  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id, includeIndia } = req.query;
+  const { page, size, searchtext, searchfrom, columnname, orderby, category_id, country_id, includeIndia, is_trending } = req.query;
 
   var column = columnname ? columnname : "id";
   var order = orderby ? orderby : "ASC";
@@ -1696,6 +1710,9 @@ exports.news = async (req, res) => {
   if (category_id) {
     data_array.push({ category_id });
   }
+  if (is_trending) {
+    data_array.push({ is_trending: is_trending });
+  }
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   condition ? data_array.push(condition) : null;
@@ -1714,6 +1731,10 @@ exports.news = async (req, res) => {
         "created_at",
         "category_id",
         "country_id",
+        "listing_order",
+        "is_trending",
+        "created_at"
+
       ],
       include: [
         {
@@ -2612,14 +2633,6 @@ exports.addjobenquires = async (req, res) => {
 
     if (req.files && req.files.resume) {
       let avatar = req.files.resume;
-
-      // if (!array_of_allowed_file_types.includes(avatar.mimetype)) {
-      //   return res.status(400).send({
-      //     message: "Invalid File type ",
-      //     errors: {},
-      //     status: 0,
-      //   });
-      // }
 
       if (avatar.size / (1024 * 1024) > 12) {
         return res.status(400).send({
@@ -3736,7 +3749,7 @@ exports.findreview = async (req, res) => {
 
 exports.statusupdate = async (req, res) => {
   const { id, is_approved } = req.body;
-  console.log(is_approved,"is_approved");
+  console.log(is_approved, "is_approved");
   if (id === undefined) {
     return res.status(400).send({
       status: 0,
