@@ -856,3 +856,30 @@ CREATE TABLE general_course_testimonials (
 ALTER TABLE `video_testimonials` CHANGE `designation` `designation` LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
 
 ALTER TABLE `video_testimonials` CHANGE `title` `title` VARCHAR(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+
+ALTER TABLE landing_pages ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER status;
+
+ALTER TABLE news_and_events ADD listing_order BIGINT(20) NULL DEFAULT '99999' AFTER status;
+
+ALTER TABLE `news_and_events` ADD `is_trending` TINYINT(1) NULL DEFAULT '0' AFTER `pdf_name`;
+
+CREATE TABLE exam_streams (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  exam_id INT,
+  stream_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (exam_id) REFERENCES exams(id) ON DELETE CASCADE,
+  FOREIGN KEY (stream_id) REFERENCES streams(id) ON DELETE CASCADE
+);
+
+CREATE TABLE board_schools (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  school_id INT,
+  school_board_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
+  FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
+);

@@ -10,7 +10,7 @@ const examage = db.exam_agelimits;
 const examid = db.exam_id_proof_details;
 const examfaqs = db.exam_faqs;
 const fileTypes = require("../config/fileTypes");
-
+const Examstreams = db.exam_streams;
 const fs = require("fs").promises;
 async function removeFile(filePath) {
   try {
@@ -168,6 +168,16 @@ exports.create = async (req, res) => {
         types_of_exams: types_of_exams,
       });
 
+      if (req.body.streams && examsDetails.id) {
+        const stream = JSON.parse(req.body.streams);
+        _.forEach(stream, async function (value) {
+          await Examstreams.create({
+            stream_id: value.id,
+            exam_id: examsDetails.id,
+          });
+        });
+      }
+
       res.status(200).send({
         status: 1,
         message: "Data Save Successfully",
@@ -299,8 +309,8 @@ exports.update = async (req, res) => {
       }
     }
 
-     // Check if a new logo is provided
-     if (req.files && req.files.logo) {
+    // Check if a new logo is provided
+    if (req.files && req.files.logo) {
       const avatar = req.files.logo;
 
       // Check file type and size
@@ -337,6 +347,21 @@ exports.update = async (req, res) => {
     // Update database record
     await exam.update(examsUpdates, { where: { id: req.body.id } });
 
+    if (req.body.streams && req.body.id) {
+      await Examstreams.destroy({
+        where: { exam_id: req.body.id },
+      });
+      const stream = JSON.parse(req.body.streams);
+      _.forEach(stream, async function (value) {
+        await Examstreams.create({
+
+          stream_id: value.id,
+          exam_id: req.body.id,
+
+        });
+      });
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data saved successfully",
@@ -367,49 +392,63 @@ exports.findAll = async (req, res) => {
 
   var condition = sendsearch.customseacrh(searchtext, searchfrom);
   let data_array = [];
+  let includearray = [
 
-  if (stream_id ) {
-    data_array.push({ stream_id : stream_id  });
+    {
+      required: false,
+      association: "stream",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "country",
+      attributes: [
+        "id",
+        "name",
+
+      ],
+    },
+
+  ];
+
+
+  // if (stream_id) {
+  //   data_array.push({ stream_id: stream_id });
+  // }
+
+  if (stream_id) {
+    includearray.push({
+      association: "examstreams",
+      required: true,
+      attributes: ["id"],
+      where: {
+        stream_id: JSON.parse(stream_id)
+      }
+    });
   }
 
-  if (country_id ) {
-    data_array.push({ country_id : country_id  });
+  if (country_id) {
+    data_array.push({ country_id: country_id });
   }
 
-  if (level_of_study ) {
-    data_array.push({ level_of_study : level_of_study  });
+  if (level_of_study) {
+    data_array.push({ level_of_study: level_of_study });
   }
 
-  if (types_of_exams ) {
-    data_array.push({ types_of_exams : types_of_exams  });
+  if (types_of_exams) {
+    data_array.push({ types_of_exams: types_of_exams });
   }
 
   condition ? data_array.push(condition) : null;
 
   const { limit, offset } = getPagination(page, size);
+
   exam
     .findAndCountAll({
       where: data_array,
       limit,
       offset,
-      include: [
-
-        {
-          required: false,
-          association: "stream",
-          attributes: ["id", "name"],
-        },
-            {
-           required: false,
-                    association: "country",
-                    attributes: [
-                        "id",
-                        "name",
-
-                    ],
-        },
-
-      ],
+      include: includearray,
       order: [orderconfig],
     })
     .then((data) => {
@@ -472,17 +511,30 @@ exports.findOne = (req, res) => {
         },
         {
           required: false,
+          association: "examstreams",
+          attributes: ["id", "stream_id"],
+          required: false,
+          include: [
+            {
+              association: "examstrDetails",
+              attributes: ["id", "name", "slug"],
+              required: false,
+            },
+          ],
+        },
+        {
+          required: false,
           association: "examfaqs",
           attributes: ["id", "questions", "answers"],
         },
         {
-           required: false,
-                    association: "country",
-                    attributes: [
-                        "id",
-                        "name",
+          required: false,
+          association: "country",
+          attributes: [
+            "id",
+            "name",
 
-                    ],
+          ],
         },
 
       ],

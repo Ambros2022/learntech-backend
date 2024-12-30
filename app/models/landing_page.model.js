@@ -12,6 +12,9 @@ module.exports = (sequelize, Sequelize) => {
         status: {
             type: Sequelize.ENUM("Draft", "Published"),
         },
+        listing_order: {
+            type: Sequelize.INTEGER
+          },
     },
         {
 

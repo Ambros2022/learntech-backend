@@ -33,7 +33,13 @@ module.exports = (sequelize, Sequelize) => {
     status: {
       type: Sequelize.ENUM('Draft', 'Published'),
     },
+    listing_order: {
+      type: Sequelize.INTEGER
+    },
     pdf_name: {
+      type: Sequelize.STRING
+    },
+    is_trending: {
       type: Sequelize.STRING
     },
 

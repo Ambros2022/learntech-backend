@@ -433,7 +433,7 @@ const schoolSchema = [
   ...validateIdRequired_id(countries, "country_id"),
   ...validateIdRequired_id(state, "state_id"),
   ...validateIdRequired_id(city, "city_id"),
-  ...validateIdRequired_id(schoolboards, "school_board_id"),
+  // ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
 
@@ -447,7 +447,7 @@ const schoolUpdateSchema = [
   ...validateIdRequired_id(countries, "country_id"),
   ...validateIdRequired_id(state, "state_id"),
   ...validateIdRequired_id(city, "city_id"),
-  ...validateIdRequired_id(schoolboards, "school_board_id"),
+  // ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 
 ];
@@ -782,7 +782,7 @@ const examSchema = [
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
 
-  ...validateIdRequired_id(stream, "stream_id"),
+  // ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 const examUpdateSchema = [
@@ -796,7 +796,7 @@ const examUpdateSchema = [
     .isLength({ max: 150 })
     .withMessage("Slug should be less than 150 character"),
 
-  ...validateIdRequired_id(stream, "stream_id"),
+  // ...validateIdRequired_id(stream, "stream_id"),
 ];
 
 const scholarlevelSchema = [
