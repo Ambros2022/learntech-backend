@@ -217,10 +217,25 @@ exports.allstream_exams = async (req, res) => {
       ],
       include: [{
         required: false,
-        association: "exam",
-        attributes: ["id", "exam_title", "slug"],
-        where: { status: "Published" }
-      }],
+        association: "examstr",
+        attributes: ["id","exam_id"],
+        include: [
+          {
+            required: false,
+            association: "examstreams",
+            attributes: ["id","exam_title","slug"],
+          },
+        ],
+
+      }
+    
+    ],
+      // include: [{
+      //   required: false,
+      //   association: "exam",
+      //   attributes: ["id", "exam_title", "slug"],
+      //   where: { status: "Published" }
+      // }],
       order: [orderconfig]
     })
     .then((data) => {
@@ -1310,13 +1325,24 @@ exports.allschools = async (req, res) => {
   if (country_id) data_array.push({ country_id: JSON.parse(country_id) });
   if (state_id) data_array.push({ state_id: JSON.parse(state_id) });
   if (city_id) data_array.push({ city_id: JSON.parse(city_id) });
-  if (school_board_id) data_array.push({ school_board_id: JSON.parse(school_board_id) });
+  // if (school_board_id) data_array.push({ school_board_id: JSON.parse(school_board_id) });
 
 
   const condition = sendsearch.customseacrh(searchtext, searchfrom);
   if (condition) data_array.push(condition);
 
   let includearray = [];
+
+  if (school_board_id) {
+    includearray.push({
+      association: "boardschools",
+      required: true,
+      attributes: ["id"],
+      where: {
+        school_board_id: JSON.parse(school_board_id)
+      }
+    });
+  }
 
   const { limit, offset } = getPagination(page, size);
 
@@ -1398,6 +1424,18 @@ exports.schoolfindone = (req, res) => {
             },
           ],
         },
+        {
+          required: false,
+          association: "boardschools",
+          attributes: ["id"],
+          include: [
+            {
+              required: false,
+              association: "schbordname",
+              attributes: ["id", "name","short_name"],
+            },
+          ],
+        },
 
         {
           required: false,
@@ -1462,6 +1500,7 @@ exports.abroadpages = async (req, res) => {
         "country_id",
         "name",
         "slug",
+        "backgroundimage"
       ],
       include: [
         {

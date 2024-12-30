@@ -4,6 +4,7 @@ const school = db.school;
 const _ = require("lodash");
 const schoollevels = db.schoollevels;
 const level = db.level;
+const boardschools = db.boardschools;
 const schoolamenities = db.schoolamenities;
 const school_faqs = db.school_faqs;
 const sendsearch = require("../utility/Customsearch");
@@ -150,6 +151,16 @@ exports.create = async (req, res) => {
         await schoollevels.create({
           school_id: schoolDetails.id,
           level_id: value.id,
+        });
+      });
+    }
+
+    if (req.body.boards && schoolDetails.id) {
+      const amndata = JSON.parse(req.body.boards);
+      _.forEach(amndata, async function (value) {
+        await boardschools.create({
+          school_id: schoolDetails.id,
+          school_board_id: value.id,
         });
       });
     }
@@ -304,6 +315,18 @@ exports.update = async (req, res) => {
         });
       });
     }
+    if (req.body.boards && req.body.id) {
+      await boardschools.destroy({
+        where: { school_id: req.body.id },
+      });
+      const amndata = JSON.parse(req.body.boards);
+      _.forEach(amndata, async function (value) {
+        await boardschools.create({
+          school_id: req.body.id,
+          school_board_id: value.id,
+        });
+      });
+    }
 
 
     res.status(200).send({
@@ -347,8 +370,39 @@ exports.findAll = async (req, res) => {
 
   let data_array = [];
 
+  let includearray = [
+    {
+      required: false,
+      association: "country",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "state",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "citys",
+      attributes: ["id", "name"],
+    },
+    {
+      required: false,
+      association: "schoolboard",
+      attributes: ["id", "name"],
+    },
+
+  ]
+
   if (school_board_id) {
-    data_array.push({ school_board_id: school_board_id });
+    includearray.push({
+      association: "boardschools",
+      required: true,
+      attributes: ["id"],
+      where: {
+        school_board_id: JSON.parse(school_board_id)
+      }
+    });
   }
 
   if (status) {
@@ -364,29 +418,8 @@ exports.findAll = async (req, res) => {
       where: data_array,
       limit,
       offset,
-      include: [
-        {
-          required: false,
-          association: "country",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "state",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "citys",
-          attributes: ["id", "name"],
-        },
-        {
-          required: false,
-          association: "schoolboard",
-          attributes: ["id", "name"],
-        },
+      include: includearray,
 
-      ],
       subQuery: false,
 
       order: [orderconfig],
@@ -458,6 +491,18 @@ exports.findOne = (req, res) => {
             },
           ],
         },
+        {
+          required: false,
+          association: "boardschools",
+          attributes: ["id"],
+          include: [
+            {
+              required: false,
+              association: "schbordname",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
 
         {
           required: false,
@@ -467,7 +512,7 @@ exports.findOne = (req, res) => {
         {
           required: false,
           association: "schfaqs",
-          attributes: ["id", "questions","answers"],
+          attributes: ["id", "questions", "answers"],
         },
 
       ],

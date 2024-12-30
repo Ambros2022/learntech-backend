@@ -433,7 +433,7 @@ const schoolSchema = [
   ...validateIdRequired_id(countries, "country_id"),
   ...validateIdRequired_id(state, "state_id"),
   ...validateIdRequired_id(city, "city_id"),
-  ...validateIdRequired_id(schoolboards, "school_board_id"),
+  // ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 ];
 
@@ -447,7 +447,7 @@ const schoolUpdateSchema = [
   ...validateIdRequired_id(countries, "country_id"),
   ...validateIdRequired_id(state, "state_id"),
   ...validateIdRequired_id(city, "city_id"),
-  ...validateIdRequired_id(schoolboards, "school_board_id"),
+  // ...validateIdRequired_id(schoolboards, "school_board_id"),
 
 
 ];

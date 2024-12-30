@@ -96,6 +96,7 @@ db.organization_page_steps = require("./organization_page_steps.model.js")(seque
 db.college_testimonials = require("./college_testimonial.model.js")(sequelize, Sequelize);
 db.stream_testimonials = require("./stream_testimonial.model.js")(sequelize, Sequelize);
 db.general_course_testimonials = require("./general_course_testimonial.model.js")(sequelize, Sequelize);
+db.boardschools = require("./boardschools.model.js")(sequelize, Sequelize);
 
 
 
@@ -326,6 +327,15 @@ db.schoollevels.belongsTo(db.level, {
   foreignKey: "level_id",
   as: "schlevelname",
 });
+
+db.school.hasMany(db.boardschools, { as: "boardschools" });
+db.boardschools.belongsTo(db.school, {
+  foreignKey: "school_id",
+  as: "boardschools",
+});
+
+
+db.boardschools.belongsTo(db.schoolboards, {foreignKey: "school_board_id",as: "schbordname",});
 
 
 db.school.hasMany(db.school_faqs, { as: "schfaqs", foreignKey: "school_id" });
@@ -603,10 +613,14 @@ db.exam_streams.belongsTo(db.exam, {
 });
 
 
+db.stream.hasMany(db.exam_streams, { as: "examstr" });
 db.exam_streams.belongsTo(db.stream, {
   foreignKey: "stream_id",
   as: "examstrDetails",
 });
+
+
+
 
 
 
