@@ -852,7 +852,7 @@ exports.exploreexam = async (req, res) => {
       attributes: ["id", "name", "slug", "logo", "listing_order"],
       include: [{
         required: false,
-        association: "exam",
+        association: "examstr",
         attributes: ["id"],
       }],
       limit,
@@ -860,9 +860,10 @@ exports.exploreexam = async (req, res) => {
       order: [orderconfig],
     });
 
+
     // Map the data to include the course count
     const formattedData = data.map(stream => {
-      const courseCount = stream.exam.length;
+      const courseCount = stream.examstr.length;
       return {
         id: stream.id,
         name: stream.name,
