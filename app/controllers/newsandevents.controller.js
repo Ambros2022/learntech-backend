@@ -213,9 +213,9 @@ exports.update = async (req, res) => {
         });
       }
 
-      if (avatar.size / (1024 * 1024) > allowed_file_size) {
+      if (avatar.size / (1024 * 1024) > 50) {
         return res.status(400).send({
-          message: "File too large ",
+          message: "File too large please add 50mb. ",
           errors: {},
           status: 0,
         });

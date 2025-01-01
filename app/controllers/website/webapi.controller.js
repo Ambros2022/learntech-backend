@@ -51,6 +51,8 @@ const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
 const allowed_file_size = 2;
 const blogcategories = db.blog_categories;
+const Collegegallery = db.college_gallery;
+const College_faq = db.college_faqs;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -218,18 +220,18 @@ exports.allstream_exams = async (req, res) => {
       include: [{
         required: false,
         association: "examstr",
-        attributes: ["id","exam_id"],
+        attributes: ["id", "exam_id"],
         include: [
           {
             required: false,
             association: "examstreams",
-            attributes: ["id","exam_title","slug"],
+            attributes: ["id", "exam_title", "slug"],
           },
         ],
 
       }
-    
-    ],
+
+      ],
       // include: [{
       //   required: false,
       //   association: "exam",
@@ -1085,96 +1087,209 @@ exports.allcolleges = async (req, res) => {
   }
 };
 
-
-
-exports.collegefindOne = (req, res) => {
+exports.collegefindOne = async (req, res) => {
   const id = req.params.id;
-  college.findByPk(id, {
-    include: [
 
-
-      {
-        required: false,
-        association: "country",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "state",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "citys",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "collegestreams",
-        attributes: ["id", "stream_id"],
-        include: [
-          {
-            association: "clgstreams",
-            attributes: ["id", "name"],
-          },
-        ],
-      },
-      {
-        required: false,
-        association: "collegeamenities",
-        attributes: ["id", "amenitie_id"],
-        include: [
-          {
-            association: "clgamenities",
-            attributes: ["id", "amenities_name", "amenities_logo"],
-          },
-        ],
-      },
-      {
-        required: false,
-        association: "collegerecognitions",
-        attributes: ["id", "recognition_id"],
-        include: [
-          {
-            association: "clgrecognitions",
-            attributes: ["id", "recognition_approval_name"],
-          },
-        ],
-      },
-      {
-        required: false,
-        association: "collegefaqs",
-        attributes: ["id", "questions", "answers"],
-      },
-      {
-        required: false,
-        association: "clggallery",
-        attributes: ["id", "image"],
-      },
-
-    ],
-  })
-    .then((data) => {
-      if (data) {
-        res.status(200).send({
-          status: 1,
-          message: "successfully retrieved",
-          data: data,
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `Cannot find colleges with id=${id}.`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Error retrieving colleges with id=" + id,
-      });
+  try {
+    // First query: Fetch college data with necessary associations (excluding collegefaqs and clggallery)
+    const dataPromise = college.findByPk(id, {
+      include: [
+        {
+          required: false,
+          association: "country",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "state",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "citys",
+          attributes: ["id", "name"],
+        },
+        {
+          required: false,
+          association: "collegestreams",
+          attributes: ["id", "stream_id"],
+          include: [
+            {
+              association: "clgstreams",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+        {
+          required: false,
+          association: "collegeamenities",
+          attributes: ["id", "amenitie_id"],
+          include: [
+            {
+              association: "clgamenities",
+              attributes: ["id", "amenities_name", "amenities_logo"],
+            },
+          ],
+        },
+        {
+          required: false,
+          association: "collegerecognitions",
+          attributes: ["id", "recognition_id"],
+          include: [
+            {
+              association: "clgrecognitions",
+              attributes: ["id", "recognition_approval_name"],
+            },
+          ],
+        },
+      ],
     });
+
+    // Second query: Fetch college FAQs separately
+    const collegeFaqsPromise = College_faq.findAll({
+      where: { college_id: id },
+      attributes: ["id", "questions", "answers"],
+    });
+
+    const clggalleryPromise = Collegegallery.findAll({
+      where: { college_id: id },
+      attributes: ["id", "image"],
+    });
+
+
+
+    // Wait for all queries to complete in parallel
+    const [data, collegeFaqs, clggallery] = await Promise.all([dataPromise, collegeFaqsPromise, clggalleryPromise]);
+
+    if (!data) {
+      return res.status(400).send({
+        status: 0,
+        message: `Cannot find college with id=${id}.`,
+      });
+    }
+
+    // Convert the data to plain object
+    const plainData = data.get({ plain: true });
+
+    // Extract the actual data from Sequelize instances for FAQs
+    const faqs = collegeFaqs.map(faq => faq.get({ plain: true }));
+
+    const gallery = clggallery.map(faq => faq.get({ plain: true }));
+
+    // Attach the FAQs and clggallery inside the data object
+    plainData.collegefaqs = faqs;
+    plainData.clggallery = gallery;
+
+    // Send the response with college data, FAQs, and gallery inside 'data'
+    res.status(200).send({
+      status: 1,
+      message: "Successfully retrieved college data",
+      data: plainData, // FAQs and gallery are now part of the 'data' object
+    });
+
+  } catch (err) {
+    console.error("Error:", err);
+    res.status(500).send({
+      status: 0,
+      message: "Error retrieving college data with id=" + id,
+    });
+  }
 };
+
+
+
+
+
+// old api //
+
+// exports.collegefindOne = (req, res) => {
+//   const id = req.params.id;
+//   college.findByPk(id, {
+//     include: [
+
+
+//       {
+//         required: false,
+//         association: "country",
+//         attributes: ["id", "name"],
+//       },
+//       {
+//         required: false,
+//         association: "state",
+//         attributes: ["id", "name"],
+//       },
+//       {
+//         required: false,
+//         association: "citys",
+//         attributes: ["id", "name"],
+//       },
+//       {
+//         required: false,
+//         association: "collegestreams",
+//         attributes: ["id", "stream_id"],
+//         include: [
+//           {
+//             association: "clgstreams",
+//             attributes: ["id", "name"],
+//           },
+//         ],
+//       },
+//       {
+//         required: false,
+//         association: "collegeamenities",
+//         attributes: ["id", "amenitie_id"],
+//         include: [
+//           {
+//             association: "clgamenities",
+//             attributes: ["id", "amenities_name", "amenities_logo"],
+//           },
+//         ],
+//       },
+//       {
+//         required: false,
+//         association: "collegerecognitions",
+//         attributes: ["id", "recognition_id"],
+//         include: [
+//           {
+//             association: "clgrecognitions",
+//             attributes: ["id", "recognition_approval_name"],
+//           },
+//         ],
+//       },
+//       {
+//         required: false,
+//         association: "collegefaqs",
+//         attributes: ["id", "questions", "answers"],
+//       },
+//       {
+//         required: false,
+//         association: "clggallery",
+//         attributes: ["id", "image"],
+//       },
+
+//     ],
+//   })
+//     .then((data) => {
+//       if (data) {
+//         res.status(200).send({
+//           status: 1,
+//           message: "successfully retrieved",
+//           data: data,
+//         });
+//       } else {
+//         res.status(400).send({
+//           status: 0,
+//           message: `Cannot find colleges with id=${id}.`,
+//         });
+//       }
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         status: 0,
+//         message: "Error retrieving colleges with id=" + id,
+//       });
+//     });
+// };
 
 exports.courses = async (req, res) => {
   const { page, size, searchtext, searchfrom, columnname, orderby, } = req.query;
@@ -1433,7 +1548,7 @@ exports.schoolfindone = (req, res) => {
             {
               required: false,
               association: "schbordname",
-              attributes: ["id", "name","short_name"],
+              attributes: ["id", "name", "short_name"],
             },
           ],
         },
