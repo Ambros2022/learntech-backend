@@ -883,3 +883,9 @@ CREATE TABLE board_schools (
   FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
   FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
 );
+
+ ALTER TABLE `board_schools`
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ ALTER TABLE `exam_streams`
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
