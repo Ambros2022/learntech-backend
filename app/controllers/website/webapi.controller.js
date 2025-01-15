@@ -4488,3 +4488,270 @@ exports.blogcategories = async (req, res) => {
       });
     });
 };
+
+
+exports.xmlgenerator = async (req, res) => {
+  const {
+    page,
+    size,
+    columnname,
+    orderby,
+    type, // The type parameter to determine the category
+  } = req.query;
+
+  const { limit, offset } = getPagination(page, 5000);
+  const baseUrl = "https://learntechww.com"; // Base URL for the sitemap
+
+  const buildSitemap = (items, type) => {
+    return items
+      .map(
+        (item) => `
+  <url>
+    <loc>${baseUrl}/${type}/${item.id}/${item.slug}</loc>
+    <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
+  </url>`
+      )
+      .join('');
+  };
+  const buildSitemapgeneral = (items, type) => {
+    return items
+      .map(
+        (item) => `
+  <url>
+    <loc>${baseUrl}/${type}/${item?.streams.id}/${item?.streams.slug}/${item.slug}</loc>
+    <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
+  </url>`
+      )
+      .join('');
+  };
+
+  const buildSitemapcollegecourse = (items, type) => {
+    return items
+      .map(
+        (item) => `
+  <url>
+    <loc>${baseUrl}/${type}/${item?.college?.id}/${item?.college?.slug}/${item.slug}</loc>
+    <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
+  </url>`
+      )
+      .join('');
+  };
+
+  try {
+    const column = columnname || "id";
+    const order = orderby || "ASC";
+    const orderconfig = column.includes(".")
+      ? column.split(".").concat(order)
+      : [column, order];
+
+    let data = "";
+
+    const fetchDatauni = async () => {
+      const items = await college.findAll({
+        where: { type: "university", status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "university") : "";
+    };
+
+    const fetchDataclg = async () => {
+      const items = await college.findAll({
+        where: { type: "college", status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "college") : "";
+    };
+    const fetchDataschools = async () => {
+      const items = await school.findAll({
+        where: { status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "school") : "";
+    };
+    const fetchDatascholarships = async () => {
+      const items = await scholarships.findAll({
+        where: { status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "scholarship") : "";
+    };
+
+    const fetchDataboards = async () => {
+      const items = await schoolboards.findAll({
+        where: { status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "board") : "";
+    };
+
+    const exams = async () => {
+      const items = await exam.findAll({
+        where: { status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "exam_title", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "exam") : "";
+    };
+
+    const blogs = async () => {
+      const items = await blog.findAll({
+        where: { status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "blog") : "";
+    };
+    const news = async () => {
+      const items = await news_and_events.findAll({
+        where: { status: PUBLISHED },
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "news") : "";
+    };
+
+    const streamcourses = async () => {
+      const items = await stream.findAll({
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemap(items, "course") : "";
+    };
+
+    const generalcourses = async () => {
+      const items = await generalcourse.findAll({
+        where: { status: PUBLISHED },
+        include: [
+          {
+            required: false,
+            association: "streams",
+            attributes: ["id", "name", "slug", "banner"],
+          },
+        ],
+        limit,
+        offset,
+        attributes: ["id", "name", "slug", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemapgeneral(items, "course") : "";
+    };
+
+    const collegecourses = async () => {
+      const items = await courses.findAll({
+        where: { status: PUBLISHED },
+        include: [
+          {
+            required: false,
+            association: "college",
+            attributes: ["id", "name", "slug"],
+          },
+        ],
+        limit,
+        offset,
+        attributes: ["id", "slug", "status", "updated_at"],
+        order: [orderconfig],
+        subQuery: false,
+      });
+
+      return items.length > 0 ? buildSitemapcollegecourse(items, "college") : "";
+    };
+
+
+
+
+    switch (type) {
+      case "colleges":
+        data = await fetchDataclg();
+        break;
+      case "universities":
+        data = await fetchDatauni();
+        break;
+      case "schools":
+        data = await fetchDataschools();
+        break;
+      case "scholarships":
+        data = await fetchDatascholarships();
+        break;
+      case "boards":
+        data = await fetchDataboards();
+        break;
+      case "exams":
+        data = await exams();
+        break;
+      case "blogs":
+        data = await blogs();
+        break;
+      case "news":
+        data = await news();
+        break;
+      case "courses":
+        data = await streamcourses();
+        break;
+      case "generalcourse":
+        data = await generalcourses();
+        break;
+      case "collegecourses":
+        data = await collegecourses();
+        break;
+
+
+      default:
+        return res.status(400).send({ status: 0, message: "Invalid type parameter" });
+    }
+
+    const xmlResponse = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${data}
+</urlset>`;
+
+    res.setHeader("Content-Type", "application/xml");
+    return res.status(200).send(xmlResponse);
+  } catch (error) {
+    console.error("Error generating sitemap:", error);
+    res.status(500).send({ status: 0, message: "Internal Server Error" });
+  }
+};
+
