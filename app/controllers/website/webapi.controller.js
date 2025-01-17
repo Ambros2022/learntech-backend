@@ -4502,36 +4502,42 @@ exports.xmlgenerator = async (req, res) => {
   const { limit, offset } = getPagination(page, 5000);
   const baseUrl = "https://learntechww.com"; // Base URL for the sitemap
 
-  const buildSitemap = (items, type) => {
+  const buildSitemap = (items, type,priority) => {
     return items
       .map(
         (item) => `
   <url>
     <loc>${baseUrl}/${type}/${item.id}/${item.slug}</loc>
     <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
+    <changefreq>always</changefreq>
+    <priority>${priority}</priority>
   </url>`
       )
       .join('');
   };
-  const buildSitemapgeneral = (items, type) => {
+  const buildSitemapgeneral = (items, type,priority) => {
     return items
       .map(
         (item) => `
   <url>
     <loc>${baseUrl}/${type}/${item?.streams.id}/${item?.streams.slug}/${item.slug}</loc>
     <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
+    <changefreq>always</changefreq>
+    <priority>${priority}</priority>
   </url>`
       )
       .join('');
   };
 
-  const buildSitemapcollegecourse = (items, type) => {
+  const buildSitemapcollegecourse = (items, type,priority) => {
     return items
       .map(
         (item) => `
   <url>
     <loc>${baseUrl}/${type}/${item?.college?.id}/${item?.college?.slug}/${item.slug}</loc>
     <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
+     <changefreq>always</changefreq>
+    <priority>${priority}</priority>
   </url>`
       )
       .join('');
@@ -4556,7 +4562,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "university") : "";
+      return items.length > 0 ? buildSitemap(items, "university",0.9) : "";
     };
 
     const fetchDataclg = async () => {
@@ -4569,7 +4575,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "college") : "";
+      return items.length > 0 ? buildSitemap(items, "college",0.9) : "";
     };
     const fetchDataschools = async () => {
       const items = await school.findAll({
@@ -4581,7 +4587,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "school") : "";
+      return items.length > 0 ? buildSitemap(items, "school",0.9) : "";
     };
     const fetchDatascholarships = async () => {
       const items = await scholarships.findAll({
@@ -4593,7 +4599,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "scholarship") : "";
+      return items.length > 0 ? buildSitemap(items, "scholarship",0.7) : "";
     };
 
     const fetchDataboards = async () => {
@@ -4606,7 +4612,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "board") : "";
+      return items.length > 0 ? buildSitemap(items, "board",0.7) : "";
     };
 
     const exams = async () => {
@@ -4619,7 +4625,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "exam") : "";
+      return items.length > 0 ? buildSitemap(items, "exam",0.7) : "";
     };
 
     const blogs = async () => {
@@ -4632,7 +4638,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "blog") : "";
+      return items.length > 0 ? buildSitemap(items, "blog",0.7) : "";
     };
     const news = async () => {
       const items = await news_and_events.findAll({
@@ -4644,7 +4650,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "news") : "";
+      return items.length > 0 ? buildSitemap(items, "news",0.7) : "";
     };
 
     const streamcourses = async () => {
@@ -4656,7 +4662,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "course") : "";
+      return items.length > 0 ? buildSitemap(items, "course",0.7) : "";
     };
 
     const generalcourses = async () => {
@@ -4676,7 +4682,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemapgeneral(items, "course") : "";
+      return items.length > 0 ? buildSitemapgeneral(items, "course",0.7) : "";
     };
 
     const collegecourses = async () => {
@@ -4696,7 +4702,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemapcollegecourse(items, "college") : "";
+      return items.length > 0 ? buildSitemapcollegecourse(items, "college",0.7) : "";
     };
 
 
