@@ -53,6 +53,7 @@ const allowed_file_size = 2;
 const blogcategories = db.blog_categories;
 const Collegegallery = db.college_gallery;
 const College_faq = db.college_faqs;
+const Redirect = db.redirecturl;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -4762,11 +4763,16 @@ ${data}
 };
 
 exports.redirecturls = async (req, res) => {
+  try {
+    // Fetch only the required fields: id, old_url, and new_url
+    const redirections = await Redirect.findAll({
+      attributes: ['id', 'old_url', 'new_url'], // Specify the columns to fetch
+    });
 
-  let redirections = [
-    { oldUrl: '/old-page', newUrl: '/news' },
-    { oldUrl: '/sss', newUrl: '/blogs' },
-    // Add more mappings here as needed
-  ];
-  return res.json(redirections);
+    // Send the mappings as a JSON response
+    res.status(200).json(redirections);
+  } catch (error) {
+    console.error('Error fetching redirection mappings:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };

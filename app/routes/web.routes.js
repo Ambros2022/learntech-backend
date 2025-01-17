@@ -4,7 +4,6 @@ const homecontroller = require("../controllers/website/home.controller");
 // const webapicontroller = require("../controllers/website/webapi.controller");
 const webapicontroller = require("../controllers/website/webapi.controller");
 
-const redirecturlcontroller = require("../controllers/redirecturl.controller");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -203,6 +202,7 @@ module.exports = function (app) {
   app.post("/api/website/review/statusupdate", webapicontroller.statusupdate);
 
   app.post("/api/website/review/likesupdate", webapicontroller.likesUpdate);
+
   app.get("/redirecturls", webapicontroller.redirecturls);
 
 
@@ -296,16 +296,7 @@ module.exports = function (app) {
 
 
 
-  // redirection
-
-  app.get(
-    "/api/website/redirecturl/get", redirecturlcontroller.findAll
-  );
-
-  app.get(
-    "/api/website/redirecturl/config", redirecturlcontroller.getFile
-  );
-
+ 
   /* start Home page apis*/
 
   app.post(

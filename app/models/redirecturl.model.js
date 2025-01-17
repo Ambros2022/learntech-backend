@@ -8,9 +8,7 @@ module.exports = (sequelize, Sequelize) => {
       new_url: {
         type: Sequelize.STRING,
       },
-      status_code: {
-        type: Sequelize.ENUM("301", "307", "503"),
-      },
+    
     },
     {
       timestamps: true,
