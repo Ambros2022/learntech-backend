@@ -234,39 +234,40 @@ module.exports = function (app) {
 
   /** Data backup  End*/
 
-  /**  redirecturl Routes Start  **/
+ 
+
+  /**  redirect **/
 
   app.get(
-    "/api/admin/redirect-url/get",
+    "/api/admin/redirect/get",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     redirecturlcontroller.findAll
   );
-
+  app.post(
+    "/api/admin/redirect/add",
+    globalvalidation.RedirecturlSchema,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.create
+  );
+  app.post(
+    "/api/admin/redirect/update",
+    globalvalidation.RedirecturlSchemaUpdate,
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    redirecturlcontroller.update
+  );
   app.get(
-    "/api/admin/redirect-url/get/:id",
+    "/api/admin/redirect/get/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     redirecturlcontroller.findOne
   );
 
   app.post(
-    "/api/admin/redirect-url/add",
-    globalvalidation.RedirecturlSchema,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.create
-  );
-
-  app.post(
-    "/api/admin/redirect-url/update",
-    globalvalidation.RedirecturlSchemaUpdate,
-    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
-    redirecturlcontroller.update
-  );
-
-  app.post(
-    "/api/admin/redirect-url/delete/:id",
+    "/api/admin/redirect/delete/:id",
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     redirecturlcontroller.delete
   );
+
+
 
 
   /**  Countries Routes start **/
