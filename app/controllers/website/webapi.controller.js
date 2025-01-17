@@ -4761,3 +4761,12 @@ ${data}
   }
 };
 
+exports.redirecturls = async (req, res) => {
+
+  let redirections = [
+    { oldUrl: '/old-page', newUrl: '/news' },
+    { oldUrl: '/sss', newUrl: '/blogs' },
+    // Add more mappings here as needed
+  ];
+  return res.json(redirections);
+};
