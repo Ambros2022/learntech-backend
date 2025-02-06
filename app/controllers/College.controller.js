@@ -322,40 +322,40 @@ exports.create = async (req, res) => {
     }
 
     const CollegeDetails = await College.create({
-      country_id: req.body.country_id,
-      state_id: req.body.state_id,
-      city_id: req.body.city_id,
-      name: req.body.name,
-      slug: req.body.slug,
-      type: req.body.type,
-      status: req.body.status,
-      home_view_status: req.body.home_view_status,
-      college_type: req.body.college_type,
-      listing_order: req.body.listing_order,
-      established: req.body.established,
-      meta_title: req.body.meta_title,
-      meta_description: req.body.meta_description,
-      meta_keyword: req.body.meta_keyword,
-      address: req.body.address,
-      map: req.body.map,
+      country_id: req.body?.country_id,
+      state_id: req.body?.state_id,
+      city_id: req.body?.city_id,
+      name: req.body?.name,
+      slug: req.body?.slug,
+      type: req.body?.type,
+      status: req.body?.status,
+      home_view_status: req.body?.home_view_status,
+      college_type: req.body?.college_type,
+      listing_order: req.body?.listing_order,
+      established: req.body?.established,
+      meta_title: req.body?.meta_title,
+      meta_description: req.body?.meta_description,
+      meta_keyword: req.body?.meta_keyword,
+      address: req.body?.address,
+      map: req.body?.map,
       icon: icons,
       logo: logos,
       banner_image: bannerimages,
-      video_url: req.body.video_url,
-      avg_rating: req.body.avg_rating,
-      info: req.body.info,
-      course_fees: req.body.course_fees,
-      admissions: req.body.admissions,
-      placements: req.body.placements,
-      rankings: req.body.rankings,
-      scholarship: req.body.scholarship,
-      hostel: req.body.hostel,
-      is_associated: req.body.is_associated,
+      video_url: req.body?.video_url,
+      avg_rating: req.body?.avg_rating,
+      info: req.body?.info,
+      course_fees: req.body?.course_fees,
+      admissions: req.body?.admissions,
+      placements: req.body?.placements,
+      rankings: req.body?.rankings,
+      scholarship: req.body?.scholarship,
+      hostel: req.body?.hostel,
+      is_associated: req.body?.is_associated,
     });
 
 
-    if (req.body.streams && CollegeDetails.id) {
-      const stream = JSON.parse(req.body.streams);
+    if (req.body?.streams && CollegeDetails.id) {
+      const stream = JSON.parse(req.body?.streams);
       _.forEach(stream, async function (value) {
 
         await Collegestream.create({
@@ -365,8 +365,8 @@ exports.create = async (req, res) => {
       });
     }
 
-    if (req.body.amenities && CollegeDetails.id) {
-      const stream = JSON.parse(req.body.amenities);
+    if (req.body?.amenities && CollegeDetails.id) {
+      const stream = JSON.parse(req.body?.amenities);
       _.forEach(stream, async function (value) {
 
         await Collegeameneties.create({
@@ -376,8 +376,8 @@ exports.create = async (req, res) => {
       });
     }
 
-    if (req.body.recoginations && CollegeDetails.id) {
-      const stream = JSON.parse(req.body.recoginations);
+    if (req.body?.recoginations && CollegeDetails.id) {
+      const stream = JSON.parse(req.body?.recoginations);
       _.forEach(stream, async function (value) {
 
         await Collegerecoginations.create({
@@ -431,7 +431,7 @@ exports.update = async (req, res) => {
   try {
 
     const existingRecord = await College.findOne({
-      where: { id: req.body.id },
+      where: { id: req.body?.id },
     });
 
     if (!existingRecord) {
@@ -440,34 +440,34 @@ exports.update = async (req, res) => {
         status: 0,
       });
     }
-    console.log(req.body.video_url,"req.body.video_url")
+    console.log(req.body?.video_url,"req.body?.video_url")
     const collegeupdate = {
-      country_id: req.body.country_id || existingRecord.country_id,
-      state_id: req.body.state_id || existingRecord.state_id,
-      city_id: req.body.city_id || existingRecord.city_id,
-      name: req.body.name || existingRecord.name,
-      slug: req.body.slug || existingRecord.slug,
-      type: req.body.type || existingRecord.type,
-      status: req.body.status || existingRecord.status,
-      home_view_status: req.body.home_view_status || existingRecord.home_view_status,
-      college_type: req.body.college_type || existingRecord.college_type,
-      listing_order: req.body.listing_order || existingRecord.listing_order,
-      established: req.body.established || existingRecord.established,
-      meta_title: req.body.meta_title || existingRecord.meta_title,
-      meta_description: req.body.meta_description || existingRecord.meta_description,
-      meta_keyword: req.body.meta_keyword || existingRecord.meta_keyword,
-      address: req.body.address || existingRecord.address,
-      map: req.body.map || existingRecord.map,
-      video_url: req.body.video_url,
-      avg_rating: req.body.avg_rating,
-      info: req.body.info || existingRecord.info,
-      course_fees: req.body.course_fees || existingRecord.course_fees,
-      admissions: req.body.admissions || existingRecord.admissions,
-      placements: req.body.placements || existingRecord.placements,
-      rankings: req.body.rankings || existingRecord.rankings,
-      scholarship: req.body.scholarship || existingRecord.scholarship,
-      hostel: req.body.hostel || existingRecord.hostel,
-      is_associated: req.body.is_associated || existingRecord.is_associated,
+      country_id: req.body?.country_id || existingRecord.country_id,
+      state_id: req.body?.state_id || existingRecord.state_id,
+      city_id: req.body?.city_id || existingRecord.city_id,
+      name: req.body?.name || existingRecord.name,
+      slug: req.body?.slug || existingRecord.slug,
+      type: req.body?.type || existingRecord.type,
+      status: req.body?.status || existingRecord.status,
+      home_view_status: req.body?.home_view_status || existingRecord.home_view_status,
+      college_type: req.body?.college_type || existingRecord.college_type,
+      listing_order: req.body?.listing_order || existingRecord.listing_order,
+      established: req.body?.established || existingRecord.established,
+      meta_title: req.body?.meta_title || existingRecord.meta_title,
+      meta_description: req.body?.meta_description || existingRecord.meta_description,
+      meta_keyword: req.body?.meta_keyword || existingRecord.meta_keyword,
+      address: req.body?.address || existingRecord.address,
+      map: req.body?.map || existingRecord.map,
+      video_url: req.body?.video_url,
+      avg_rating: req.body?.avg_rating,
+      info: req.body?.info,
+      course_fees: req.body?.course_fees,
+      admissions: req.body?.admissions,
+      placements: req.body?.placements ,
+      rankings: req.body?.rankings,
+      scholarship: req.body?.scholarship,
+      hostel: req.body?.hostel,
+      is_associated: req.body?.is_associated || existingRecord.is_associated,
     };
 
     // Check if a new logo is provided
@@ -574,41 +574,41 @@ exports.update = async (req, res) => {
     }
 
     // Update database record
-    await College.update(collegeupdate, { where: { id: req.body.id } });
+    await College.update(collegeupdate, { where: { id: req.body?.id } });
 
 
-    if (req.body.streams && req.body.id) {
+    if (req.body?.streams && req.body?.id) {
       await Collegestream.destroy({
-        where: { college_id: req.body.id },
+        where: { college_id: req.body?.id },
       });
-      const stream = JSON.parse(req.body.streams);
+      const stream = JSON.parse(req.body?.streams);
       _.forEach(stream, async function (value) {
         await Collegestream.create({
-          college_id: req.body.id,
+          college_id: req.body?.id,
           stream_id: value.id,
         });
       });
     }
-    if (req.body.amenities && req.body.id) {
+    if (req.body?.amenities && req.body?.id) {
       await Collegeameneties.destroy({
-        where: { college_id: req.body.id },
+        where: { college_id: req.body?.id },
       });
-      const stream = JSON.parse(req.body.amenities);
+      const stream = JSON.parse(req.body?.amenities);
       _.forEach(stream, async function (value) {
         await Collegeameneties.create({
-          college_id: req.body.id,
+          college_id: req.body?.id,
           amenitie_id: value.id,
         });
       });
     }
-    if (req.body.recoginations && req.body.id) {
+    if (req.body?.recoginations && req.body?.id) {
       await Collegerecoginations.destroy({
-        where: { college_id: req.body.id },
+        where: { college_id: req.body?.id },
       });
-      const stream = JSON.parse(req.body.recoginations);
+      const stream = JSON.parse(req.body?.recoginations);
       _.forEach(stream, async function (value) {
         await Collegerecoginations.create({
-          college_id: req.body.id,
+          college_id: req.body?.id,
           recognition_id: value.id,
         });
       });
@@ -632,14 +632,14 @@ exports.update = async (req, res) => {
 
 exports.updatefaqs = async (req, res) => {
   try {
-    if (req.body.faqs && req.body.id) {
+    if (req.body?.faqs && req.body?.id) {
       await college_faq.destroy({
-        where: { college_id: req.body.id },
+        where: { college_id: req.body?.id },
       });
-      const faqss = JSON.parse(req.body.faqs);
+      const faqss = JSON.parse(req.body?.faqs);
       await _.forEach(faqss, function (value) {
         college_faq.create({
-          college_id: req.body.id,
+          college_id: req.body?.id,
           questions: value.questions ? value.questions : null,
           answers: value.answers ? value.answers : null,
         });
@@ -663,8 +663,8 @@ exports.updatefaqs = async (req, res) => {
 exports.updategallery = async (req, res) => {
   try {
     // Check if old images are provided
-    if (req.body.oldimages) {
-      const oldImages = JSON.parse(req.body.oldimages);
+    if (req.body?.oldimages) {
+      const oldImages = JSON.parse(req.body?.oldimages);
 
       if (Array.isArray(oldImages) && oldImages.length > 0) {
         let finaloldimage = [];
@@ -677,7 +677,7 @@ exports.updategallery = async (req, res) => {
 
         let oldRecordsToDelete = await Collegegallery.findAll({
           where: {
-            college_id: req.body.id,
+            college_id: req.body?.id,
             image: {
               [Op.notIn]: finaloldimage
             }
@@ -689,7 +689,7 @@ exports.updategallery = async (req, res) => {
         if (oldRecordsToDelete.length > 0) {
           let deletedRecords = await Collegegallery.destroy({
             where: {
-              college_id: req.body.id,
+              college_id: req.body?.id,
               image: {
                 [Op.notIn]: finaloldimage
               }
@@ -709,7 +709,7 @@ exports.updategallery = async (req, res) => {
 
         let oldRecordsToDelete = await Collegegallery.findAll({
           where: {
-            college_id: req.body.id,
+            college_id: req.body?.id,
 
           }
         });
@@ -719,7 +719,7 @@ exports.updategallery = async (req, res) => {
         if (oldRecordsToDelete.length > 0) {
           let deletedRecords = await Collegegallery.destroy({
             where: {
-              college_id: req.body.id,
+              college_id: req.body?.id,
             },
           });
           oldRecordsToDelete.map(async (value) => {
@@ -747,7 +747,7 @@ exports.updategallery = async (req, res) => {
 
             // Save the image path to the database
             await Collegegallery.create({
-              college_id: req.body.id,
+              college_id: req.body?.id,
               image: "college_galleries/" + imgname,
             });
           } catch (error) {
