@@ -239,11 +239,8 @@ const RedirecturlSchema = [
         );
       }
     }),
-  checkField('new_url', 200, redirecturl, true),
 
-  body("status_code")
-    .exists({ checkFalsy: true })
-    .withMessage(" status_code is required"),
+
 ];
 
 const RedirecturlSchemaUpdate = [
@@ -281,9 +278,7 @@ const RedirecturlSchemaUpdate = [
 
 
 
-  body("status_code")
-    .exists({ checkFalsy: true })
-    .withMessage(" status_code is required"),
+
 
 ];
 
@@ -3032,8 +3027,10 @@ const globalvalidation = {
   StudentformSchemaUpdate: StudentformSchemaUpdate,
   JobvacanciesSchema: JobvacanciesSchema,
   JobvacanciesSchemaUpdate: JobvacanciesSchemaUpdate,
+
   RedirecturlSchema: RedirecturlSchema,
   RedirecturlSchemaUpdate: RedirecturlSchemaUpdate,
+
   PromopageSchema: PromopageSchema,
   PromopageSchemaUpdate: PromopageSchemaUpdate,
 

@@ -1,5 +1,4 @@
 require("dotenv").config();
-const { where } = require("sequelize");
 const db = require("../../models");
 const path = require('path');
 const sendsearch = require("../../utility/Customsearch");
@@ -53,6 +52,7 @@ const allowed_file_size = 2;
 const blogcategories = db.blog_categories;
 const Collegegallery = db.college_gallery;
 const College_faq = db.college_faqs;
+const Redirect = db.redirecturl;
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -534,56 +534,97 @@ exports.allcourses = async (req, res) => {
 };
 
 
-
 exports.searchbarhome = async (req, res) => {
   try {
     const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
 
-    var column = columnname ? columnname : "id";
-    var order = orderby ? orderby : "ASC";
-    var orderconfig = [column, order];
+    let column = columnname || "id";
+    let order = orderby || "ASC";
+    let orderconfig = [[column, order]]; // Ensuring correct structure
 
     const myArray = column.split(".");
-    if (typeof myArray[1] !== "undefined") {
-      var table = myArray[0];
+    if (myArray.length > 1) {
+      let table = myArray[0];
       column = myArray[1];
-      orderconfig = [table, column, order];
+      orderconfig = [[{ model: table, as: "alias" }, column, order]]; // Ensure aliasing is correct
     }
 
+    const condition = sendsearch.customseacrh(searchtext, searchfrom);
+    const condition2 = sendsearch.customseacrh(searchtext, "exam_title");
+    const condition3 = sendsearch.customseacrh(searchtext, "short_name,name");
+
     let data_array = [{ status: "Published" }];
-    var condition = sendsearch.customseacrh(searchtext, searchfrom);
-    console.log(condition, "condition");
-    condition ? data_array.push(condition) : null;
+    let data_array2 = [{ status: "Published" }];
+    let data_array3 = [{ status: "Published" }];
+
+    if (condition) data_array.push(condition);
+    if (condition2) data_array2.push(condition2);
+    if (condition3) data_array3.push(condition3);
 
     const { limit, offset } = getPagination(page, size);
+
     const collegedata = await college.findAndCountAll({
-      where: data_array,
-      attributes: ["id", "name", "slug"],
-      order: [orderconfig],
+      where: { [Op.and]: data_array },
+      attributes: ["id", "name", "slug","type"],
+      order: orderconfig,
       limit,
       offset
     });
+
     const schooldata = await school.findAndCountAll({
-      where: data_array,
+      where: { [Op.and]: data_array },
       attributes: ["id", "name", "slug"],
-      order: [orderconfig],
+      order: orderconfig,
       limit,
       offset
     });
 
+    const examdata = await exam.findAndCountAll({
+      where: { [Op.and]: data_array2 },
+      attributes: ["id", ["exam_title", "name"], "slug"],
+      order: orderconfig,
+      limit,
+      offset
+    });
+    const coursesdata = await generalcourse.findAndCountAll({
+      where: { [Op.and]: data_array3 },
+      attributes: ["id","name", "slug","short_name"],
+      include: [
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id","slug"],
+        },
+      ],
+      order: orderconfig,
+      limit,
+      offset
+    });
     const responseData = [];
-
     if (collegedata.count > 0) {
       responseData.push({
         type: "collegedata",
-        data: collegedata.rows
+        data: collegedata.rows,
       });
     }
 
     if (schooldata.count > 0) {
       responseData.push({
         type: "schooldata",
-        data: schooldata.rows
+        data: schooldata.rows,
+      });
+    }
+
+    if (examdata.count > 0) {
+      responseData.push({
+        type: "examdata",
+        data: examdata.rows,
+      });
+    }
+    if (coursesdata.count > 0) {
+      responseData.push({
+        type: "coursesdata",
+        data: coursesdata.rows,
       });
     }
 
@@ -594,12 +635,97 @@ exports.searchbarhome = async (req, res) => {
     });
 
   } catch (err) {
+    console.error("Error:", err);
     res.status(500).send({
       status: 0,
-      message: err.message || "Some error occurred while retrieving streams.",
+      message: err.message || "Some error occurred while retrieving data.",
     });
   }
 };
+
+// exports.searchbarhome = async (req, res) => {
+//   try {
+//     const { page, size, searchtext, searchfrom, columnname, orderby } = req.query;
+
+//     var column = columnname ? columnname : "id";
+//     var order = orderby ? orderby : "ASC";
+//     var orderconfig = [column, order];
+
+//     const myArray = column.split(".");
+//     if (typeof myArray[1] !== "undefined") {
+//       var table = myArray[0];
+//       column = myArray[1];
+//       orderconfig = [table, column, order];
+//     }
+
+//     let data_array = [{ status: "Published" }];
+//     let data_array2 = [{ status: "Published" }];
+//     var condition = sendsearch.customseacrh(searchtext, searchfrom);
+//     var condition2 = sendsearch.customseacrh(searchtext, "exam_title");
+
+//     condition ? data_array.push(condition) : null;
+//     condition2 ? data_array2.push(condition2) : null;
+
+//     const { limit, offset } = getPagination(page, size);
+//     const collegedata = await college.findAndCountAll({
+//       where: data_array,
+//       attributes: ["id", "name", "slug"],
+//       order: [orderconfig],
+//       limit,
+//       offset
+//     });
+//     const schooldata = await school.findAndCountAll({
+//       where: data_array,
+//       attributes: ["id", "name", "slug"],
+//       order: [orderconfig],
+//       limit,
+//       offset
+//     });
+
+//     const examdata = await exam.findAndCountAll({
+//       where: data_array2,
+//       attributes: ["id", "exam_title", "slug"],
+//       order: [orderconfig],
+//       limit,
+//       offset
+//     });
+//     console.log(examdata);
+
+//     const responseData = [];
+
+//     if (collegedata.count > 0) {
+//       responseData.push({
+//         type: "collegedata",
+//         data: collegedata.rows
+//       });
+//     }
+
+//     if (schooldata.count > 0) {
+//       responseData.push({
+//         type: "schooldata",
+//         data: schooldata.rows
+//       });
+//     }
+//     if (examdata.count > 0) {
+//       responseData.push({
+//         type: "examdata",
+//         data: examdata.rows
+//       });
+//     }
+
+//     res.status(200).send({
+//       status: 1,
+//       message: "success",
+//       data: responseData,
+//     });
+
+//   } catch (err) {
+//     res.status(500).send({
+//       status: 0,
+//       message: err.message || "Some error occurred while retrieving streams.",
+//     });
+//   }
+// };
 
 exports.enquiry = async (req, res) => {
   try {
@@ -4502,7 +4628,7 @@ exports.xmlgenerator = async (req, res) => {
   const { limit, offset } = getPagination(page, 5000);
   const baseUrl = "https://learntechww.com"; // Base URL for the sitemap
 
-  const buildSitemap = (items, type,priority) => {
+  const buildSitemap = (items, type, priority) => {
     return items
       .map(
         (item) => `
@@ -4515,7 +4641,7 @@ exports.xmlgenerator = async (req, res) => {
       )
       .join('');
   };
-  const buildSitemapgeneral = (items, type,priority) => {
+  const buildSitemapgeneral = (items, type, priority) => {
     return items
       .map(
         (item) => `
@@ -4529,7 +4655,7 @@ exports.xmlgenerator = async (req, res) => {
       .join('');
   };
 
-  const buildSitemapcollegecourse = (items, type,priority) => {
+  const buildSitemapcollegecourse = (items, type, priority) => {
     return items
       .map(
         (item) => `
@@ -4562,7 +4688,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "university",0.9) : "";
+      return items.length > 0 ? buildSitemap(items, "university", 0.9) : "";
     };
 
     const fetchDataclg = async () => {
@@ -4575,7 +4701,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "college",0.9) : "";
+      return items.length > 0 ? buildSitemap(items, "college", 0.9) : "";
     };
     const fetchDataschools = async () => {
       const items = await school.findAll({
@@ -4587,7 +4713,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "school",0.9) : "";
+      return items.length > 0 ? buildSitemap(items, "school", 0.9) : "";
     };
     const fetchDatascholarships = async () => {
       const items = await scholarships.findAll({
@@ -4599,7 +4725,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "scholarship",0.7) : "";
+      return items.length > 0 ? buildSitemap(items, "scholarship", 0.7) : "";
     };
 
     const fetchDataboards = async () => {
@@ -4612,7 +4738,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "board",0.7) : "";
+      return items.length > 0 ? buildSitemap(items, "board", 0.7) : "";
     };
 
     const exams = async () => {
@@ -4625,7 +4751,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "exam",0.7) : "";
+      return items.length > 0 ? buildSitemap(items, "exam", 0.7) : "";
     };
 
     const blogs = async () => {
@@ -4638,7 +4764,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "blog",0.7) : "";
+      return items.length > 0 ? buildSitemap(items, "blog", 0.7) : "";
     };
     const news = async () => {
       const items = await news_and_events.findAll({
@@ -4650,7 +4776,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "news",0.7) : "";
+      return items.length > 0 ? buildSitemap(items, "news", 0.7) : "";
     };
 
     const streamcourses = async () => {
@@ -4662,7 +4788,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemap(items, "course",0.7) : "";
+      return items.length > 0 ? buildSitemap(items, "course", 0.7) : "";
     };
 
     const generalcourses = async () => {
@@ -4682,7 +4808,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemapgeneral(items, "course",0.7) : "";
+      return items.length > 0 ? buildSitemapgeneral(items, "course", 0.7) : "";
     };
 
     const collegecourses = async () => {
@@ -4702,7 +4828,7 @@ exports.xmlgenerator = async (req, res) => {
         subQuery: false,
       });
 
-      return items.length > 0 ? buildSitemapcollegecourse(items, "college",0.7) : "";
+      return items.length > 0 ? buildSitemapcollegecourse(items, "college", 0.7) : "";
     };
 
 
@@ -4761,3 +4887,17 @@ ${data}
   }
 };
 
+exports.redirecturls = async (req, res) => {
+  try {
+    // Fetch only the required fields: id, old_url, and new_url
+    const redirections = await Redirect.findAll({
+      attributes: ['id', 'old_url', 'new_url'], // Specify the columns to fetch
+    });
+
+    // Send the mappings as a JSON response
+    res.status(200).json(redirections);
+  } catch (error) {
+    console.error('Error fetching redirection mappings:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
