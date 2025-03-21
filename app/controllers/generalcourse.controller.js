@@ -120,8 +120,8 @@ exports.create = async (req, res) => {
       career_opportunities: req.body.career_opportunities,
       top_college: req.body.top_college,
       logo: logos,
-      is_trending: req.body.is_trending,
-      is_top_rank: req.body.is_top_rank,
+      is_trending: req.body.is_trending ? 1 : 0,
+      is_top_rank: req.body.is_top_rank ? 1 : 0,
       status: req.body.status,
       banner: banners,
     });
