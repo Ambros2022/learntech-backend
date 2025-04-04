@@ -2,59 +2,70 @@ const express = require("express");
 const cors = require("cors");
 const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
-const path = require('path');
+const path = require('path'); // Import path module
+const app = express();
 const http = require("http");
 
-const app = express();
-const portnumber = 5000;
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://preprod.keralastudy.com');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+app.use(cors());
 
-// ✅ CORS configuration
-const allowedOrigins = [
-  "http://preprod.keralastudy.com",
-  "https://learntechww.com",
-  "http://localhost:3000"
-];
+// var corsOptions = {
+//   origin: [
+//     "http://localhost:3000",
+//     "http://preprod.keralastudy.com",
+//   ]
+// };
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+// app.use(cors(corsOptions));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
 
-// ✅ Body parsers
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
-// ✅ File upload middleware
-app.use(fileUpload({
-  limits: { fileSize: 100 * 1024 * 1024 },
-  createParentPath: true,
-}));
+// app.use(fileUpload({
+//   limits: { fileSize: 50 * 1024 * 1024 },
+//   createParentPath: true
+// }));
 
-// ✅ Static file serving
-app.use('/', express.static(path.join(__dirname, '/storage')));
-app.use('/storage', express.static(path.join(__dirname, '/storage')));
+// File Upload Middleware
+app.use(
+  fileUpload({
+    limits: { fileSize: 100 * 1024 * 1024 },
+    createParentPath: true,
+  })
+);
 
-// ✅ Routes
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/', express.static(__dirname + '/storage'));
+app.use('/storage', express.static(__dirname + '/storage'));
+
 require('./app/routes/web.routes')(app);
 require('./app/routes/auth.routes')(app);
 require('./app/routes/user.routes')(app);
 require('./app/routes/admin.routes')(app);
 
-// ✅ Test route
+
 app.get("/api", (req, res) => {
-  res.json({ message: "Welcome to Learntechww.com v1.2811" });
+ res.json({ message: "Welcome to Learntechww.com v1.2811" });
 });
 
-// ✅ Start server
-const httpServer = http.createServer(app);
-httpServer.listen(portnumber, () => {
-  console.log("✅ Server running on port:", portnumber);
+// Start the HTTP server
+let portnumber = 5000;
+
+var httpServer = http.createServer(app);
+httpServer.listen(portnumber);
+
+httpServer.on("listening", function () {
+  console.log("ok, server is running on port: " + portnumber);
 });
+
+
+
