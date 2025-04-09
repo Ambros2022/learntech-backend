@@ -39,12 +39,18 @@ const getPagingData = (data, page, limit) => {
 };
 
 exports.create = async (req, res) => {
+  let general_course_id = req.body?.general_course_id;
+
+// Convert empty string or 'null' to actual null
+if (!general_course_id || general_course_id === 'null') {
+  general_course_id = null;
+}
   try {
 
     {
       const coursesDetails = await courses.create({
         college_id: req.body.college_id,
-        general_course_id: req.body.general_course_id,
+        general_course_id: general_course_id  ,
         course_type: req.body.course_type,
         slug: req.body.slug,
         meta_title: req.body.meta_title,
@@ -55,6 +61,7 @@ exports.create = async (req, res) => {
         fee_structure: req.body.fee_structure,
         status: req.body.status,
         course_short_name: req.body.course_short_name,
+        title: req.body.title,
       });
 
       res.status(200).send({
@@ -74,12 +81,19 @@ exports.create = async (req, res) => {
 
 exports.update = (req, res) => {
   const id = req.body.id;
+  let general_course_id = req.body?.general_course_id;
+
+// Convert empty string or 'null' to actual null
+if (!general_course_id || general_course_id === 'null') {
+  general_course_id = null;
+}
+
 
   try {
 
     courses.update({
       college_id: req.body.college_id,
-      general_course_id: req.body.general_course_id,
+      general_course_id: general_course_id ,
       course_type: req.body.course_type,
       slug: req.body.slug,
       meta_title: req.body.meta_title,
@@ -90,6 +104,7 @@ exports.update = (req, res) => {
       fee_structure: req.body.fee_structure,
       status: req.body.status,
       course_short_name: req.body.course_short_name,
+      title: req.body.title,
     }, {
       where: { id: req.body.id }
     });

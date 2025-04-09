@@ -643,7 +643,7 @@ const coursesSchema = [
     .withMessage("Slug should be less than 150 character"),
 
   ...validateIdRequired_id(college, "college_id"),
-  ...validateIdRequired_id(generalcourse, "general_course_id"),
+  // ...validateIdRequired_id(generalcourse, "general_course_id"),
 ];
 
 const coursesUpdateSchema = [
@@ -656,7 +656,7 @@ const coursesUpdateSchema = [
     .withMessage("Slug should be less than 150 character"),
 
   ...validateIdRequired_id(college, "college_id"),
-  ...validateIdRequired_id(generalcourse, "general_course_id"),
+  // ...validateIdRequired_id(generalcourse, "general_course_id"),
 ];
 
 const abroadpageSchema = [

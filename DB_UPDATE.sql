@@ -888,3 +888,5 @@ CREATE TABLE board_schools (
 
  ALTER TABLE `exam_streams`
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+ALTER TABLE `courses` ADD `title` VARCHAR(200) NULL DEFAULT NULL AFTER `course_short_name`;
