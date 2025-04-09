@@ -36,6 +36,9 @@ module.exports = (sequelize, Sequelize) => {
     course_short_name: {
       type: Sequelize.STRING
     },
+    title: {
+      type: Sequelize.STRING
+    },
   }
     ,
     {
