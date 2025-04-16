@@ -14,24 +14,8 @@ app.use((req, res, next) => {
 });
 app.use(cors());
 
-// var corsOptions = {
-//   origin: [
-//     "http://localhost:3000",
-//     "http://preprod.keralastudy.com",
-//   ]
-// };
-
-// app.use(cors(corsOptions));
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
-
-// app.use(fileUpload({
-//   limits: { fileSize: 50 * 1024 * 1024 },
-//   createParentPath: true
-// }));
 
 // File Upload Middleware
 app.use(
@@ -66,4 +50,6 @@ httpServer.listen(portnumber);
 httpServer.on("listening", function () {
   console.log("ok, server is running on port: " + portnumber);
 });
+
+
 
