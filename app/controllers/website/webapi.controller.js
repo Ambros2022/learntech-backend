@@ -1,5 +1,6 @@
 require("dotenv").config();
 const db = require("../../models");
+const axios = require("axios");
 const path = require('path');
 const sendsearch = require("../../utility/Customsearch");
 const fileTypes = require("../../config/fileTypes");
@@ -565,7 +566,7 @@ exports.searchbarhome = async (req, res) => {
 
     const collegedata = await college.findAndCountAll({
       where: { [Op.and]: data_array },
-      attributes: ["id", "name", "slug","type"],
+      attributes: ["id", "name", "slug", "type"],
       order: orderconfig,
       limit,
       offset
@@ -588,12 +589,12 @@ exports.searchbarhome = async (req, res) => {
     });
     const coursesdata = await generalcourse.findAndCountAll({
       where: { [Op.and]: data_array3 },
-      attributes: ["id","name", "slug","short_name"],
+      attributes: ["id", "name", "slug", "short_name"],
       include: [
         {
           required: false,
           association: "streams",
-          attributes: ["id","slug"],
+          attributes: ["id", "slug"],
         },
       ],
       order: orderconfig,
@@ -726,14 +727,70 @@ exports.searchbarhome = async (req, res) => {
 //     });
 //   }
 // };
+async function doPostRequest(leadData) {
+
+
+  let dataobj = [
+    {
+      Attribute: "FirstName",
+      Value: leadData.name,
+    },
+    {
+      Attribute: "Phone",
+      Value: leadData.contact_number,
+    },
+    {
+      Attribute: "EmailAddress",
+      Value: leadData.email,
+    },
+    {
+      Attribute: "mx_State",
+      Value: leadData.location,
+    },
+    {
+      Attribute: "mx_Interested_Course",
+      Value: leadData.course_in_mind,
+    },
+    {
+      Attribute: "Source",
+      Value: leadData.Source,
+    },
+    {
+      Attribute: "SourceCampaign",
+      Value: leadData.SourceCampaign,
+    },
+    {
+      Attribute: "Notes",
+      Value: leadData.description,
+    },
+  ];
+  // console.log(dataobj,"doPostRequest");
+
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  const params = {
+    accessKey: process.env.CRM_Access_Key,
+    secretKey: process.env.CRM_Secret_Key,
+  };
+  const captureUrl =
+    "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
+
+  try {
+    let response = await axios.post(captureUrl, dataobj, {
+      headers: headers,
+      params: params,
+    });
+    console.log(response,"doPostRequest");
+  } catch (error) {
+    console.error("Error making API request:", error);
+  }
+}
 
 exports.enquiry = async (req, res) => {
   try {
     // Validate input data
     const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url } = req.body;
-
-
-
     // Create enquiry
     const enquiryDetails = await enquiry.create({
       name,
@@ -746,6 +803,23 @@ exports.enquiry = async (req, res) => {
       description: description || null,
       current_url: current_url || null,
     });
+
+    const leadData = {
+      name: name || null,
+      email: email || null,
+      contact_number: contact_number || null,
+      location: location || null,
+      course_in_mind: course_in_mind || null,
+      college_name: college_name || null,
+      school_name: school_name || null,
+      description: description || null,
+      current_url: current_url || null,
+      Source: "Website",
+      SourceCampaign: "Learntech Website",
+    };
+    
+
+    doPostRequest(leadData);
 
     res.status(200).send({
       status: 1,
@@ -1488,7 +1562,7 @@ exports.coursefindone = (req, res) => {
   courses
     .findOne({
       where: whereClause,
-      attributes: ['id', 'slug','course_short_name','title','meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure'],
+      attributes: ['id', 'slug', 'course_short_name', 'title', 'meta_title', 'meta_description', 'meta_keywords', 'course_details', 'eligibility', 'fee_structure'],
       include: [
         {
           required: false,
