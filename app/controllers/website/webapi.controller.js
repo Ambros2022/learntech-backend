@@ -752,6 +752,10 @@ async function doPostRequest(leadData) {
       Value: leadData.course_in_mind,
     },
     {
+      Attribute: "mx_Interested_Campus",
+      Value: leadData.college_name ? leadData.college_name : "  ",
+    },
+    {
       Attribute: "Source",
       Value: leadData.Source,
     },
