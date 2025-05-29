@@ -95,6 +95,9 @@ module.exports = function (app) {
   app.post(
     "/api/website/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.enquiry
   );
+  app.post(
+    "/api/website/landingpage/enquiry", globalvalidation.enquirySchema, [globalvalidation.Validate], webapicontroller.LandingPageEnquiry
+  );
 
 
 
