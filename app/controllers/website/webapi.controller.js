@@ -785,12 +785,78 @@ async function doPostRequest(leadData) {
       headers: headers,
       params: params,
     });
-    console.log(response,"doPostRequest");
+    console.log(response, "doPostRequest");
   } catch (error) {
     console.error("Error making API request:", error);
   }
 }
+async function LandingPagedoPostRequest(leadData) {
 
+
+  let dataobj = [
+    {
+      Attribute: "FirstName",
+      Value: leadData.name,
+    },
+    {
+      Attribute: "Phone",
+      Value: leadData.contact_number,
+    },
+    {
+      Attribute: "EmailAddress",
+      Value: leadData.email,
+    },
+    {
+      Attribute: "mx_State",
+      Value: leadData.location,
+    },
+    {
+      Attribute: "mx_Interested_Course",
+      Value: leadData.course_in_mind,
+    },
+    {
+      Attribute: "mx_Interested_College",
+      Value: leadData.college_name ? leadData.college_name : "  ",
+    },
+    {
+      Attribute: "mx_Neet_Score",
+      Value: leadData?.neetrank ? leadData?.neetrank : "  ",
+    },
+    {
+      Attribute: "Source",
+      Value: leadData.Source,
+    },
+    {
+      Attribute: "SourceCampaign",
+      Value: leadData.SourceCampaign,
+    },
+    {
+      Attribute: "Notes",
+      Value: leadData.description,
+    },
+  ];
+  // console.log(dataobj,"doPostRequest");
+
+  const headers = {
+    "Content-Type": "application/json",
+  };
+  const params = {
+    accessKey: process.env.CRM_Access_Key,
+    secretKey: process.env.CRM_Secret_Key,
+  };
+  const captureUrl =
+    "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
+
+  try {
+    let response = await axios.post(captureUrl, dataobj, {
+      headers: headers,
+      params: params,
+    });
+
+  } catch (error) {
+    console.error("Error making API request:", error);
+  }
+}
 exports.enquiry = async (req, res) => {
   try {
     // Validate input data
@@ -821,9 +887,58 @@ exports.enquiry = async (req, res) => {
       Source: "Website",
       SourceCampaign: "Learntech Website",
     };
-    
+
 
     doPostRequest(leadData);
+
+    res.status(200).send({
+      status: 1,
+      message: "Enquiry created successfully",
+      enquiryDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      status: 0,
+      message: "An error occurred while processing your request",
+      error: error.message,
+    });
+  };
+};
+exports.LandingPageEnquiry = async (req, res) => {
+  try {
+    // Validate input data
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url, SourceCampaign, neetrank } = req.body;
+    // Create enquiry
+    const enquiryDetails = await enquiry.create({
+      name,
+      email,
+      contact_number: contact_number || null,
+      location: location || null,
+      course_in_mind: course_in_mind || null,
+      college_name: college_name || null,
+      school_name: school_name || null,
+      description: description || null,
+      current_url: current_url || null,
+    });
+
+    const leadData = {
+      name: name || null,
+      email: email || null,
+      contact_number: contact_number || null,
+      location: location || null,
+      course_in_mind: course_in_mind || null,
+      college_name: college_name || null,
+      school_name: school_name || null,
+      description: description || null,
+      current_url: current_url || null,
+      neetrank: neetrank || null,
+      Source: "Landing Page",
+      SourceCampaign: SourceCampaign || "Landing Page Campaign",
+    };
+
+
+    LandingPagedoPostRequest(leadData);
 
     res.status(200).send({
       status: 1,
