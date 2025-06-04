@@ -4721,7 +4721,7 @@ exports.xmlgenerator = async (req, res) => {
       .map(
         (item) => `
   <url>
-    <loc>${baseUrl}/${type}/${item.id}/${item.slug}</loc>
+    <loc>${baseUrl}/${type}/${item.id}/${item.slug}/</loc>
     <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
     <changefreq>always</changefreq>
     <priority>${priority}</priority>
@@ -4734,7 +4734,7 @@ exports.xmlgenerator = async (req, res) => {
       .map(
         (item) => `
   <url>
-    <loc>${baseUrl}/${type}/${item?.streams.id}/${item?.streams.slug}/${item.slug}</loc>
+    <loc>${baseUrl}/${type}/${item?.streams.id}/${item?.streams.slug}/${item.slug}/</loc>
     <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
     <changefreq>always</changefreq>
     <priority>${priority}</priority>
@@ -4748,7 +4748,7 @@ exports.xmlgenerator = async (req, res) => {
       .map(
         (item) => `
   <url>
-    <loc>${baseUrl}/${type}/${item?.college?.id}/${item?.college?.slug}/${item.slug}</loc>
+    <loc>${baseUrl}/${type}/${item?.college?.id}/${item?.college?.slug}/${item.slug}/</loc>
     <lastmod>${new Date(item.updated_at).toISOString()}</lastmod>
      <changefreq>always</changefreq>
     <priority>${priority}</priority>
