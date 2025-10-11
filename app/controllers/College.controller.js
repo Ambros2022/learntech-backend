@@ -1,7 +1,7 @@
 const db = require("../models");
 const path = require("path");
 const College = db.college;
-const Collegestream = db.college_stream;
+const Collegestreams = db.college_stream;
 const Collegeameneties = db.college_amenities;
 const Collegerecoginations = db.college_recognition;
 const Collegegallery = db.college_gallery;
@@ -10,8 +10,8 @@ const _ = require("lodash");
 const Op = db.Sequelize.Op;
 const sendsearch = require("../utility/Customsearch");
 const fileTypes = require("../config/fileTypes");
-// Function to remove a file
 const fs = require("fs").promises;
+
 async function removeFile(filePath) {
   try {
     await fs.unlink(filePath);
@@ -21,6 +21,108 @@ async function removeFile(filePath) {
     }
   }
 }
+
+exports.findOne = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    // Step 1: Fetch the base college + small lookup tables only
+    const college = await College.findByPk(id, {
+      attributes: {
+        exclude: ["deleted_at"],
+      },
+      include: [
+        { association: "country", attributes: ["id", "name"], required: false },
+        { association: "state", attributes: ["id", "name"], required: false },
+        { association: "citys", attributes: ["id", "name"], required: false },
+      ],
+    });
+
+    if (!college) {
+      return res.status(404).send({
+        status: 0,
+        message: `Cannot find college with id=${id}.`,
+      });
+    }
+
+    // Step 2: Load related data separately (still same structure)
+    const [
+      collegestreams,
+      collegeamenities,
+      collegerecognitions,
+      collegefaqs,
+      clggallery,
+    ] = await Promise.all([
+      // ✅ Fixed variable name
+      Collegestreams.findAll({
+        where: { college_id: id },
+        attributes: ["id", "stream_id"],
+        include: [{ association: "clgstreams", attributes: ["id", "name"] }],
+      }),
+
+      // ✅ Fixed variable name
+      Collegeameneties.findAll({
+        where: { college_id: id },
+        attributes: ["id", "amenitie_id"],
+        include: [
+          {
+            association: "clgamenities",
+            attributes: ["id", "amenities_name"],
+          },
+        ],
+      }),
+
+      // ✅ Fixed variable name
+      Collegerecoginations.findAll({
+        where: { college_id: id },
+        attributes: ["id", "recognition_id"],
+        include: [
+          {
+            association: "clgrecognitions",
+            attributes: ["id", "recognition_approval_name"],
+          },
+        ],
+      }),
+
+      // ✅ Fixed variable name
+      college_faq.findAll({
+        where: { college_id: id },
+        attributes: ["id", "questions", "answers"],
+        order: [["id", "ASC"]],
+      }),
+
+      // ✅ Fixed variable name
+      Collegegallery.findAll({
+        where: { college_id: id },
+        attributes: ["id", "image"],
+        order: [["id", "ASC"]],
+      }),
+    ]);
+
+    // Step 3: Combine manually (same JSON structure)
+    const data = {
+      ...college.toJSON(),
+      collegestreams,
+      collegeamenities,
+      collegerecognitions,
+      collegefaqs,
+      clggallery,
+    };
+
+    // Step 4: Respond
+    return res.status(200).send({
+      status: 1,
+      message: "successfully retrieved",
+      data,
+    });
+  } catch (err) {
+    console.error("Error retrieving college:", err);
+    return res.status(500).send({
+      status: 0,
+      message: "Error retrieving college: " + err.message,
+    });
+  }
+};
 
 // Array of allowed files
 const array_of_allowed_file_types = fileTypes.Imageformat;
@@ -137,95 +239,6 @@ exports.findAll = async (req, res) => {
     });
 };
 
-exports.findOne = (req, res) => {
-  const id = req.params.id;
-  College.findByPk(id, {
-    include: [
-
-
-      {
-        required: false,
-        association: "country",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "state",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "citys",
-        attributes: ["id", "name"],
-      },
-      {
-        required: false,
-        association: "collegestreams",
-        attributes: ["id", "stream_id"],
-        include: [
-          {
-            association: "clgstreams",
-            attributes: ["id", "name"],
-          },
-        ],
-      },
-      {
-        required: false,
-        association: "collegeamenities",
-        attributes: ["id", "amenitie_id"],
-        include: [
-          {
-            association: "clgamenities",
-            attributes: ["id", "amenities_name"],
-          },
-        ],
-      },
-      {
-        required: false,
-        association: "collegerecognitions",
-        attributes: ["id", "recognition_id"],
-        include: [
-          {
-            association: "clgrecognitions",
-            attributes: ["id", "recognition_approval_name"],
-          },
-        ],
-      },
-      {
-        required: false,
-        association: "collegefaqs",
-        attributes: ["id", "questions", "answers"],
-      },
-      {
-        required: false,
-        association: "clggallery",
-        attributes: ["id", "image"],
-      },
-
-    ],
-    // ],
-  })
-    .then((data) => {
-      if (data) {
-        res.status(200).send({
-          status: 1,
-          message: "successfully retrieved",
-          data: data,
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `Cannot find colleges with id=${id}.`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Error retrieving colleges with id=" + id,
-      });
-    });
-};
 
 exports.create = async (req, res) => {
   try {
@@ -358,7 +371,7 @@ exports.create = async (req, res) => {
       const stream = JSON.parse(req.body?.streams);
       _.forEach(stream, async function (value) {
 
-        await Collegestream.create({
+        await Collegestreams.create({
           stream_id: value.id,
           college_id: CollegeDetails.id,
         });
@@ -578,12 +591,12 @@ exports.update = async (req, res) => {
 
 
     if (req.body?.streams && req.body?.id) {
-      await Collegestream.destroy({
+      await Collegestreams.destroy({
         where: { college_id: req.body?.id },
       });
       const stream = JSON.parse(req.body?.streams);
       _.forEach(stream, async function (value) {
-        await Collegestream.create({
+        await   Collegestreams.create({
           college_id: req.body?.id,
           stream_id: value.id,
         });
