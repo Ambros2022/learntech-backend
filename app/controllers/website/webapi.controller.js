@@ -2398,6 +2398,16 @@ exports.blogfindone = (req, res) => {
   blog
     .findByPk(id, {
       attributes: ['id', 'name', 'slug', 'banner_image', 'meta_title', 'meta_description', 'created_at', 'overview'],
+      include: [
+   
+        {
+          required: false,
+          association: "blogfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
+
+
+      ],
 
     })
     .then((data) => {

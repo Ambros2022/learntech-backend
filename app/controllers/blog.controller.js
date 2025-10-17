@@ -3,6 +3,7 @@ const path = require("path");
 const blog = db.blog;
 const college_groups = db.college_groups;
 const sendsearch = require("../utility/Customsearch");
+const blogfaq = db.blog_faq;
 // const { college_groups } = require("../models");
 
 // Function to remove a file
@@ -263,10 +264,15 @@ exports.findOne = (req, res) => {
           association: "blogcategories",
           attributes: ["id", "name"],
         },
+        {
+          required: false,
+          association: "blogfaqs",
+          attributes: ["id", "questions", "answers"],
+        },
 
 
       ],
-      subQuery: false,
+      subQuery: true,
     })
 
     .then((data) => {
@@ -318,4 +324,33 @@ exports.delete = (req, res) => {
         message: "Could not delete Stream with id=" + id,
       });
     });
+};
+
+exports.updatefaqs = async (req, res) => {
+  try {
+    if (req.body.faqs && req.body.id) {
+      await blogfaq.destroy({ where: { blog_id: req.body.id } });
+      const faqss = JSON.parse(req.body.faqs);
+
+      for (const value of faqss) {
+        await blogfaq.create({
+          blog_id: req.body.id,
+          questions: value.questions || null,
+          answers: value.answers || null,
+        });
+      }
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: "Data saved successfully",
+    });
+  } catch (error) {
+    console.error("FAQ update error:", error);
+    return res.status(400).send({
+      message: "Unable to update data",
+      errors: error,
+      status: 0,
+    });
+  }
 };
