@@ -1048,6 +1048,12 @@ module.exports = function (app) {
     [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
     blogcontroller.update
   );
+  
+    app.post(
+    "/api/admin/blog/updatefaq",
+    [authJwt.verifyToken, authJwt.isAdmin, globalvalidation.Validate],
+    blogcontroller.updatefaqs
+  );
 
 
   /** exam  route  End*/

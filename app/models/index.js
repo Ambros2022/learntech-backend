@@ -97,7 +97,7 @@ db.college_testimonials = require("./college_testimonial.model.js")(sequelize, S
 db.stream_testimonials = require("./stream_testimonial.model.js")(sequelize, Sequelize);
 db.general_course_testimonials = require("./general_course_testimonial.model.js")(sequelize, Sequelize);
 db.boardschools = require("./boardschools.model.js")(sequelize, Sequelize);
-
+db.blog_faq = require("../models/blog_faq.model.js")(sequelize, Sequelize);
 
 
 
@@ -1059,6 +1059,12 @@ db.course_modes.belongsTo(db.modes, {
 db.blog.belongsTo(db.blog_categories, {
   foreignKey: "category_id",
   as: "blogcategories",
+});
+
+db.blog.hasMany(db.blog_faq, { as: "blogfaqs", foreignKey: "blog_id" });
+db.blog_faq.belongsTo(db.blog, {
+  foreignKey: "blog_id",
+  as: "blogfaqs",
 });
 
 // db.author.hasMany(db.blog, { as: "author" });
