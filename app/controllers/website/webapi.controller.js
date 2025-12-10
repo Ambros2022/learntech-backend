@@ -908,7 +908,7 @@ exports.enquiry = async (req, res) => {
 exports.LandingPageEnquiry = async (req, res) => {
   try {
     // Validate input data
-    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url, SourceCampaign, neetrank } = req.body;
+    const { name, email, contact_number, location, course_in_mind, college_name, school_name, description, current_url, SourceCampaign, neetrank,Source } = req.body;
     // Create enquiry
     const enquiryDetails = await enquiry.create({
       name,
@@ -933,7 +933,7 @@ exports.LandingPageEnquiry = async (req, res) => {
       description: description || null,
       current_url: current_url || null,
       neetrank: neetrank || null,
-      Source: "Landing Page",
+      Source: Source || "Landing Page",
       SourceCampaign: SourceCampaign || "Landing Page Campaign",
     };
 
