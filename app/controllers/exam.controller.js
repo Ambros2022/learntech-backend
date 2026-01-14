@@ -41,6 +41,12 @@ const getPagingData = (data, page, limit) => {
   return { totalItems, exam, totalPages, currentPage };
 };
 
+const enumOrNull = (value) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value === "string" && value.trim() === "") return null;
+  return value;
+};
+
 exports.create = async (req, res) => {
   try {
     let cover_images = "";
@@ -137,7 +143,7 @@ exports.create = async (req, res) => {
     }
     {
 
-      console.log("req.body.level_of_study", req.body.level_of_study);
+
       const examsDetails = await exam.create({
         stream_id: req.body.stream_id,
         country_id: req.body.country_id,
@@ -164,8 +170,8 @@ exports.create = async (req, res) => {
         cover_image: cover_images,
         promo_banner: promo_banners,
         logo: logos,
-        level_of_study: req.body.level_of_study,
-        types_of_exams: req.body.types_of_exams,
+        level_of_study: enumOrNull(req.body.level_of_study),
+        types_of_exams: enumOrNull(req.body.types_of_exams),
       });
 
 
