@@ -137,7 +137,7 @@ exports.create = async (req, res) => {
     }
     {
 
-
+      console.log("req.body.level_of_study", req.body.level_of_study);
       const examsDetails = await exam.create({
         stream_id: req.body.stream_id,
         country_id: req.body.country_id,
@@ -164,9 +164,10 @@ exports.create = async (req, res) => {
         cover_image: cover_images,
         promo_banner: promo_banners,
         logo: logos,
-        level_of_study: level_of_study,
-        types_of_exams: types_of_exams,
+        level_of_study: req.body.level_of_study,
+        types_of_exams: req.body.types_of_exams,
       });
+
 
       if (req.body.streams && examsDetails.id) {
         const stream = JSON.parse(req.body.streams);
@@ -185,9 +186,11 @@ exports.create = async (req, res) => {
       });
     }
   } catch (error) {
+
+
     return res.status(400).send({
       message: "Unable to insert data",
-      errors: error,
+      errors: error.message || error,
       status: 0,
     });
   }
