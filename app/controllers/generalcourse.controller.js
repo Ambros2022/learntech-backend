@@ -105,7 +105,9 @@ exports.create = async (req, res) => {
 
     const generalcoursesDetails = await generalcourse.create({
       stream_id: req.body.stream_id,
-      sub_streams_id: req.body.sub_streams_id,
+      sub_streams_id: Number.isInteger(Number(req.body.sub_streams_id))
+        ? Number(req.body.sub_streams_id)
+        : null,
       course_type: req.body.course_type,
       name: req.body.name,
       slug: req.body.slug,
