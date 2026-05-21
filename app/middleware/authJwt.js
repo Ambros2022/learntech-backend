@@ -5,7 +5,7 @@ const User = db.users;
 const Admin = db.admin;
 
 verifyToken = (req, res, next) => {
-  let token = req.headers["x-access-token"];  
+  let token = req.headers["x-access-token"] || req.query.token;  
   if (!token) {
     return res.status(403).send({
       message: "No token provided!"
