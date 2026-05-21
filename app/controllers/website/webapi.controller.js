@@ -778,7 +778,7 @@ async function doPostRequest(leadData) {
     secretKey: process.env.CRM_Secret_Key,
   };
   const captureUrl =
-    "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
+    "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.CreateOrUpdate";
 
   try {
     let response = await axios.post(captureUrl, dataobj, {
@@ -845,7 +845,7 @@ async function LandingPagedoPostRequest(leadData) {
     secretKey: process.env.CRM_Secret_Key,
   };
   const captureUrl =
-    "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.Capture";
+    "https://api-in21.leadsquared.com/v2/LeadManagement.svc/Lead.CreateOrUpdate";
 
   try {
     let response = await axios.post(captureUrl, dataobj, {

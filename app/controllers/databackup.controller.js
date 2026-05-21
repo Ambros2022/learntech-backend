@@ -73,21 +73,58 @@ exports.downloadfile = async (req, res) => {
   const filename = filepath;
 
 
-  await res.download(diractoryname + filename, filename, function (err) {
+  res.download(diractoryname + filename, filename, function (err) {
     if (err) {
-      return res.status(500).send({
-        status: 0,
-        message: "Could not download the file. " + err,
-      });
-
-    
+      if (!res.headersSent) {
+        return res.status(500).send({
+          status: 0,
+          message: "Could not download the file. " + err,
+        });
+      } else {
+        console.error("Error during download: ", err);
+      }
     }
-  
   });
  
 };
 
+// Helper to keep only the latest 4 backups and delete older files & records
+const cleanupOldBackups = async () => {
+  try {
+    const backupDir = "./storage/database_backup";
+    // Find all database backup records ordered by created_at DESC
+    const allBackups = await databackup.findAll({
+      order: [["created_at", "DESC"]],
+    });
+
+    const keepLimit = 4;
+    if (allBackups.length > keepLimit) {
+      const toDelete = allBackups.slice(keepLimit);
+      for (const item of toDelete) {
+        // Delete the file on disk if it exists
+        if (item.path) {
+          const fileToDel = path.join(backupDir, item.path);
+          if (fs.existsSync(fileToDel)) {
+            try {
+              fs.unlinkSync(fileToDel);
+            } catch (unlinkError) {
+              console.error(`❌ Failed to delete old backup file: ${fileToDel}`, unlinkError);
+            }
+          }
+        }
+        // Delete the database entry
+        await databackup.destroy({ where: { id: item.id } });
+      }
+      console.log(`🧹 Successfully cleaned up ${toDelete.length} old backups, keeping the latest ${keepLimit}.`);
+    }
+  } catch (error) {
+    console.error("❌ Error during database backup cleanup:", error);
+  }
+};
+
 exports.backuprequest = async (req, res) => {
+  let filename = "";
+  let filePath = "";
   try {
     let date = new Date();
     var day = date.getDate();
@@ -100,14 +137,26 @@ exports.backuprequest = async (req, res) => {
     let datefromat =
       year + "-" + month + "-" + day + "-" + h + "_" + m + "_" + s;
 
-    let filePath = "./storage/database_backup/backup-" + datefromat + ".sql";
+    // Ensure the backup directory exists recursively
+    const backupDir = "./storage/database_backup";
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
 
-    let filename = "backup-" + datefromat + ".sql";
+    filePath = backupDir + "/backup-" + datefromat + ".sql";
+    filename = "backup-" + datefromat + ".sql";
+
     const streamDetails = await databackup.create({
       title: "backup",
       path: filename,
-      status: 1,
+      status: 1, // PROCESSING
     });
+
+    // Configure SSL for remote databases (like DigitalOcean Managed MySQL)
+    const isRemoteDb = process.env.DB_HOST && 
+      !process.env.DB_HOST.includes("localhost") && 
+      !process.env.DB_HOST.includes("127.0.0.1");
+    const useSsl = process.env.DB_SSL === "true" || isRemoteDb;
 
     const result = await mysqldump({
       connection: {
@@ -115,17 +164,21 @@ exports.backuprequest = async (req, res) => {
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
+        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306,
+        ssl: useSsl ? { rejectUnauthorized: false } : undefined,
       },
       dumpToFile: filePath,
     });
 
     if (result) {
       await databackup.update(
-        { status: 2 },
+        { status: 2 }, // COMPLETED
         {
           where: { path: filename },
         }
       );
+      // Clean up old backups (keep latest 4 completed/failed entries)
+      await cleanupOldBackups();
     }
 
     res.status(200).send({
@@ -134,9 +187,25 @@ exports.backuprequest = async (req, res) => {
       data: filePath,
     });
   } catch (error) {
+    console.error("❌ Database backup error:", error);
+    
+    // Update status to 3 (Cancelled / Failed) in case of error
+    if (filename) {
+      try {
+        await databackup.update(
+          { status: 3 },
+          {
+            where: { path: filename },
+          }
+        );
+      } catch (dbError) {
+        console.error("❌ Failed to update backup status to failed:", dbError);
+      }
+    }
+
     return res.status(400).send({
       message: "Unable to databackup request",
-      errors: error,
+      errors: error.message || error,
       status: 0,
     });
   }
