@@ -23,6 +23,8 @@ app.use(
 
          // test / preprod / dev
          "http://localhost:3000",
+         "http://localhost:3001",
+         "https://learntech-admin.vercel.app",
          "http://localhost:5173",
          "https://learntech-git-main-learntech-edu-solutions-pvt-ltds-projects.vercel.app"
       ],
