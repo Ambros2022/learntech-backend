@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 exports.findAllcoursetype = async (req, res) => {
 
 

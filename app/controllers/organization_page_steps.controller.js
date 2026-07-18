@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const organizationpagesteps = db.organization_page_steps;
@@ -83,6 +84,17 @@ exports.create = async (req, res) => {
         });
 
 
+        if (organizationpagestepsDetails.organization_page_id) {
+            try {
+                const parentPage = await db.organization_pages.findByPk(organizationpagestepsDetails.organization_page_id);
+                if (parentPage && parentPage.categories) {
+                    revalidate.revalidatePage(`organization-${parentPage.categories}`);
+                }
+            } catch (err) {
+                console.error("Cache revalidation failed:", err.message);
+            }
+        }
+
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",
@@ -147,31 +159,49 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
-    organizationpagesteps
-        .destroy({
-            where: { id: id },
-        })
-        .then((num) => {
-            if (num == 1) {
-                res.status(200).send({
-                    status: 1,
-                    message: "organization page steps  deleted successfully",
-                });
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `delete organization page steps with id=${id}. Maybe organization page steps was not found!`,
-                });
-            }
-        })
-        .catch((err) => {
-            res.status(500).send({
+    try {
+        const existingRecord = await organizationpagesteps.findByPk(id);
+        if (!existingRecord) {
+            return res.status(404).send({
                 status: 0,
-                message: "Could not delete organization page steps with id=" + id,
+                message: `delete organization page steps with id=${id}. Maybe organization page steps was not found!`,
             });
+        }
+
+        const num = await organizationpagesteps.destroy({
+            where: { id: id },
         });
+
+        if (num == 1) {
+            if (existingRecord.organization_page_id) {
+                try {
+                    const parentPage = await db.organization_pages.findByPk(existingRecord.organization_page_id);
+                    if (parentPage && parentPage.categories) {
+                        revalidate.revalidatePage(`organization-${parentPage.categories}`);
+                    }
+                } catch (err) {
+                    console.error("Cache revalidation failed:", err.message);
+                }
+            }
+
+            res.status(200).send({
+                status: 1,
+                message: "organization page steps  deleted successfully",
+            });
+        } else {
+            res.status(400).send({
+                status: 0,
+                message: `delete organization page steps with id=${id}. Maybe organization page steps was not found!`,
+            });
+        }
+    } catch (err) {
+        res.status(500).send({
+            status: 0,
+            message: "Could not delete organization page steps with id=" + id,
+        });
+    }
 };
 
 exports.findOne = (req, res) => {
@@ -271,6 +301,23 @@ exports.update = async (req, res) => {
         // Update database record
         await organizationpagesteps.update(organizationpagestepsUpdates, { where: { id: req.body.id } });
 
+
+        try {
+            if (existingRecord.organization_page_id) {
+                const parentPage = await db.organization_pages.findByPk(existingRecord.organization_page_id);
+                if (parentPage && parentPage.categories) {
+                    revalidate.revalidatePage(`organization-${parentPage.categories}`);
+                }
+            }
+            if (req.body.organization_page_id && req.body.organization_page_id !== existingRecord.organization_page_id) {
+                const parentPage = await db.organization_pages.findByPk(req.body.organization_page_id);
+                if (parentPage && parentPage.categories) {
+                    revalidate.revalidatePage(`organization-${parentPage.categories}`);
+                }
+            }
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
 
         res.status(200).send({
             status: 1,

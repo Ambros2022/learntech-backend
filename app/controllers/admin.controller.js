@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const CollegeAndUniversity = db.collegeAndUniversity;
 const school = db.school;

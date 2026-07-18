@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const College = db.college;
@@ -400,6 +401,33 @@ exports.create = async (req, res) => {
       });
     }
 
+    let streamIds = [];
+    if (req.body?.streams) {
+      try {
+        const stream = JSON.parse(req.body.streams);
+        streamIds = stream.map(s => s.id);
+      } catch (e) {}
+    }
+
+    try {
+      revalidate.revalidatePage("colleges");
+      revalidate.revalidatePage(`college-${CollegeDetails.id}`);
+    
+      if (CollegeDetails.country_id) {
+        revalidate.revalidatePage(`country-${CollegeDetails.country_id}`);
+      }
+      if (CollegeDetails.is_associated) {
+        revalidate.revalidatePage("associated-colleges");
+      }
+      if (streamIds.length) {
+        for (const streamId of streamIds) {
+          revalidate.revalidatePage(`stream-${streamId}`);
+        }
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -414,30 +442,66 @@ exports.create = async (req, res) => {
   }
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  College.destroy({
-    where: { id: id },
-  })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "College  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete College with id=${id}. Maybe College was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
+  try {
+    const existingRecord = await College.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
         status: 0,
-        message: "Could not delete college with id=" + id,
+        message: `Cannot delete College with id=${id}. Maybe College was not found!`,
       });
+    }
+
+    // Get streams before deleting
+    let streamIds = [];
+    try {
+      const streams = await Collegestreams.findAll({ where: { college_id: id } });
+      streamIds = streams.map(s => s.stream_id);
+    } catch (e) {}
+
+    const num = await College.destroy({
+      where: { id: id },
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("colleges");
+        revalidate.revalidatePage(`college-${id}`);
+        if (existingRecord.slug) {
+          revalidate.revalidatePage(`college-${existingRecord.slug}`);
+        }
+        if (existingRecord.country_id) {
+          revalidate.revalidatePage(`country-${existingRecord.country_id}`);
+        }
+        if (existingRecord.is_associated) {
+          revalidate.revalidatePage("associated-colleges");
+        }
+        if (streamIds.length) {
+          for (const streamId of streamIds) {
+            revalidate.revalidatePage(`stream-${streamId}`);
+          }
+        }
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "College deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete College with id=${id}. Maybe College was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete college with id=" + id,
+    });
+  }
 };
 
 exports.update = async (req, res) => {
@@ -453,6 +517,12 @@ exports.update = async (req, res) => {
         status: 0,
       });
     }
+
+    let oldStreamIds = [];
+    try {
+      const oldStreams = await Collegestreams.findAll({ where: { college_id: existingRecord.id } });
+      oldStreamIds = oldStreams.map(s => s.stream_id);
+    } catch (e) {}
     console.log(req.body?.video_url,"req.body?.video_url")
     const collegeupdate = {
       country_id: req.body?.country_id || existingRecord.country_id,
@@ -628,6 +698,38 @@ exports.update = async (req, res) => {
     }
 
 
+    try {
+      revalidate.revalidatePage("colleges");
+      revalidate.revalidatePage(`college-${existingRecord.id}`);
+      if (existingRecord.country_id) {
+        revalidate.revalidatePage(`country-${existingRecord.country_id}`);
+      }
+      if (req.body?.country_id && req.body.country_id !== existingRecord.country_id) {
+        revalidate.revalidatePage(`country-${req.body.country_id}`);
+      }
+      if (existingRecord.is_associated || req.body?.is_associated) {
+        revalidate.revalidatePage("associated-colleges");
+      }
+
+      let finalStreamIds = [...oldStreamIds];
+      if (req.body?.streams) {
+        try {
+          const parsedNewStreams = JSON.parse(req.body.streams);
+          parsedNewStreams.forEach(s => {
+            if (!finalStreamIds.includes(s.id)) finalStreamIds.push(s.id);
+          });
+        } catch (e) {}
+      }
+
+      if (finalStreamIds.length) {
+        for (const streamId of finalStreamIds) {
+          revalidate.revalidatePage(`stream-${streamId}`);
+        }
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data update Successfully",
@@ -645,6 +747,7 @@ exports.update = async (req, res) => {
 
 exports.updatefaqs = async (req, res) => {
   try {
+    const existingRecord = await College.findByPk(req.body?.id);
     if (req.body?.faqs && req.body?.id) {
       await college_faq.destroy({
         where: { college_id: req.body?.id },
@@ -657,6 +760,15 @@ exports.updatefaqs = async (req, res) => {
           answers: value.answers ? value.answers : null,
         });
       });
+    }
+
+    if (existingRecord) {
+      try {
+        revalidate.revalidatePage(`college-${existingRecord.id}`);
+     
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({
@@ -675,6 +787,7 @@ exports.updatefaqs = async (req, res) => {
 
 exports.updategallery = async (req, res) => {
   try {
+    const existingRecord = await College.findByPk(req.body?.id);
     // Check if old images are provided
     if (req.body?.oldimages) {
       const oldImages = JSON.parse(req.body?.oldimages);
@@ -769,6 +882,15 @@ exports.updategallery = async (req, res) => {
             throw error; // Re-throw the error to trigger the catch block
           }
         }));
+      }
+
+      if (existingRecord) {
+        try {
+          revalidate.revalidatePage(`college-${existingRecord.id}`);
+       
+        } catch (err) {
+          console.error("Cache revalidation failed:", err.message);
+        }
       }
 
       // Send success response

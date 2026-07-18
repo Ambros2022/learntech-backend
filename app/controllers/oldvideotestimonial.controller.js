@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const videotestimonial = db.videotestimonial;
@@ -70,6 +71,31 @@ exports.create = async (req, res) => {
       });
     }
 
+    try {
+      revalidate.revalidatePage("video-testimonials");
+      revalidate.revalidatePage("about-video-testimonials");
+      if (req.body.colleges) {
+        try {
+          const parsed = JSON.parse(req.body.colleges);
+          parsed.forEach(c => revalidate.revalidatePage(`testimonials-college-${c.id}`));
+        } catch (e) {}
+      }
+      if (req.body.streams) {
+        try {
+          const parsed = JSON.parse(req.body.streams);
+          parsed.forEach(s => revalidate.revalidatePage(`testimonials-stream-${s.id}`));
+        } catch (e) {}
+      }
+      if (req.body.courses) {
+        try {
+          const parsed = JSON.parse(req.body.courses);
+          parsed.forEach(c => revalidate.revalidatePage(`testimonials-gc-${c.id}`));
+        } catch (e) {}
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: 'Data Save Successfully',
@@ -137,41 +163,68 @@ exports.findAll = async (req, res) => {
 };
 
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  videotestimonial.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-
-        res.status(200).send({
-          status: 1,
-          message: 'videotestimonial  deleted successfully',
-
-        });
-
-
-      } else {
-
-        res.status(400).send({
-          status: 0,
-          message: `delete  videotestimonial with id=${id}. Maybe videotestimonial was not found!`
-
-        });
-
-
-      }
-    })
-    .catch(err => {
-
-      res.status(500).send({
+  try {
+    const existingRecord = await videotestimonial.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
         status: 0,
-        message: "Could not delete videotestimonial with id=" + id
-
+        message: `delete  videotestimonial with id=${id}. Maybe videotestimonial was not found!`
       });
+    }
 
+    // Get college/stream/course associations before deleting
+    let collegeIds = [];
+    let streamIds = [];
+    let courseIds = [];
+
+    try {
+      const cts = await Collegetestimonial.findAll({ where: { video_id: id } });
+      collegeIds = cts.map(c => c.college_id);
+      const sts = await Streamtestimonial.findAll({ where: { video_id: id } });
+      streamIds = sts.map(s => s.stream_id);
+      const gts = await GeneralCoursetestimonial.findAll({ where: { video_id: id } });
+      courseIds = gts.map(g => g.general_course_id);
+    } catch (e) {}
+
+    const num = await videotestimonial.destroy({
+      where: { id: id }
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("video-testimonials");
+        revalidate.revalidatePage("about-video-testimonials");
+        for (const cid of collegeIds) {
+          revalidate.revalidatePage(`testimonials-college-${cid}`);
+        }
+        for (const sid of streamIds) {
+          revalidate.revalidatePage(`testimonials-stream-${sid}`);
+        }
+        for (const gcid of courseIds) {
+          revalidate.revalidatePage(`testimonials-gc-${gcid}`);
+        }
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: 'videotestimonial  deleted successfully',
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete  videotestimonial with id=${id}. Maybe videotestimonial was not found!`
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete videotestimonial with id=" + id
+    });
+  }
 };
 
 
@@ -229,10 +282,19 @@ exports.findOne = (req, res) => {
 
 
 exports.update = async (req, res) => {
-
-
-
+  const id = req.body.id;
   try {
+    let oldCollegeIds = [];
+    let oldStreamIds = [];
+    let oldCourseIds = [];
+    try {
+      const cts = await Collegetestimonial.findAll({ where: { video_id: id } });
+      oldCollegeIds = cts.map(c => c.college_id);
+      const sts = await Streamtestimonial.findAll({ where: { video_id: id } });
+      oldStreamIds = sts.map(s => s.stream_id);
+      const gts = await GeneralCoursetestimonial.findAll({ where: { video_id: id } });
+      oldCourseIds = gts.map(g => g.general_course_id);
+    } catch (e) {}
 
 
     await videotestimonial.update({
@@ -293,6 +355,51 @@ exports.update = async (req, res) => {
       });
     }
 
+
+    try {
+      revalidate.revalidatePage("video-testimonials");
+      revalidate.revalidatePage("about-video-testimonials");
+
+      let collegeIds = [...oldCollegeIds];
+      if (req.body.colleges) {
+        try {
+          const parsed = JSON.parse(req.body.colleges);
+          parsed.forEach(c => {
+            if (!collegeIds.includes(c.id)) collegeIds.push(c.id);
+          });
+        } catch (e) {}
+      }
+      let streamIds = [...oldStreamIds];
+      if (req.body.streams) {
+        try {
+          const parsed = JSON.parse(req.body.streams);
+          parsed.forEach(s => {
+            if (!streamIds.includes(s.id)) streamIds.push(s.id);
+          });
+        } catch (e) {}
+      }
+      let courseIds = [...oldCourseIds];
+      if (req.body.courses) {
+        try {
+          const parsed = JSON.parse(req.body.courses);
+          parsed.forEach(c => {
+            if (!courseIds.includes(c.id)) courseIds.push(c.id);
+          });
+        } catch (e) {}
+      }
+
+      for (const cid of collegeIds) {
+        revalidate.revalidatePage(`testimonials-college-${cid}`);
+      }
+      for (const sid of streamIds) {
+        revalidate.revalidatePage(`testimonials-stream-${sid}`);
+      }
+      for (const gcid of courseIds) {
+        revalidate.revalidatePage(`testimonials-gc-${gcid}`);
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
 
     res.status(200).send({
       status: 1,

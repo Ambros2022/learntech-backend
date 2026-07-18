@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const blogcategories = db.blog_categories;

@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const sendsearch = require("../utility/Customsearch");
 const recognition = db.recognition;

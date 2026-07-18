@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const scholarlevels = db.scholar_levels;

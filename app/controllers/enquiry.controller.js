@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const enquiry = db.enquiry;
 const _ = require('lodash');

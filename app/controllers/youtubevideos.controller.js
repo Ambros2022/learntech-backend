@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const youtubevideos = db.youtubevideos;
 const sendsearch = require("../utility/Customsearch");
