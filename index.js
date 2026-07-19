@@ -28,7 +28,8 @@ app.use(
          "https://learntech-admin.vercel.app",
          "http://localhost:5173",
          "https://learntech-git-main-learntech-edu-solutions-pvt-ltds-projects.vercel.app",
-         "https://learntech-git-ce0616-learntech-edu-solutions-pvt-ltds-projects.vercel.app"
+         "https://learntech-git-ce0616-learntech-edu-solutions-pvt-ltds-projects.vercel.app",
+         "http://rye71gspaguwtnrsgv4kr4je.143.244.129.196.sslip.io"
       ],
       methods: ["GET", "POST", "PUT", "DELETE"],
       credentials: true
