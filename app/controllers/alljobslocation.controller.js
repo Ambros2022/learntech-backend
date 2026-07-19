@@ -29,6 +29,7 @@ exports.create = async (req, res) => {
 
         });
 
+        try { revalidate.revalidatePage("job-locations"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
@@ -100,6 +101,7 @@ exports.delete = (req, res) => {
     })
         .then(num => {
             if (num == 1) {
+                try { revalidate.revalidatePage("job-locations"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
 
                 res.status(200).send({
                     status: 1,
@@ -135,6 +137,7 @@ exports.update = (req, res) => {
                 {
                     where: { id: req.body.id }
                 });
+        try { revalidate.revalidatePage("job-locations"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully'

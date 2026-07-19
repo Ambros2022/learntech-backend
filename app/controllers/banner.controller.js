@@ -36,6 +36,32 @@ const getPagingData = (data, page, limit) => {
   return { totalItems, banner, totalPages, currentPage };
 };
 
+// Map promo_banner values to frontend cache tags
+const promoBannerCacheTag = (promoBanner) => {
+  const map = {
+    All_courses_page:  "course-page-banner",
+    All_Exam_page:     "exam-page-banner",
+    All_Scholarship_page: "scholarship-banners",
+    Draft:             "banners",
+    All_about_page:    "about-banners",
+    Advertise_page:    "advertise-banners",
+    Services_Page:     "services-banners",
+    Nri_page:          "nri-banners",
+    Home_news_page:    "news-section-banner",
+    All_our_teams:     "our-team-banners",
+  };
+  return map[promoBanner] || null;
+};
+
+const revalidateBanner = (promoBannerValue) => {
+  try {
+    const tag = promoBannerCacheTag(promoBannerValue);
+    if (tag) revalidate.revalidatePage(tag);
+  } catch (err) {
+    console.error("Cache revalidation failed:", err.message);
+  }
+};
+
 exports.create = async (req, res) => {
   try {
     let images = " ";
@@ -83,6 +109,8 @@ exports.create = async (req, res) => {
         promo_banner: req.body.promo_banner ? req.body.promo_banner : "Draft",
         image: images,
       });
+
+      revalidateBanner(bannerDetails.promo_banner);
 
       res.status(200).send({
         status: 1,
@@ -145,31 +173,34 @@ exports.findAll = async (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  banner
-    .destroy({
+  try {
+    const existing = await banner.findByPk(id);
+
+    const num = await banner.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "banner deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `banner with id=${id}  was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete banner with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      if (existing) revalidateBanner(existing.promo_banner);
+
+      res.status(200).send({
+        status: 1,
+        message: "banner deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `banner with id=${id}  was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete banner with id=" + id,
+    });
+  }
 };
 exports.findOne = (req, res) => {
   const id = req.params.id;
@@ -256,6 +287,12 @@ exports.update = async (req, res) => {
 
     // Update database record
     await banner.update(newdata, { where: { id: req.body.id } });
+
+    // Revalidate cache for old promo_banner and new promo_banner (if changed)
+    revalidateBanner(existingRecord.promo_banner);
+    if (newdata.promo_banner !== existingRecord.promo_banner) {
+      revalidateBanner(newdata.promo_banner);
+    }
 
     res.status(200).send({
       status: 1,

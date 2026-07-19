@@ -118,6 +118,13 @@ exports.create = async (req, res) => {
         });
       }
 
+      try {
+        revalidate.revalidatePage("boards");
+        revalidate.revalidatePage(`board-${schoolboardsDetails.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
       res.status(200).send({
         status: 1,
         message: "Data Save Successfully",
@@ -212,31 +219,37 @@ exports.findAll = async (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  schoolboards
-    .destroy({
+  try {
+    const num = await schoolboards.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "schoolboards  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete  schoolboards with id=${id}. Maybe schoolboards was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete schoolboards with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("boards");
+        revalidate.revalidatePage(`board-${id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "schoolboards  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete  schoolboards with id=${id}. Maybe schoolboards was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete schoolboards with id=" + id,
+    });
+  }
 };
 
 exports.findOne = (req, res) => {
@@ -393,6 +406,13 @@ exports.update = async (req, res) => {
         });
       });
     }
+    try {
+      revalidate.revalidatePage("boards");
+      revalidate.revalidatePage(`board-${req.body.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data saved successfully",
@@ -421,6 +441,15 @@ exports.updatefaqs = async (req, res) => {
           answers: value.answers ? value.answers : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage("boards");
+        revalidate.revalidatePage(`board-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({

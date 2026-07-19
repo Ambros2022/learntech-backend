@@ -123,6 +123,14 @@ exports.create = async (req, res) => {
 
 
 
+    try {
+      revalidate.revalidatePage("streams");
+      revalidate.revalidatePage("nav-courses");
+      revalidate.revalidatePage(`stream-${streamDetails.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -189,31 +197,38 @@ exports.findAll = async (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  stream
-    .destroy({
+  try {
+    const num = await stream.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "Stream  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete Sub Stream with id=${id}. Maybe Stream was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete Stream with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("streams");
+        revalidate.revalidatePage("nav-courses");
+        revalidate.revalidatePage(`stream-${id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "Stream  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete Sub Stream with id=${id}. Maybe Stream was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete Stream with id=" + id,
+    });
+  }
 };
 
 exports.findOne = (req, res) => {
@@ -408,6 +423,14 @@ exports.update = async (req, res) => {
     await stream.update(streamUpdates, { where: { id: req.body.id } });
 
 
+    try {
+      revalidate.revalidatePage("streams");
+      revalidate.revalidatePage("nav-courses");
+      revalidate.revalidatePage(`stream-${existingRecord.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -423,8 +446,8 @@ exports.update = async (req, res) => {
 
 
 exports.updatefaqs = async (req, res) => {
-
   try {
+    const existingRecord = await stream.findByPk(req.body.id);
     if (req.body.faqs && req.body.id) {
       await streamfaq.destroy({
         where: { stream_id: req.body.id },
@@ -437,6 +460,16 @@ exports.updatefaqs = async (req, res) => {
           answers: value.answers ? value.answers : null,
         });
       });
+    }
+
+    if (existingRecord) {
+      try {
+        revalidate.revalidatePage("streams");
+        revalidate.revalidatePage("nav-courses");
+        revalidate.revalidatePage(`stream-${existingRecord.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({

@@ -129,7 +129,9 @@ exports.create = async (req, res) => {
       revalidate.revalidatePage("news");
       revalidate.revalidatePage("latest-news");
       revalidate.revalidatePage(`news-${newsandeventsDetails.id}`);
-   
+      if (newsandeventsDetails.category_id == 4) {
+        revalidate.revalidatePage("exam-news-links");
+      }
     } catch (err) {
       console.error("Cache revalidation failed:", err.message);
     }
@@ -253,7 +255,9 @@ exports.update = async (req, res) => {
       revalidate.revalidatePage("news");
       revalidate.revalidatePage("latest-news");
       revalidate.revalidatePage(`news-${existingRecord.id}`);
-
+      if (existingRecord.category_id == 4 || req.body.category_id == 4) {
+        revalidate.revalidatePage("exam-news-links");
+      }
     } catch (err) {
       console.error("Cache revalidation failed:", err.message);
     }
@@ -359,7 +363,9 @@ exports.delete = async (req, res) => {
         revalidate.revalidatePage("news");
         revalidate.revalidatePage("latest-news");
         revalidate.revalidatePage(`news-${id}`);
-     
+        if (existingRecord.category_id == 4) {
+          revalidate.revalidatePage("exam-news-links");
+        }
       } catch (err) {
         console.error("Cache revalidation failed:", err.message);
       }

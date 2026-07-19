@@ -25,6 +25,18 @@ const array_of_allowed_file_types = fileTypes.Imageformat;
 // Allowed file size in mb
 const allowed_file_size = 2;
 
+const revalidateCourse = async (courseId) => {
+  if (!courseId) return;
+  try {
+    const parentCourse = await courses.findByPk(courseId);
+    if (parentCourse && parentCourse.college_id && parentCourse.slug) {
+      revalidate.revalidatePage(`course-${parentCourse.college_id}-${parentCourse.slug}`);
+    }
+  } catch (err) {
+    console.error("Cache revalidation failed:", err.message);
+  }
+};
+
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
   const limit = size ? +size : 10;
@@ -65,6 +77,8 @@ if (!general_course_id || general_course_id === 'null') {
         title: req.body.title,
       });
 
+      await revalidateCourse(coursesDetails.id);
+
       res.status(200).send({
         status: 1,
         message: "Data Save Successfully",
@@ -80,21 +94,21 @@ if (!general_course_id || general_course_id === 'null') {
   }
 };
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.body.id;
   let general_course_id = req.body?.general_course_id;
 
-// Convert empty string or 'null' to actual null
-if (!general_course_id || general_course_id === 'null') {
-  general_course_id = null;
-}
-
+  // Convert empty string or 'null' to actual null
+  if (!general_course_id || general_course_id === 'null') {
+    general_course_id = null;
+  }
 
   try {
+    await revalidateCourse(id);
 
-    courses.update({
+    await courses.update({
       college_id: req.body.college_id,
-      general_course_id: general_course_id ,
+      general_course_id: general_course_id,
       course_type: req.body.course_type,
       slug: req.body.slug,
       meta_title: req.body.meta_title,
@@ -107,9 +121,10 @@ if (!general_course_id || general_course_id === 'null') {
       course_short_name: req.body.course_short_name,
       title: req.body.title,
     }, {
-      where: { id: req.body.id }
+      where: { id: id }
     });
 
+    await revalidateCourse(id);
 
     res.status(200).send({
       status: 1,
@@ -211,31 +226,32 @@ exports.findAll = async (req, res) => {
       });
     });
 };
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  courses
-    .destroy({
+  try {
+    await revalidateCourse(id);
+
+    const num = await courses.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "courses deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `courseswith id=${id}  was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete courses with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      res.status(200).send({
+        status: 1,
+        message: "courses deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `courseswith id=${id}  was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete courses with id=" + id,
+    });
+  }
 };
 exports.findOne = (req, res) => {
   const id = req.params.id;
@@ -351,14 +367,14 @@ exports.modesfindAll = (req, res) => {
     });
 };
 
-exports.updatejob_analysis = (req, res) => {
+exports.updatejob_analysis = async (req, res) => {
   try {
     if (req.body.job && req.body.id) {
-      job.destroy({
+      await job.destroy({
         where: { course_id: req.body.id },
       });
       const jobs = JSON.parse(req.body.job);
-      _.forEach(jobs, function (value) {
+      await _.forEach(jobs, function (value) {
         job.create({
           course_id: req.body.id,
           job_profile: value.job_profile ? value.job_profile : null,
@@ -366,6 +382,10 @@ exports.updatejob_analysis = (req, res) => {
           average_salary: value.average_salary ? value.average_salary : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      await revalidateCourse(req.body.id);
     }
 
     res.status(200).send({
@@ -397,6 +417,10 @@ exports.updateeligibilities = async (req, res) => {
       });
     }
 
+    if (req.body.id) {
+      await revalidateCourse(req.body.id);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -424,6 +448,10 @@ exports.updatesalary = async (req, res) => {
           amount: value.amount ? value.amount : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      await revalidateCourse(req.body.id);
     }
 
     res.status(200).send({
@@ -498,6 +526,10 @@ exports.updategallery = async (req, res) => {
             });
           });
 
+          if (req.body.id) {
+            await revalidateCourse(req.body.id);
+          }
+
           return res.status(200).send({
             status: 1,
             message: "Data Save Successfully",
@@ -546,6 +578,10 @@ exports.updategallery = async (req, res) => {
 
           images: images,
         });
+
+        if (req.body.id) {
+          await revalidateCourse(req.body.id);
+        }
 
         return res.status(200).send({
           status: 1,
@@ -597,6 +633,10 @@ exports.updatefees = async (req, res) => {
       });
     }
 
+    if (req.body.id) {
+      await revalidateCourse(req.body.id);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -640,6 +680,10 @@ exports.updatesyllabus = async (req, res) => {
             }
           });
       });
+    }
+
+    if (req.body.id) {
+      await revalidateCourse(req.body.id);
     }
 
     res.status(200).send({

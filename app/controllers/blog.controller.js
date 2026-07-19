@@ -94,9 +94,7 @@ exports.create = async (req, res) => {
       revalidate.revalidatePage("blogs");
       revalidate.revalidatePage("blogs-listing");
       revalidate.revalidatePage(`blog-${blogsDetails.id}`);
-      if (blogsDetails.slug) {
-        revalidate.revalidatePage(`blog-${blogsDetails.slug}`);
-      }
+  
     } catch (err) {
       console.error("Cache revalidation failed:", err.message);
     }
@@ -182,12 +180,7 @@ exports.update = async (req, res) => {
       revalidate.revalidatePage("blogs");
       revalidate.revalidatePage("blogs-listing");
       revalidate.revalidatePage(`blog-${existingRecord.id}`);
-      // if (existingRecord.slug) {
-      //   revalidate.revalidatePage(`blog-${existingRecord.slug}`);
-      // }
-      // if (req.body.slug && req.body.slug !== existingRecord.slug) {
-      //   revalidate.revalidatePage(`blog-${req.body.slug}`);
-      // }
+
     } catch (err) {
       console.error("Cache revalidation failed:", err.message);
     }
@@ -345,9 +338,7 @@ exports.delete = async (req, res) => {
         revalidate.revalidatePage("blogs");
         revalidate.revalidatePage("blogs-listing");
         revalidate.revalidatePage(`blog-${id}`);
-        // if (existingRecord.slug) {
-        //   revalidate.revalidatePage(`blog-${existingRecord.slug}`);
-        // }
+   
       } catch (err) {
         console.error("Cache revalidation failed:", err.message);
       }
@@ -391,9 +382,7 @@ exports.updatefaqs = async (req, res) => {
         revalidate.revalidatePage("blogs");
         revalidate.revalidatePage("blogs-listing");
         revalidate.revalidatePage(`blog-${existingRecord.id}`);
-        // if (existingRecord.slug) {
-        //   revalidate.revalidatePage(`blog-${existingRecord.slug}`);
-        // }
+
       } catch (err) {
         console.error("Cache revalidation failed:", err.message);
       }

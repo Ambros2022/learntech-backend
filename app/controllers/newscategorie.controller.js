@@ -29,6 +29,8 @@ exports.create = async (req, res) => {
 
         });
 
+        try { revalidate.revalidatePage("news-categories"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
+
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
@@ -93,60 +95,28 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
-    newscategories.destroy({
-        where: { id: id }
-    })
-        .then(num => {
-            if (num == 1) {
-
-                res.status(200).send({
-                    status: 1,
-                    message: 'news categories deleted successfully',
-
-                });
-
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `news categories  with id=${id}. Maybe news categories id  was not found!`
-
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                status: 0,
-                message: "Could not delete news categories with id=" + id
-
-            });
-
-        });
-};
-exports.update = (req, res) => {
-    const id = req.body.id;
     try {
-        newscategories.update
-            ({
-                name: req.body.name,
-            },
-                {
-                    where: { id: req.body.id }
-                });
-        res.status(200).send({
-            status: 1,
-            message: 'Data Save Successfully'
-        });
+        const num = await newscategories.destroy({ where: { id: id } });
+        if (num == 1) {
+            try { revalidate.revalidatePage("news-categories"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
+            res.status(200).send({ status: 1, message: 'news categories deleted successfully' });
+        } else {
+            res.status(400).send({ status: 0, message: `news categories  with id=${id}. Maybe news categories id  was not found!` });
+        }
+    } catch (err) {
+        res.status(500).send({ status: 0, message: "Could not delete news categories with id=" + id });
     }
-    catch (error) {
-        return res.status(400).send({
-            message: 'Unable to update data',
-            errors: error,
-            status: 0
-        });
+};
+exports.update = async (req, res) => {
+    try {
+        await newscategories.update({ name: req.body.name }, { where: { id: req.body.id } });
+        try { revalidate.revalidatePage("news-categories"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
+        res.status(200).send({ status: 1, message: 'Data Save Successfully' });
+    } catch (error) {
+        return res.status(400).send({ message: 'Unable to update data', errors: error, status: 0 });
     }
-
 };
 
 exports.findOne = (req, res) => {

@@ -84,6 +84,7 @@ exports.create = async (req, res) => {
 
         });
 
+        try { revalidate.revalidatePage("landing-pages"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",
@@ -148,6 +149,7 @@ exports.delete = (req, res) => {
         })
         .then((num) => {
             if (num == 1) {
+                try { revalidate.revalidatePage("landing-pages"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
                 res.status(200).send({
                     status: 1,
                     message: "landing page  deleted successfully",
@@ -257,6 +259,7 @@ exports.update = async (req, res) => {
           await landingpage.update(landingpageUpdates, { where: { id: req.body.id } });
 
 
+        try { revalidate.revalidatePage("landing-pages"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",

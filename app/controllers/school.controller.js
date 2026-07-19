@@ -167,6 +167,13 @@ exports.create = async (req, res) => {
     }
 
 
+    try {
+      revalidate.revalidatePage("schools");
+      revalidate.revalidatePage(`school-${schoolDetails.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -329,6 +336,13 @@ exports.update = async (req, res) => {
       });
     }
 
+
+    try {
+      revalidate.revalidatePage("schools");
+      revalidate.revalidatePage(`school-${existingRecord.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
 
     res.status(200).send({
       status: 1,
@@ -549,31 +563,37 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  school
-    .destroy({
+  try {
+    const num = await school.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "school  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete schoolwith id=${id}. Maybe Stream was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete school with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("schools");
+        revalidate.revalidatePage(`school-${id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "school  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete schoolwith id=${id}. Maybe Stream was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete school with id=" + id,
+    });
+  }
 };
 
 exports.updatefaqs = async (req, res) => {
@@ -591,6 +611,15 @@ exports.updatefaqs = async (req, res) => {
           answers: value.answers ? value.answers : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage("schools");
+        revalidate.revalidatePage(`school-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({
@@ -708,6 +737,15 @@ exports.updategallery = async (req, res) => {
       }
 
       // Send success response
+      if (req.body.id) {
+        try {
+          revalidate.revalidatePage("schools");
+          revalidate.revalidatePage(`school-${req.body.id}`);
+        } catch (err) {
+          console.error("Cache revalidation failed:", err.message);
+        }
+      }
+
       return res.status(200).send({
         status: 1,
         message: "Data saved successfully",
