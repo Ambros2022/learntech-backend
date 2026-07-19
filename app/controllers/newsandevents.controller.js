@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const newsandevents = db.news_and_events;
 const _ = require("lodash");
@@ -124,6 +125,17 @@ exports.create = async (req, res) => {
       is_trending: req.body.is_trending,
       listing_order: req.body.listing_order,
     });
+    try {
+      revalidate.revalidatePage("news");
+      revalidate.revalidatePage("latest-news");
+      revalidate.revalidatePage(`news-${newsandeventsDetails.id}`);
+      if (newsandeventsDetails.category_id == 4) {
+        revalidate.revalidatePage("exam-news-links");
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -239,6 +251,17 @@ exports.update = async (req, res) => {
     await newsandevents.update(newsandeventsUpdates, { where: { id: req.body.id } });
 
 
+    try {
+      revalidate.revalidatePage("news");
+      revalidate.revalidatePage("latest-news");
+      revalidate.revalidatePage(`news-${existingRecord.id}`);
+      if (existingRecord.category_id == 4 || req.body.category_id == 4) {
+        revalidate.revalidatePage("exam-news-links");
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -320,31 +343,49 @@ exports.findAll = async (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  newsandevents
-    .destroy({
-      where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "newsandevents  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete newsandevents with id=${id} maybe not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
+  try {
+    const existingRecord = await newsandevents.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
         status: 0,
-        message: "Could not delete newsandevents  with id=" + id,
+        message: `delete newsandevents with id=${id} maybe not found!`,
       });
+    }
+
+    const num = await newsandevents.destroy({
+      where: { id: id },
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("news");
+        revalidate.revalidatePage("latest-news");
+        revalidate.revalidatePage(`news-${id}`);
+        if (existingRecord.category_id == 4) {
+          revalidate.revalidatePage("exam-news-links");
+        }
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "newsandevents  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete newsandevents with id=${id} maybe not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete newsandevents  with id=" + id,
+    });
+  }
 };
 
 exports.findOne = (req, res) => {

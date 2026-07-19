@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const websitepopup = db.websitepopup;
 const path = require("path");

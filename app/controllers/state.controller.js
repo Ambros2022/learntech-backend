@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const state = db.state;
@@ -31,11 +32,16 @@ exports.create = async (req, res) => {
 
         });
 
+        try {
+            revalidate.revalidatePage("nav-states");
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
+
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
             data: stateDetails
-
         });
     }
     catch (error) {
@@ -106,63 +112,65 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
-    state.destroy({
-        where: { id: id }
-    })
-        .then(num => {
-            if (num == 1) {
-
-                res.status(200).send({
-                    status: 1,
-                    message: 'state deleted successfully',
-
-                });
-
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `state  with id=${id}. Maybe state id  was not found!`
-
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                status: 0,
-                message: "Could not delete state with id=" + id
-
-            });
-
+    try {
+        const num = await state.destroy({
+            where: { id: id }
         });
+
+        if (num == 1) {
+            try {
+                revalidate.revalidatePage("nav-states");
+            } catch (err) {
+                console.error("Cache revalidation failed:", err.message);
+            }
+
+            res.status(200).send({
+                status: 1,
+                message: 'state deleted successfully',
+            });
+        } else {
+            res.status(400).send({
+                status: 0,
+                message: `state  with id=${id}. Maybe state id  was not found!`
+            });
+        }
+    } catch (err) {
+        res.status(500).send({
+            status: 0,
+            message: "Could not delete state with id=" + id
+        });
+    }
 };
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
     const id = req.body.id;
     try {
-        state.update
-            ({
-                name: req.body.name,
-                country_id: req.body.country_id,
-                is_top: req.body.is_top,
-       
-            },
-                {
-                    where: { id: req.body.id }
-                });
+        await state.update({
+            name: req.body.name,
+            country_id: req.body.country_id,
+            is_top: req.body.is_top,
+        }, {
+            where: { id: id }
+        });
+
+        try {
+            revalidate.revalidatePage("nav-states");
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
+
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully'
         });
-    }
-    catch (error) {
+    } catch (error) {
         return res.status(400).send({
             message: 'Unable to update data',
             errors: error,
             status: 0
         });
     }
-
 };
 
 

@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const countries = db.countries;
 const sendsearch = require("../utility/Customsearch");
@@ -81,6 +82,14 @@ exports.create = async (req, res) => {
       name: req.body.name,
     });
 
+    try {
+      revalidate.revalidatePage("countries");
+      revalidate.revalidatePage("nav-countries");
+      revalidate.revalidatePage("abroad-countries");
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -120,10 +129,9 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.update = (req, res) => {
-
+exports.update = async (req, res) => {
   try {
-    countries.update(
+    await countries.update(
       {
         name: req.body.name,
       },
@@ -131,6 +139,15 @@ exports.update = (req, res) => {
         where: { id: req.body.id },
       }
     );
+
+    try {
+      revalidate.revalidatePage("countries");
+      revalidate.revalidatePage("nav-countries");
+      revalidate.revalidatePage("abroad-countries");
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -143,31 +160,38 @@ exports.update = (req, res) => {
     });
   }
 };
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  countries
-    .destroy({
+  try {
+    const num = await countries.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "countries deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `countries  with id=${id}  was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete countries with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("countries");
+        revalidate.revalidatePage("nav-countries");
+        revalidate.revalidatePage("abroad-countries");
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "countries deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `countries  with id=${id}  was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete countries with id=" + id,
+    });
+  }
 };
 
 

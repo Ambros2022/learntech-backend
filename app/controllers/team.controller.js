@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const team = db.team;
@@ -65,6 +66,7 @@ exports.create = async (req, res) => {
       photo: logonames,
     });
 
+    try { revalidate.revalidatePage("ourteams"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -125,6 +127,7 @@ exports.delete = (req, res) => {
     })
     .then((num) => {
       if (num == 1) {
+        try { revalidate.revalidatePage("ourteams"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
           status: 1,
           message: "team  deleted successfully",
@@ -213,6 +216,7 @@ exports.update = (req, res) => {
       where: { id: req.body.id },
     });
 
+    try { revalidate.revalidatePage("ourteams"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",

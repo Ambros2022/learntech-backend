@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const scholarships = db.scholarships;
@@ -102,6 +103,12 @@ exports.create = async (req, res) => {
         });
       });
     }
+    try {
+      revalidate.revalidatePage("scholarships");
+      revalidate.revalidatePage(`scholarship-${scholarshipsDetails.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -197,6 +204,13 @@ exports.update = async (req, res) => {
           gender_id: value.id,
         });
       });
+    }
+
+    try {
+      revalidate.revalidatePage("scholarships");
+      revalidate.revalidatePage(`scholarship-${req.body.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
     }
 
     res.status(200).send({
@@ -336,29 +350,35 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  scholarships
-    .destroy({
+  try {
+    const num = await scholarships.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "scholarships  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete scholarships with id=${id}. Maybe Stream was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete scholarships with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("scholarships");
+        revalidate.revalidatePage(`scholarship-${id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "scholarships  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete scholarships with id=${id}. Maybe Stream was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete scholarships with id=" + id,
+    });
+  }
 };

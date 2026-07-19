@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const exam = db.exam;
@@ -183,6 +184,14 @@ exports.create = async (req, res) => {
             exam_id: examsDetails.id,
           });
         });
+      }
+
+      try {
+        revalidate.revalidatePage("exams");
+        revalidate.revalidatePage("nav-exams");
+        revalidate.revalidatePage(`exam-${examsDetails.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
       }
 
       res.status(200).send({
@@ -371,6 +380,14 @@ exports.update = async (req, res) => {
       });
     }
 
+    try {
+      revalidate.revalidatePage("exams");
+      revalidate.revalidatePage("nav-exams");
+      revalidate.revalidatePage(`exam-${existingRecord.id}`);
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data saved successfully",
@@ -480,31 +497,38 @@ exports.findAll = async (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  exam
-    .destroy({
+  try {
+    const num = await exam.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "exam deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `Exam with id=${id}  was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete Exam with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("exams");
+        revalidate.revalidatePage("nav-exams");
+        revalidate.revalidatePage(`exam-${id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "exam deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `Exam with id=${id}  was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete Exam with id=" + id,
+    });
+  }
 };
 
 exports.findOne = (req, res) => {
@@ -587,6 +611,14 @@ exports.updatefees = (req, res) => {
       });
     }
 
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage(`exam-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -614,6 +646,14 @@ exports.updateeligibilities = async (req, res) => {
           description: value.description ? value.description : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage(`exam-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({
@@ -646,6 +686,14 @@ exports.updateexamdates = async (req, res) => {
       });
     }
 
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage(`exam-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -673,6 +721,14 @@ exports.updateexamagelimit = async (req, res) => {
           description: value.description ? value.description : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage(`exam-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({
@@ -703,6 +759,14 @@ exports.updateexamifproof = async (req, res) => {
       });
     }
 
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage(`exam-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -730,6 +794,14 @@ exports.updatefaq = async (req, res) => {
           answers: value.answers ? value.answers : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      try {
+        revalidate.revalidatePage(`exam-${req.body.id}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
     }
 
     res.status(200).send({

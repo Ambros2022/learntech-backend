@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const jobs_positions = db.jobs_positions;
@@ -46,6 +47,7 @@ exports.create = async (req, res) => {
 
 
 
+        try { revalidate.revalidatePage("job-positions"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully',
@@ -134,6 +136,7 @@ exports.delete = (req, res) => {
     })
         .then(num => {
             if (num == 1) {
+                try { revalidate.revalidatePage("job-positions"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
 
                 res.status(200).send({
                     status: 1,
@@ -187,6 +190,7 @@ exports.update = (req, res) => {
                 });
             });
         }
+        try { revalidate.revalidatePage("job-positions"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully'

@@ -485,6 +485,39 @@ module.exports = function (app) {
     "/api/website/home/sitemap/get", homecontroller.sitemap
   );
   app.get(
+    "/api/website/home/sitemap/blogs", homecontroller.sitemapBlogs
+  );
+  app.get(
+    "/api/website/home/sitemap/colleges", homecontroller.sitemapColleges
+  );
+  app.get(
+    "/api/website/home/sitemap/universities", homecontroller.sitemapUniversities
+  );
+  app.get(
+    "/api/website/home/sitemap/schools", homecontroller.sitemapSchools
+  );
+  app.get(
+    "/api/website/home/sitemap/scholarships", homecontroller.sitemapScholarships
+  );
+  app.get(
+    "/api/website/home/sitemap/boards", homecontroller.sitemapBoards
+  );
+  app.get(
+    "/api/website/home/sitemap/exams", homecontroller.sitemapExams
+  );
+  app.get(
+    "/api/website/home/sitemap/news", homecontroller.sitemapNews
+  );
+  app.get(
+    "/api/website/home/sitemap/courses", homecontroller.sitemapCourses
+  );
+  app.get(
+    "/api/website/home/sitemap/generalcourse", homecontroller.sitemapGeneralCourse
+  );
+  app.get(
+    "/api/website/home/sitemap/collegecourses", homecontroller.sitemapCollegeCourses
+  );
+  app.get(
     "/api/website/home/seolink/get", homecontroller.seolink
   );
 

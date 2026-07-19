@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const generalcourse = db.general_course;
@@ -24,6 +25,22 @@ async function removeFile(filePath) {
 
 // // Allowed file size in mb
 const allowed_file_size = 2;
+
+const revalidateGeneralCourse = async (generalCourseId) => {
+  if (!generalCourseId) return;
+  try {
+    const gc = await generalcourse.findByPk(generalCourseId);
+    if (gc && gc.stream_id && gc.slug) {
+      revalidate.revalidatePage(`general-course-${gc.stream_id}-${gc.slug}`);
+    }
+    revalidate.revalidatePage("all-general-courses");
+    if (gc && gc.is_trending) {
+      revalidate.revalidatePage("trending-courses");
+    }
+  } catch (err) {
+    console.error("Cache revalidation failed:", err.message);
+  }
+};
 
 const getPagination = (page, size) => {
   const pages = page > 0 ? page : 1;
@@ -127,6 +144,8 @@ exports.create = async (req, res) => {
       status: req.body.status,
       banner: banners,
     });
+
+    await revalidateGeneralCourse(generalcoursesDetails.id);
 
     res.status(200).send({
       status: 1,
@@ -252,7 +271,9 @@ exports.update = async (req, res) => {
 
 
     // Update database record
+    await revalidateGeneralCourse(req.body.id);
     await generalcourse.update(generalcourseupdates, { where: { id: req.body.id } });
+    await revalidateGeneralCourse(req.body.id);
 
     res.status(200).send({
       status: 1,
@@ -391,31 +412,32 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  generalcourse
-    .destroy({
+  try {
+    await revalidateGeneralCourse(id);
+
+    const num = await generalcourse.destroy({
       where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "general course  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: `delete general course with id=${id}. Maybe general course was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
-        status: 0,
-        message: "Could not delete general course with id=" + id,
-      });
     });
+
+    if (num == 1) {
+      res.status(200).send({
+        status: 1,
+        message: "general course  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete general course with id=${id}. Maybe general course was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete general course with id=" + id,
+    });
+  }
 };
 
 
@@ -434,6 +456,10 @@ exports.updatefaq = async (req, res) => {
           answers: value.answers ? value.answers : null,
         });
       });
+    }
+
+    if (req.body.id) {
+      await revalidateGeneralCourse(req.body.id);
     }
 
     res.status(200).send({

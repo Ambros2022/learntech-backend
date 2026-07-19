@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const organizationpages = db.organization_pages;
@@ -33,6 +34,14 @@ exports.create = async (req, res) => {
       categories: req.body.categories,
     });
 
+
+    if (organizationpagesDetails.categories) {
+      try {
+        revalidate.revalidatePage(`organization-${organizationpagesDetails.categories}`);
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+    }
 
     res.status(200).send({
       status: 1,
@@ -113,41 +122,46 @@ exports.findAll = async (req, res) => {
 };
 
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  organizationpages.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-
-        res.status(200).send({
-          status: 1,
-          message: 'organization pages  deleted successfully',
-
-        });
-
-
-      } else {
-
-        res.status(400).send({
-          status: 0,
-          message: ` delete organization pages with id=${id}. Maybe organization pages was not found!`
-
-        });
-
-
-      }
-    })
-    .catch(err => {
-
-      res.status(500).send({
+  try {
+    const existingRecord = await organizationpages.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
         status: 0,
-        message: "Could not delete organization pages with id=" + id
-
+        message: `delete organization pages with id=${id}. Maybe organization pages was not found!`
       });
+    }
 
+    const num = await organizationpages.destroy({
+      where: { id: id }
     });
+
+    if (num == 1) {
+      if (existingRecord.categories) {
+        try {
+          revalidate.revalidatePage(`organization-${existingRecord.categories}`);
+        } catch (err) {
+          console.error("Cache revalidation failed:", err.message);
+        }
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: 'organization pages  deleted successfully',
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete organization pages with id=${id}. Maybe organization pages was not found!`
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete organization pages with id=" + id
+    });
+  }
 };
 
 
@@ -197,30 +211,45 @@ exports.findOne = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.body.id;
-
   try {
+    const existingRecord = await organizationpages.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: 'Record not found',
+        status: 0
+      });
+    }
 
-    organizationpages.update({
+    await organizationpages.update({
       title: req.body.title,
       content: req.body.content,
       categories: req.body.categories,
     }, {
-      where: { id: req.body.id }
+      where: { id: id }
     });
+
+    try {
+      if (existingRecord.categories) {
+        revalidate.revalidatePage(`organization-${existingRecord.categories}`);
+      }
+      if (req.body.categories && req.body.categories !== existingRecord.categories) {
+        revalidate.revalidatePage(`organization-${req.body.categories}`);
+      }
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
 
     res.status(200).send({
       status: 1,
       message: 'Data Save Successfully'
     });
-  }
-  catch (error) {
+  } catch (error) {
     return res.status(400).send({
       message: 'Unable to update data',
       errors: error,
       status: 0
     });
   }
-
 };

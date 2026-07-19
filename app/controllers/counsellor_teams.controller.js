@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const counsellorteam = db.counsellor_teams;
@@ -84,6 +85,12 @@ exports.create = async (req, res) => {
         });
 
 
+        try {
+            revalidate.revalidatePage("counsellors");
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
+
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",
@@ -140,31 +147,36 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
-    counsellorteam
-        .destroy({
+    try {
+        const num = await counsellorteam.destroy({
             where: { id: id },
-        })
-        .then((num) => {
-            if (num == 1) {
-                res.status(200).send({
-                    status: 1,
-                    message: "counsellor team  deleted successfully",
-                });
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `delete our teams with id=${id}. Maybe counsellor team was not found!`,
-                });
-            }
-        })
-        .catch((err) => {
-            res.status(500).send({
-                status: 0,
-                message: "Could not delete counsellor team with id=" + id,
-            });
         });
+
+        if (num == 1) {
+            try {
+                revalidate.revalidatePage("counsellors");
+            } catch (err) {
+                console.error("Cache revalidation failed:", err.message);
+            }
+
+            res.status(200).send({
+                status: 1,
+                message: "counsellor team  deleted successfully",
+            });
+        } else {
+            res.status(400).send({
+                status: 0,
+                message: `delete our teams with id=${id}. Maybe counsellor team was not found!`,
+            });
+        }
+    } catch (err) {
+        res.status(500).send({
+            status: 0,
+            message: "Could not delete counsellor team with id=" + id,
+        });
+    }
 };
 
 exports.findOne = (req, res) => {
@@ -257,6 +269,12 @@ exports.update = async (req, res) => {
         // Update database record
         await counsellorteam.update(counsellorteamUpdates, { where: { id: req.body.id } });
 
+
+        try {
+            revalidate.revalidatePage("counsellors");
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
 
         res.status(200).send({
             status: 1,

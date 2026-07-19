@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 
 //const modes = db.modes 
 // Array of allowed files

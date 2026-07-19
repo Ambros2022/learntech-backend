@@ -1,3 +1,4 @@
+const revalidate = require("../../utility/revalidate");
 require("dotenv").config();
 const db = require("../../models");
 const axios = require("axios");
@@ -3472,7 +3473,7 @@ exports.sitemap = async (req, res) => {
     size,
     columnname,
     orderby,
-  } = req.body;
+  } = req.query;
 
   const { limit, offset } = getPagination(page, size);
 

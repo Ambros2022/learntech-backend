@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const trainingteam = db.training_teams;
 const sendsearch = require("../utility/Customsearch");

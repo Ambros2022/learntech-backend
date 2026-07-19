@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const blog = db.blog;
@@ -89,6 +90,15 @@ exports.create = async (req, res) => {
       status: req.body.status,
     });
 
+    try {
+      revalidate.revalidatePage("blogs");
+      revalidate.revalidatePage("blogs-listing");
+      revalidate.revalidatePage(`blog-${blogsDetails.id}`);
+  
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
+
     res.status(200).send({
       status: 1,
       message: "Data Save Successfully",
@@ -165,6 +175,15 @@ exports.update = async (req, res) => {
 
     // Update database record
     await blog.update(blogsUpdates, { where: { id: req.body.id } });
+
+    try {
+      revalidate.revalidatePage("blogs");
+      revalidate.revalidatePage("blogs-listing");
+      revalidate.revalidatePage(`blog-${existingRecord.id}`);
+
+    } catch (err) {
+      console.error("Cache revalidation failed:", err.message);
+    }
 
     res.status(200).send({
       status: 1,
@@ -299,35 +318,52 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  blog
-    .destroy({
-      where: { id: id },
-    })
-    .then((num) => {
-      if (num == 1) {
-        res.status(200).send({
-          status: 1,
-          message: "blog  deleted successfully",
-        });
-      } else {
-        res.status(400).send({
-          status: 0,
-          message: ` delete blog with id=${id}. Maybe blog was not found!`,
-        });
-      }
-    })
-    .catch((err) => {
-      res.status(500).send({
+  try {
+    const existingRecord = await blog.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
         status: 0,
-        message: "Could not delete Stream with id=" + id,
+        message: `delete blog with id=${id}. Maybe blog was not found!`,
       });
+    }
+
+    const num = await blog.destroy({
+      where: { id: id },
     });
+
+    if (num == 1) {
+      try {
+        revalidate.revalidatePage("blogs");
+        revalidate.revalidatePage("blogs-listing");
+        revalidate.revalidatePage(`blog-${id}`);
+   
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
+      }
+
+      res.status(200).send({
+        status: 1,
+        message: "blog  deleted successfully",
+      });
+    } else {
+      res.status(400).send({
+        status: 0,
+        message: `delete blog with id=${id}. Maybe blog was not found!`,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete blog with id=" + id,
+    });
+  }
 };
 
 exports.updatefaqs = async (req, res) => {
   try {
+    const existingRecord = await blog.findByPk(req.body.id);
     if (req.body.faqs && req.body.id) {
       await blogfaq.destroy({ where: { blog_id: req.body.id } });
       const faqss = JSON.parse(req.body.faqs);
@@ -338,6 +374,17 @@ exports.updatefaqs = async (req, res) => {
           questions: value.questions || null,
           answers: value.answers || null,
         });
+      }
+    }
+
+    if (existingRecord) {
+      try {
+        revalidate.revalidatePage("blogs");
+        revalidate.revalidatePage("blogs-listing");
+        revalidate.revalidatePage(`blog-${existingRecord.id}`);
+
+      } catch (err) {
+        console.error("Cache revalidation failed:", err.message);
       }
     }
 

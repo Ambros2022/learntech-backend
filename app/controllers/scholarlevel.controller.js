@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const scholarlevels = db.scholar_levels;
@@ -27,6 +28,8 @@ exports.create = async (req, res) => {
             name: req.body.name,
 
         });
+
+        try { revalidate.revalidatePage("scholarship-levels"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
 
         res.status(200).send({
             status: 1,
@@ -92,36 +95,19 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
-    scholarlevels.destroy({
-        where: { id: id }
-    })
-        .then(num => {
-            if (num == 1) {
-
-                res.status(200).send({
-                    status: 1,
-                    message: 'scholar levels deleted successfully',
-
-                });
-
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `scholar levels  with id=${id}. Maybe scholar levels id  was not found!`
-
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                status: 0,
-                message: "Could not delete scholar levels with id=" + id
-
-            });
-
-        });
+    try {
+        const num = await scholarlevels.destroy({ where: { id: id } });
+        if (num == 1) {
+            try { revalidate.revalidatePage("scholarship-levels"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
+            res.status(200).send({ status: 1, message: 'scholar levels deleted successfully' });
+        } else {
+            res.status(400).send({ status: 0, message: `scholar levels  with id=${id}. Maybe scholar levels id  was not found!` });
+        }
+    } catch (err) {
+        res.status(500).send({ status: 0, message: "Could not delete scholar levels with id=" + id });
+    }
 };
 
 exports.update = (req, res) => {
@@ -134,6 +120,7 @@ exports.update = (req, res) => {
                 {
                     where: { id: req.body.id }
                 });
+        try { revalidate.revalidatePage("scholarship-levels"); } catch (e) { console.error("Cache revalidation failed:", e.message); }
         res.status(200).send({
             status: 1,
             message: 'Data Save Successfully'

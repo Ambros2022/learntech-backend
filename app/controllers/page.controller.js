@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require('path');
 const pages = db.page;
@@ -36,6 +37,9 @@ exports.create = async (req, res) => {
       meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
     });
 
+    if (PageDetails.url) {
+      revalidate.revalidatePage(`page-${PageDetails.url}`);
+    }
 
     res.status(200).send({
       status: 1,
@@ -101,41 +105,35 @@ exports.findAll = async (req, res) => {
 };
 
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
   const id = req.params.id;
-  pages.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-
-        res.status(200).send({
-          status: 1,
-          message: 'Page  deleted successfully',
-
-        });
-
-
-      } else {
-
-        res.status(400).send({
-          status: 0,
-          message: ` delete Page with id=${id}. Maybe Stream was not found!`
-
-        });
-
-
-      }
-    })
-    .catch(err => {
-
-      res.status(500).send({
+  try {
+    const existingRecord = await pages.findByPk(id);
+    if (!existingRecord) {
+      return res.status(400).send({
         status: 0,
-        message: "Could not delete Page with id=" + id
-
+        message: `Cannot delete Page with id=${id}. Maybe Page was not found!`
       });
+    }
 
+    await pages.destroy({
+      where: { id: id }
     });
+
+    if (existingRecord.url) {
+      revalidate.revalidatePage(`page-${existingRecord.url}`);
+    }
+
+    res.status(200).send({
+      status: 1,
+      message: 'Page deleted successfully',
+    });
+  } catch (err) {
+    res.status(500).send({
+      status: 0,
+      message: "Could not delete Page with id=" + id
+    });
+  }
 };
 
 
@@ -175,12 +173,19 @@ exports.findOne = (req, res) => {
 };
 
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.body.id;
 
   try {
+    const existingRecord = await pages.findByPk(id);
+    if (!existingRecord) {
+      return res.status(404).send({
+        message: 'Record not found',
+        status: 0
+      });
+    }
 
-    pages.update({
+    await pages.update({
       url: req.body.url ? req.body.url : null,
       top_description: req.body.top_description ? req.body.top_description : null,
       bottom_description: req.body.bottom_description ? req.body.bottom_description : null,
@@ -188,8 +193,15 @@ exports.update = (req, res) => {
       meta_description: req.body.meta_description ? req.body.meta_description : null,
       meta_keyword: req.body.meta_keyword ? req.body.meta_keyword : null,
     }, {
-      where: { id: req.body.id }
+      where: { id: id }
     });
+
+    if (existingRecord.url) {
+      revalidate.revalidatePage(`page-${existingRecord.url}`);
+    }
+    if (req.body.url && req.body.url !== existingRecord.url) {
+      revalidate.revalidatePage(`page-${req.body.url}`);
+    }
 
     res.status(200).send({
       status: 1,
@@ -203,5 +215,4 @@ exports.update = (req, res) => {
       status: 0
     });
   }
-
 };

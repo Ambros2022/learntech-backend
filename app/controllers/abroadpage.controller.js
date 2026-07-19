@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const path = require("path");
 const abroadpage = db.abroadpages;
@@ -89,6 +90,15 @@ exports.create = async (req, res) => {
         });
 
 
+        try {
+            revalidate.revalidatePage("abroad-pages");
+            if (abroadpageDetails.slug) {
+                revalidate.revalidatePage(`abroad-${abroadpageDetails.slug}`);
+            }
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
+
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",
@@ -167,31 +177,47 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
-    abroadpage
-        .destroy({
-            where: { id: id },
-        })
-        .then((num) => {
-            if (num == 1) {
-                res.status(200).send({
-                    status: 1,
-                    message: "abroad page  deleted successfully",
-                });
-            } else {
-                res.status(400).send({
-                    status: 0,
-                    message: `delete abroad page with id=${id}. Maybe abroad page was not found!`,
-                });
-            }
-        })
-        .catch((err) => {
-            res.status(500).send({
+    try {
+        const existingRecord = await abroadpage.findByPk(id);
+        if (!existingRecord) {
+            return res.status(404).send({
                 status: 0,
-                message: "Could not delete abroad page with id=" + id,
+                message: `delete abroad page with id=${id}. Maybe abroad page was not found!`,
             });
+        }
+
+        const num = await abroadpage.destroy({
+            where: { id: id },
         });
+
+        if (num == 1) {
+            try {
+                revalidate.revalidatePage("abroad-pages");
+                if (existingRecord.slug) {
+                    revalidate.revalidatePage(`abroad-${existingRecord.slug}`);
+                }
+            } catch (err) {
+                console.error("Cache revalidation failed:", err.message);
+            }
+
+            res.status(200).send({
+                status: 1,
+                message: "abroad page  deleted successfully",
+            });
+        } else {
+            res.status(400).send({
+                status: 0,
+                message: `delete abroad page with id=${id}. Maybe abroad page was not found!`,
+            });
+        }
+    } catch (err) {
+        res.status(500).send({
+            status: 0,
+            message: "Could not delete abroad page with id=" + id,
+        });
+    }
 };
 
 exports.findOne = (req, res) => {
@@ -298,6 +324,18 @@ exports.update = async (req, res) => {
         // Update database record
         await abroadpage.update(abroadpageUpdates, { where: { id: req.body.id } });
 
+        try {
+            revalidate.revalidatePage("abroad-pages");
+            if (existingRecord.slug) {
+                revalidate.revalidatePage(`abroad-${existingRecord.slug}`);
+            }
+            if (req.body.slug && req.body.slug !== existingRecord.slug) {
+                revalidate.revalidatePage(`abroad-${req.body.slug}`);
+            }
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
+        }
+
         res.status(200).send({
             status: 1,
             message: "Data Save Successfully",
@@ -327,6 +365,16 @@ exports.updatefaqs = async (req, res) => {
                     answers: value.answers ? value.answers : null,
                 });
             });
+        }
+
+        const existingRecord = await abroadpage.findByPk(req.body.id);
+        try {
+            revalidate.revalidatePage("abroad-pages");
+            if (existingRecord && existingRecord.slug) {
+                revalidate.revalidatePage(`abroad-${existingRecord.slug}`);
+            }
+        } catch (err) {
+            console.error("Cache revalidation failed:", err.message);
         }
 
         res.status(200).send({

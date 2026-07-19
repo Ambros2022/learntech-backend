@@ -1,3 +1,4 @@
+const revalidate = require("../../utility/revalidate");
 const db = require("../../models");
 const axios = require("axios");
 var https = require("https");
@@ -32,7 +33,7 @@ const exam = db.exam;
 const testimonial = db.testimonial;
 const enquiry = db.enquiry;
 const _ = require("lodash");
-const generalcourse = db.generalcourse;
+const generalcourse = db.general_course;
 const courses = db.courses;
 const groups = db.groups;
 const Op = db.Sequelize.Op;
@@ -5536,4 +5537,261 @@ exports.landingpages = async (req, res) => {
         message: err.message || "Some error occurred while retrieving teams.",
       });
     });
+};
+
+exports.sitemapBlogs = async (req, res) => {
+  try {
+    const blogsData = await blog.findAll({
+      where: { status: PUBLISHED },
+      attributes: ["id", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: blogsData,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap blogs:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap blogs",
+    });
+  }
+};
+
+exports.sitemapColleges = async (req, res) => {
+  try {
+    const colleges = await db.college.findAll({
+      where: { type: "college", status: PUBLISHED },
+      attributes: ["id", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: colleges,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap colleges:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap colleges",
+    });
+  }
+};
+
+exports.sitemapUniversities = async (req, res) => {
+  try {
+    const universities = await db.college.findAll({
+      where: { type: "university", status: PUBLISHED },
+      attributes: ["id", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: universities,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap universities:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap universities",
+    });
+  }
+};
+
+exports.sitemapSchools = async (req, res) => {
+  try {
+    const schools = await db.school.findAll({
+      where: { status: PUBLISHED },
+      attributes: ["id", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: schools,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap schools:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap schools",
+    });
+  }
+};
+
+exports.sitemapScholarships = async (req, res) => {
+  try {
+    const data = await db.scholarships.findAll({
+      where: { status: PUBLISHED },
+      attributes: ["id", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: data,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap scholarships:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap scholarships",
+    });
+  }
+};
+
+exports.sitemapBoards = async (req, res) => {
+  try {
+    const boards = await db.schoolboards.findAll({
+      where: { status: PUBLISHED },
+      attributes: ["id", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: boards,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap boards:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap boards",
+    });
+  }
+};
+
+exports.sitemapExams = async (req, res) => {
+  try {
+    const examsData = await exam.findAll({
+      where: { status: PUBLISHED },
+      attributes: ["id", "exam_title", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: examsData,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap exams:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap exams",
+    });
+  }
+};
+
+exports.sitemapNews = async (req, res) => {
+  try {
+    const newsData = await newsandevents.findAll({
+      where: { status: PUBLISHED },
+      attributes: ["id", "name", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: newsData,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap news:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap news",
+    });
+  }
+};
+
+exports.sitemapCourses = async (req, res) => {
+  try {
+    const courseStreams = await stream.findAll({
+      attributes: ["id", "name", "slug", "updated_at"],
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: courseStreams,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap courses:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap courses",
+    });
+  }
+};
+
+exports.sitemapGeneralCourse = async (req, res) => {
+  try {
+    const generalCourses = await generalcourse.findAll({
+      where: { status: PUBLISHED },
+      include: [
+        {
+          required: false,
+          association: "streams",
+          attributes: ["id", "name", "slug"],
+        },
+      ],
+      attributes: ["id", "name", "slug", "updated_at"],
+      nest: true,
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: generalCourses,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap general courses:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap general courses",
+    });
+  }
+};
+
+exports.sitemapCollegeCourses = async (req, res) => {
+  try {
+    const collegeCourses = await courses.findAll({
+      where: { status: PUBLISHED },
+      include: [
+        {
+          required: false,
+          association: "college",
+          attributes: ["id", "name", "slug"],
+        },
+      ],
+      attributes: ["id", "slug", "updated_at"],
+      nest: true,
+      raw: true,
+    });
+
+    res.status(200).json({
+      status: 1,
+      message: "success",
+      data: collegeCourses,
+    });
+  } catch (error) {
+    console.error("Error fetching sitemap college courses:", error);
+    res.status(500).json({
+      status: 0,
+      message: "Error fetching sitemap college courses",
+    });
+  }
 };

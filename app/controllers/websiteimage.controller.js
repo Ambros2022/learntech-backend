@@ -1,3 +1,4 @@
+const revalidate = require("../utility/revalidate");
 const db = require("../models");
 const websiteimage = db.websiteimage;
 const path = require("path");
