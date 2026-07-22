@@ -20,6 +20,7 @@ app.use(
       origin: [
          "https://learntechww.com",
          "https://www.learntechww.com",
+         "https://preprod.learntechww.com",
          
 
          // test / preprod / dev
