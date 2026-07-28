@@ -4948,6 +4948,8 @@ const getSeoLinkDataInternal = async (req) => {
   // data.groups = [];
   data.newsandevents = [];
   data.school = [];
+  data.collegecourses = [];
+  data.generalcourse = [];
 
   const {
     page,
@@ -5477,6 +5479,75 @@ const getSeoLinkDataInternal = async (req) => {
     }
   }
 
+
+  if (data.collegecourses !== undefined) {
+    try {
+      data.collegecourses = await courses.findAll({
+        where: { status: PUBLISHED },
+        attributes: ["id", "slug", "title", "meta_title", "meta_description", "updated_at"],
+        include: [
+          {
+            model: CollegeAndUniversity,
+            as: "college",
+            attributes: ["id", "slug", "name"],
+          },
+        ],
+        subQuery: false,
+      }).then((rows) =>
+        rows.map((v) => ({
+          Id: v.id,
+          Pagetitle: "College Course individual",
+          H1Tag: v.title,
+          Link:
+            "https://learntechww.com/college/" +
+            (v.college?.id || "") +
+            "/" +
+            (v.college?.slug || "") +
+            "/" +
+            v.slug,
+          MetaTitle: v.meta_title,
+          MetaDescription: v.meta_description,
+        }))
+      );
+    } catch (e) {
+      data.collegecourses = [];
+    }
+  }
+
+  if (data.generalcourse !== undefined) {
+    try {
+      data.generalcourse = await generalcourse.findAll({
+        where: {},
+        attributes: ["id", "slug", "name", "meta_title", "meta_description", "updated_at"],
+        include: [
+          {
+            model: stream,
+            as: "streams",
+            attributes: ["id", "slug", "name"],
+          },
+        ],
+        subQuery: false,
+      }).then((rows) =>
+        rows.map((v) => ({
+          Id: v.id,
+          Pagetitle: "General Course individual",
+          H1Tag: v.name,
+          Link:
+            "https://learntechww.com/course/" +
+            (v.streams?.id || "") +
+            "/" +
+            (v.streams?.slug || "") +
+            "/" +
+            v.slug,
+          MetaTitle: v.meta_title,
+          MetaDescription: v.meta_description,
+        }))
+      );
+    } catch (e) {
+      data.generalcourse = [];
+    }
+  }
+
   return data;
 };
 
@@ -5530,6 +5601,8 @@ exports.seolinkExcel = async (req, res) => {
     addSheet("News & Events", data.newsandevents);
     addSheet("Schools", data.school);
     addSheet("Groups", data.groups);
+    addSheet("College Courses", data.collegecourses);
+    addSheet("General Courses", data.generalcourse);
 
     res.setHeader(
       "Content-Type",
