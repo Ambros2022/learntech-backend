@@ -39,6 +39,7 @@ const groups = db.groups;
 const Op = db.Sequelize.Op;
 const PUBLISHED = "Published";
 const sendsearch = require("../../utility/Customsearch");
+const ExcelJS = require("exceljs");
 const Accreditation = db.accreditation;
 const management = db.management;
 const school = db.school;
@@ -4945,7 +4946,7 @@ exports.sitemap = async (req, res) => {
   });
 };
 
-exports.seolink = async (req, res) => {
+const getSeoLinkDataInternal = async (req) => {
   const data = {
     errors: {},
   };
@@ -4968,7 +4969,7 @@ exports.seolink = async (req, res) => {
     searchfrom,
     columnname,
     orderby,
-  } = req.body;
+  } = req.body || req.query || {};
 
   const { limit, offset } = getPagination(page, size);
 
@@ -5009,6 +5010,7 @@ exports.seolink = async (req, res) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
             return {
+              Id: vaule.id,
               Pagetitle: "College individual",
               H1Tag: vaule.name,
               Link: "https://bangalorestudy.com/college/" + vaule.slug,
@@ -5070,6 +5072,7 @@ exports.seolink = async (req, res) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
             return {
+              Id: vaule.id,
               Pagetitle: "University individual",
               H1Tag: vaule.name,
               Link: "https://bangalorestudy.com/university/" + vaule.slug,
@@ -5127,6 +5130,7 @@ exports.seolink = async (req, res) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
             return {
+              Id: vaule.id,
               Pagetitle: "Board individual",
               H1Tag: vaule.name,
               Link: "https://bangalorestudy.com/board/" + vaule.slug,
@@ -5182,6 +5186,7 @@ exports.seolink = async (req, res) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
             return {
+              Id: vaule.id,
               Pagetitle: "Course stream individual",
               H1Tag: vaule.h1_title,
               Link: "https://bangalorestudy.com/courses/" + vaule.stream_slug,
@@ -5239,8 +5244,8 @@ exports.seolink = async (req, res) => {
         .then(async (data) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
-            // console.log(vaule.exam_title)
             return {
+              Id: vaule.id,
               Pagetitle: "Exam individual",
               H1Tag: vaule.exam_title,
               Link: "https://bangalorestudy.com/exams/" + vaule.slug,
@@ -5296,6 +5301,7 @@ exports.seolink = async (req, res) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
             return {
+              Id: vaule.id,
               Pagetitle: "Blog individual",
               H1Tag: vaule.title,
               Link: "https://bangalorestudy.com/blog/" + vaule.slug,
@@ -5352,6 +5358,7 @@ exports.seolink = async (req, res) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
             return {
+              Id: vaule.id,
               Pagetitle: "News events individual",
               H1Tag: vaule.title,
               Link: "https://bangalorestudy.com/news-and-event/" + vaule.slug,
@@ -5397,9 +5404,16 @@ exports.seolink = async (req, res) => {
         })
 
         .then((data) => {
-          //   const response = getPagingData(data, page, limit);
-
-          return data;
+          let data1 = data;
+          let finaldata = data1.map((vaule) => {
+            return {
+              Id: vaule.id,
+              Pagetitle: "Group individual",
+              H1Tag: vaule.title,
+              Link: "https://bangalorestudy.com/group/" + vaule.slug,
+            };
+          });
+          return finaldata;
         })
         .catch((err) => {
           //  data.errors.topcollege = "No top college found";
@@ -5442,8 +5456,8 @@ exports.seolink = async (req, res) => {
         .then(async (data) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
-            console.log(vaule);
             return {
+              Id: vaule.id,
               Pagetitle: "School individual",
               H1Tag: vaule.school_name,
               Link: "https://bangalorestudy.com/school/" + vaule.school_slug,
@@ -5467,11 +5481,75 @@ exports.seolink = async (req, res) => {
     }
   }
 
-  res.status(200).send({
-    status: 1,
-    message: "success",
-    data: data,
-  });
+  return data;
+};
+
+exports.seolink = async (req, res) => {
+  try {
+    const data = await getSeoLinkDataInternal(req);
+    res.status(200).send({
+      status: 1,
+      message: "success",
+      data: data,
+    });
+  } catch (error) {
+    res.status(500).send({ status: 0, error: error.message });
+  }
+};
+
+exports.seolinkExcel = async (req, res) => {
+  try {
+    const data = await getSeoLinkDataInternal(req);
+    const workbook = new ExcelJS.Workbook();
+
+    const addSheet = (name, rows) => {
+      if (!rows) return;
+      const flatRows = Array.isArray(rows) ? rows.flat(Infinity) : [];
+      if (!flatRows.length) return;
+
+      const sheet = workbook.addWorksheet(name);
+
+      const sample = flatRows[0] || {};
+      const keys = Object.keys(sample);
+
+      sheet.columns = keys.map((key) => ({
+        header: key,
+        key: key,
+        width: Math.max(key.length + 5, 25),
+      }));
+
+      flatRows.forEach((item) => {
+        sheet.addRow(item);
+      });
+
+      sheet.getRow(1).font = { bold: true };
+    };
+
+    addSheet("Colleges", data.college);
+    addSheet("Universities", data.university);
+    addSheet("Boards", data.boards);
+    addSheet("Course Streams", data.coursestreams);
+    addSheet("Exams", data.exam);
+    addSheet("Blogs", data.blogs);
+    addSheet("News & Events", data.newsandevents);
+    addSheet("Schools", data.school);
+    addSheet("Groups", data.groups);
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=LearnTech_SEO_Links.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Excel Export Error:", error);
+    res.status(500).send({ status: 0, message: "Error generating excel file" });
+  }
 };
 
 exports.uploadpdf = async (req, res) => {

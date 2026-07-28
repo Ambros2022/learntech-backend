@@ -520,6 +520,15 @@ module.exports = function (app) {
   app.get(
     "/api/website/home/seolink/get", homecontroller.seolink
   );
+  app.post(
+    "/api/website/home/seolink/get", homecontroller.seolink
+  );
+  app.get(
+    "/api/website/home/seolink/excel", homecontroller.seolinkExcel
+  );
+  app.post(
+    "/api/website/home/seolink/excel", homecontroller.seolinkExcel
+  );
 
   app.get(
     "/api/website/langingpage/get", homecontroller.landingpages
