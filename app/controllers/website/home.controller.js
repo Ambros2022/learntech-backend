@@ -726,18 +726,7 @@ exports.pagetdata = async (req, res) => {
   });
 };
 
-// async function doPostRequest(leadData) {
-//   console.log("doPostRequest",leadData)
-//   const captureUrl = "https://bangalorestudy.com/lead.php";
-//   await axios.post(captureUrl, {
-//     EmailAddress: leadData.EmailAddress,
-//     FirstName: leadData.FirstName,
-//     Phone: leadData.Phone,
-//     mx_State: leadData.mx_State,
-//     mx_Interested_Course: leadData.mx_Interested_Course,
-//     Notes: leadData.Notes,
-//   });
-// }
+
 
 
 async function doPostRequest(leadData) {
@@ -5013,7 +5002,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "College individual",
               H1Tag: vaule.name,
-              Link: "https://bangalorestudy.com/college/" + vaule.slug,
+              Link: "https://learntechww.com/college/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
@@ -5075,7 +5064,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "University individual",
               H1Tag: vaule.name,
-              Link: "https://bangalorestudy.com/university/" + vaule.slug,
+              Link: "https://learntechww.com/university/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
@@ -5133,7 +5122,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "Board individual",
               H1Tag: vaule.name,
-              Link: "https://bangalorestudy.com/board/" + vaule.slug,
+              Link: "https://learntechww.com/board/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
@@ -5171,10 +5160,10 @@ const getSeoLinkDataInternal = async (req) => {
 
           attributes: [
             "id",
-            "stream_name",
-            "stream_slug",
+            "name",
+            "slug",
             "meta_title",
-            "stream_description",
+            "description",
             "h1_title",
             "updated_at",
           ],
@@ -5188,10 +5177,10 @@ const getSeoLinkDataInternal = async (req) => {
             return {
               Id: vaule.id,
               Pagetitle: "Course stream individual",
-              H1Tag: vaule.h1_title,
-              Link: "https://bangalorestudy.com/courses/" + vaule.stream_slug,
+              H1Tag: vaule.h1_title || vaule.name,
+              Link: "https://learntechww.com/course/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
-              MetaDescription: vaule.stream_description,
+              MetaDescription: vaule.description || vaule.meta_description,
             };
           });
 
@@ -5248,7 +5237,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "Exam individual",
               H1Tag: vaule.exam_title,
-              Link: "https://bangalorestudy.com/exams/" + vaule.slug,
+              Link: "https://learntechww.com/exam/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
@@ -5305,7 +5294,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "Blog individual",
               H1Tag: vaule.title || vaule.name,
-              Link: "https://bangalorestudy.com/blog/" + vaule.slug,
+              Link: "https://learntechww.com/blog/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
@@ -5363,7 +5352,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "News events individual",
               H1Tag: vaule.title || vaule.name,
-              Link: "https://bangalorestudy.com/news-and-event/" + vaule.slug,
+              Link: "https://learntechww.com/news/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
@@ -5413,7 +5402,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "Group individual",
               H1Tag: vaule.title || vaule.name,
-              Link: "https://bangalorestudy.com/group/" + vaule.slug,
+              Link: "https://learntechww.com/group/" + vaule.id + "/" + vaule.slug,
             };
           });
           return finaldata;
@@ -5467,7 +5456,7 @@ const getSeoLinkDataInternal = async (req) => {
               Id: vaule.id,
               Pagetitle: "School individual",
               H1Tag: sName,
-              Link: "https://bangalorestudy.com/school/" + sSlug,
+              Link: "https://learntechww.com/school/" + vaule.id + "/" + sSlug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
