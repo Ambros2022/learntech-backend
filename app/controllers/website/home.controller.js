@@ -10,7 +10,7 @@ const pages = db.page;
 const base_url = process.env.APP_FRONT_BASE;
 const banner = db.banner;
 const stream = db.stream;
-const CollegeAndUniversity = db.collegeAndUniversity;
+const CollegeAndUniversity = db.college || db.collegeAndUniversity;
 const exams = db.exam;
 const streamfaq = db.stream_faq;
 const area = db.area;
@@ -28,7 +28,7 @@ const rankings = db.rankings;
 const university_colleges = db.university_colleges;
 const CollegeGalleries = db.collegeGalleries;
 const blog = db.blog;
-const newsandevents = db.newsandevents;
+const newsandevents = db.news_and_events || db.newsandevents;
 const exam = db.exam;
 const testimonial = db.testimonial;
 const enquiry = db.enquiry;
@@ -5281,13 +5281,14 @@ const getSeoLinkDataInternal = async (req) => {
     let data_array = [{ status: PUBLISHED }];
 
     try {
+      const titleAttr = blog.rawAttributes?.title ? "title" : "name";
       data.blogs = await blog
         .findAll({
           where: data_array,
 
           attributes: [
             "id",
-            "title",
+            titleAttr,
             "slug",
             "meta_title",
             "meta_description",
@@ -5303,7 +5304,7 @@ const getSeoLinkDataInternal = async (req) => {
             return {
               Id: vaule.id,
               Pagetitle: "Blog individual",
-              H1Tag: vaule.title,
+              H1Tag: vaule.title || vaule.name,
               Link: "https://bangalorestudy.com/blog/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
@@ -5338,13 +5339,14 @@ const getSeoLinkDataInternal = async (req) => {
     let data_array = [{ status: PUBLISHED }];
 
     try {
+      const titleAttr = newsandevents.rawAttributes?.title ? "title" : "name";
       data.newsandevents = await newsandevents
         .findAll({
           where: data_array,
 
           attributes: [
             "id",
-            "title",
+            titleAttr,
             "slug",
             "meta_title",
             "meta_description",
@@ -5360,7 +5362,7 @@ const getSeoLinkDataInternal = async (req) => {
             return {
               Id: vaule.id,
               Pagetitle: "News events individual",
-              H1Tag: vaule.title,
+              H1Tag: vaule.title || vaule.name,
               Link: "https://bangalorestudy.com/news-and-event/" + vaule.slug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
@@ -5379,7 +5381,7 @@ const getSeoLinkDataInternal = async (req) => {
     }
   }
 
-  if (data.groups) {
+  if (data.groups && groups) {
     var column = columnname ? columnname : "order";
     var order = orderby ? orderby : "ASC";
     var orderconfig = [column, order];
@@ -5394,11 +5396,12 @@ const getSeoLinkDataInternal = async (req) => {
     let data_array = [];
 
     try {
+      const titleAttr = groups.rawAttributes?.title ? "title" : "name";
       data.groups = await groups
         .findAll({
           where: data_array,
 
-          attributes: ["id", "title", "slug", "updated_at"],
+          attributes: ["id", titleAttr, "slug", "updated_at"],
           orderconfig,
           subQuery: false,
         })
@@ -5409,17 +5412,17 @@ const getSeoLinkDataInternal = async (req) => {
             return {
               Id: vaule.id,
               Pagetitle: "Group individual",
-              H1Tag: vaule.title,
+              H1Tag: vaule.title || vaule.name,
               Link: "https://bangalorestudy.com/group/" + vaule.slug,
             };
           });
           return finaldata;
         })
         .catch((err) => {
-          //  data.errors.topcollege = "No top college found";
+          data.groups = [];
         });
     } catch {
-      //data.errors.topcollege = "No top college found";
+      data.groups = [];
     }
   }
 
@@ -5438,14 +5441,16 @@ const getSeoLinkDataInternal = async (req) => {
     let data_array = [];
 
     try {
+      const nameAttr = school.rawAttributes?.school_name ? "school_name" : "name";
+      const slugAttr = school.rawAttributes?.school_slug ? "school_slug" : "slug";
       data.school = await school
         .findAll({
           where: data_array,
 
           attributes: [
             "id",
-            "school_name",
-            "school_slug",
+            nameAttr,
+            slugAttr,
             "meta_title",
             "meta_description",
           ],
@@ -5456,11 +5461,13 @@ const getSeoLinkDataInternal = async (req) => {
         .then(async (data) => {
           let data1 = data;
           let finaldata = await data1.map((vaule) => {
+            const sName = vaule.school_name || vaule.name;
+            const sSlug = vaule.school_slug || vaule.slug;
             return {
               Id: vaule.id,
               Pagetitle: "School individual",
-              H1Tag: vaule.school_name,
-              Link: "https://bangalorestudy.com/school/" + vaule.school_slug,
+              H1Tag: sName,
+              Link: "https://bangalorestudy.com/school/" + sSlug,
               MetaTitle: vaule.meta_title,
               MetaDescription: vaule.meta_description,
             };
