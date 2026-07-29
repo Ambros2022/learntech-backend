@@ -5165,6 +5165,7 @@ const getSeoLinkDataInternal = async (req) => {
             "name",
             "slug",
             "meta_title",
+            "meta_description",
             "description",
             "h1_title",
             "updated_at",
@@ -5182,7 +5183,7 @@ const getSeoLinkDataInternal = async (req) => {
               H1Tag: vaule.h1_title || vaule.name,
               Link: "https://learntechww.com/course/" + vaule.id + "/" + vaule.slug,
               MetaTitle: vaule.meta_title,
-              MetaDescription: vaule.description || vaule.meta_description,
+              MetaDescription: vaule.meta_description || vaule.description,
             };
           });
 
