@@ -219,7 +219,7 @@ CREATE TABLE general_courses (
   duration VARCHAR(300) DEFAULT NULL,
   meta_title VARCHAR(150) DEFAULT NULL,
   meta_description VARCHAR(200) DEFAULT NULL,
-  meta_keywords VARCHAR(200) DEFAULT NULL,
+  meta_keywords TEXT DEFAULT NULL,
   description LONGTEXT DEFAULT NULL,
   syllabus LONGTEXT DEFAULT NULL,
   admissions LONGTEXT DEFAULT NULL,
@@ -334,7 +334,7 @@ CREATE TABLE courses (
   slug VARCHAR(150) NOT NULL,
   meta_title VARCHAR(150) DEFAULT NULL,
   meta_description VARCHAR(200) DEFAULT NULL,
-  meta_keywords VARCHAR(200) DEFAULT NULL,
+  meta_keywords TEXT DEFAULT NULL,
   course_details LONGTEXT DEFAULT NULL,
   eligibility LONGTEXT DEFAULT NULL,
   fee_structure LONGTEXT DEFAULT NULL,
@@ -405,7 +405,7 @@ CREATE TABLE exams (
   cover_image VARCHAR(150),
   meta_title VARCHAR(150),
   meta_description VARCHAR(200),
-  meta_keywords VARCHAR(200),
+  meta_keywords TEXT,
   overview LONGTEXT,
   exam_dates LONGTEXT,
   eligibility_criteria LONGTEXT,
@@ -491,7 +491,7 @@ CREATE TABLE news_and_events (
   pdf_file VARCHAR(150) DEFAULT NULL,
   meta_title VARCHAR(150) DEFAULT NULL,
   meta_description VARCHAR(200) DEFAULT NULL,
-  meta_keywords VARCHAR(200) DEFAULT NULL,
+  meta_keywords TEXT DEFAULT NULL,
   overview LONGTEXT DEFAULT NULL,
   status ENUM('Draft', 'Published') DEFAULT 'Published',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -508,7 +508,7 @@ CREATE TABLE blogs (
   banner_image VARCHAR(150) DEFAULT NULL,
   meta_title VARCHAR(150) DEFAULT NULL,
   meta_description VARCHAR(200) DEFAULT NULL,
-  meta_keywords VARCHAR(200) DEFAULT NULL,
+  meta_keywords TEXT DEFAULT NULL,
   overview LONGTEXT DEFAULT NULL,
   status ENUM('Draft', 'Published') DEFAULT 'Published',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -545,7 +545,7 @@ CREATE TABLE scholarships (
   logo VARCHAR(150) DEFAULT NULL,
   meta_title VARCHAR(150) DEFAULT NULL,
   meta_description VARCHAR(200) DEFAULT NULL,
-  meta_keywords VARCHAR(200) DEFAULT NULL,
+  meta_keywords TEXT DEFAULT NULL,
   overview LONGTEXT DEFAULT NULL,
   status ENUM('Draft', 'Published') DEFAULT 'Published',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -901,6 +901,13 @@ CREATE TABLE blog_faqs (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (blog_id) REFERENCES blogs(id) ON DELETE CASCADE
 );
+
+ALTER TABLE blogs MODIFY COLUMN meta_keywords TEXT DEFAULT NULL;
+ALTER TABLE scholarships MODIFY COLUMN meta_keywords TEXT DEFAULT NULL;
+ALTER TABLE news_and_events MODIFY COLUMN meta_keywords TEXT DEFAULT NULL;
+ALTER TABLE general_courses MODIFY COLUMN meta_keywords TEXT DEFAULT NULL;
+ALTER TABLE exams MODIFY COLUMN meta_keywords TEXT DEFAULT NULL;
+ALTER TABLE courses MODIFY COLUMN meta_keywords TEXT DEFAULT NULL;
 
 
 

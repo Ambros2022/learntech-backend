@@ -25,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING
     },
     meta_keywords: {
-      type: Sequelize.STRING
+      type: Sequelize.TEXT
     },
     overview: {
       type: Sequelize.STRING
