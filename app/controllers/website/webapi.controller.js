@@ -2306,7 +2306,7 @@ exports.newsfindone = (req, res) => {
   const id = req.params.id;
   news_and_events
     .findByPk(id, {
-      attributes: ['id','name', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview', 'pdf_name'],
+      attributes: ['id','name', 'slug', 'banner_image', 'meta_title', 'pdf_file', 'meta_description', 'overview', 'pdf_name'],
       include: [
         {
           required: false,
@@ -2553,6 +2553,7 @@ exports.schoolboardfindone = (req, res) => {
     attributes: [
       "id",
       "name",
+      "slug",
       "board_type",
       "logo",
       "established",
